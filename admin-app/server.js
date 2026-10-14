@@ -6,6 +6,7 @@ import { fileURLToPath } from "node:url";
 import QRCode from "qrcode";
 import { db, audit } from "./lib/db.js";
 import * as correo from "./lib/correo.js";
+import * as copias from "./lib/copias.js";
 import {
   verifyPassword, hashPassword, DUMMY_HASH, passwordProblems,
   newTotpSecret, verifyTotp, totpUri, newToken, sha256,
@@ -320,6 +321,16 @@ app.get("/admin/api/correo/mensajes/:uid/adjuntos/:i", wrap(async (req, res) => 
   res.set({ "Content-Type": "application/octet-stream", "Content-Disposition": `attachment; filename*=UTF-8''${encodeURIComponent(a.nombre)}` });
   res.send(a.contenido);
 }));
+
+/* ===== Servidores: webs y copias automáticas ===== */
+app.get("/admin/api/servidores", async (req, res) => res.json(await copias.estado()));
+app.post("/admin/api/servidores/copias", async (req, res) => {
+  const { servidor, web, activa } = req.body || {};
+  try { await copias.cambiar(String(servidor || ""), String(web || ""), !!activa); }
+  catch (e) { return res.status(400).json({ error: "No se pudo cambiar: " + e.message }); }
+  audit(activa ? "backup_enabled" : "backup_disabled", { user: req.session.user, ip: req.ip, detail: `${servidor}/${web}` });
+  res.json({ ok: true });
+});
 
 /* ===== Páginas privadas ===== */
 const PAGES = { "": "index.html", presupuestos: "presupuestos.html", facturas: "facturas.html", correo: "correo.html", mensajes: "mensajes.html", seguridad: "seguridad.html", servidores: "servidores.html" };

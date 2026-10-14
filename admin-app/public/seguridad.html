@@ -87,7 +87,7 @@ const esc = s => String(s ?? "").replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "
 const when = t => new Date(t).toLocaleString("es-ES", { day: "2-digit", month: "2-digit", year: "numeric", hour: "2-digit", minute: "2-digit" });
 const device = ua => /iPhone|iPad/.test(ua) ? "iPhone / iPad" : /Android/.test(ua) ? "Android" : /Mac OS/.test(ua) ? "Mac" : /Windows/.test(ua) ? "Windows" : "Otro";
 const browser = ua => /Edg\//.test(ua) ? "Edge" : /Chrome\//.test(ua) ? "Chrome" : /Firefox\//.test(ua) ? "Firefox" : /Safari\//.test(ua) ? "Safari" : "";
-const EV = { login_ok: "Inicio de sesión", login_fail: "Intento fallido", account_locked: "Cuenta bloqueada", logout: "Cierre de sesión", "2fa_enabled": "2FA activada", password_changed: "Contraseña cambiada", doc_created: "Documento creado", doc_deleted: "Documento eliminado", session_revoked: "Sesión revocada", user_created: "Usuario creado", "2fa_reset": "2FA reiniciada", "2fa_disabled": "2FA desactivada", mail_connected: "Buzón conectado", mail_disconnected: "Buzón desconectado" };
+const EV = { login_ok: "Inicio de sesión", login_fail: "Intento fallido", account_locked: "Cuenta bloqueada", logout: "Cierre de sesión", "2fa_enabled": "2FA activada", password_changed: "Contraseña cambiada", doc_created: "Documento creado", doc_deleted: "Documento eliminado", session_revoked: "Sesión revocada", user_created: "Usuario creado", "2fa_reset": "2FA reiniciada", "2fa_disabled": "2FA desactivada", mail_connected: "Buzón conectado", mail_disconnected: "Buzón desconectado", backup_enabled: "Copia activada", backup_disabled: "Copia desactivada" };
 
 async function load() {
   const d = await api("security");

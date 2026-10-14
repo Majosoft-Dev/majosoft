@@ -31,6 +31,19 @@
     .tag { display: inline-block; padding: 2px 8px; border-radius: 999px; font-size: 11px; font-weight: 700; background: var(--lime); }
     .tag.warn { background: #fde2c4; }
     .scroll { overflow-x: auto; }
+    .srv + .srv { margin-top: 22px; }
+    .srv-head { margin-bottom: 6px; font-size: 13.5px; }
+    .muted { color: var(--muted); }
+    .ok { color: var(--ok); font-weight: 700; } .bad { color: var(--bad); font-weight: 700; }
+    td a { color: var(--ink); font-weight: 600; }
+    .sw { position: relative; display: inline-block; width: 40px; height: 22px; cursor: pointer; }
+    .sw input { opacity: 0; width: 0; height: 0; }
+    .sw span { position: absolute; inset: 0; background: var(--line); border-radius: 999px; transition: background .15s; }
+    .sw span::before { content: ""; position: absolute; width: 16px; height: 16px; left: 3px; top: 3px; background: #fff; border-radius: 50%; transition: transform .15s; }
+    .sw input:checked + span { background: var(--ok); }
+    .sw input:checked + span::before { transform: translateX(18px); }
+    .sw input:disabled + span { opacity: .5; cursor: wait; }
+    .sw input:focus-visible + span { outline: 3px solid rgba(214,224,34,.5); }
     @media (max-width: 900px) { .grid { grid-template-columns: 1fr; } main { padding: 24px 16px 40px; } }
   </style>
 </head>
@@ -40,29 +53,9 @@
     <div class="grid">
 
       <div class="card wide">
-        <h2>Servidores</h2><p class="sub">VPS de IONOS (Ubuntu 24.04). Se entra con <code>ssh &lt;alias&gt;</code> desde el Mac.</p>
-        <div class="scroll"><table>
-          <thead><tr><th>Servidor</th><th>IP</th><th>Alias SSH</th><th>Uso</th></tr></thead>
-          <tbody>
-            <tr><td><b>apartamentos</b></td><td>31.70.154.16</td><td><code>apartamentos</code></td><td>Webs de Majosoft y clientes (todo lo que no es de bomberos)</td></tr>
-            <tr><td><b>academia-guiadelbombero</b></td><td>217.154.107.19</td><td><code>majosoft</code></td><td>Guía del Bombero: academia y WordPress (migración a medias)</td></tr>
-            <tr><td><b>academia-objetivo</b></td><td>31.70.141.235</td><td><code>objetivo</code></td><td>Objetivo Baeza (guardias civiles): academia (academia.objetivobaeza.com) y WordPress</td></tr>
-          </tbody>
-        </table></div>
-      </div>
-
-      <div class="card wide">
-        <h2>Webs en «apartamentos»</h2><p class="sub">nginx delante de todo. Certificados Let's Encrypt con renovación automática (<code>certbot.timer</code>).</p>
-        <div class="scroll"><table>
-          <thead><tr><th>Web</th><th>Carpeta</th><th>Cómo corre</th><th>Base de datos</th><th>Despliegue</th></tr></thead>
-          <tbody>
-            <tr><td>apartamentos.majosoft.es <span class="tag">web-playa</span></td><td><code>/var/www/duna-carraca</code></td><td>systemd <code>duna-carraca</code> (Astro, :4321)</td><td>PostgreSQL <code>duna_carraca</code></td><td>compila y publica</td></tr>
-            <tr><td>majosoft.es + /admin</td><td><code>/var/www/devmajosoft/Majosoft</code></td><td>estática + PM2 <code>majosoft-admin</code> (:3060)</td><td>SQLite del panel</td><td>publica el commit subido</td></tr>
-            <tr><td>fichaje.majosoft.es</td><td><code>/var/www/fichaje-majosoft-app</code></td><td>PM2 <code>fichaje-majosoft</code> (:3050)</td><td>SQLite</td><td>pasa las pruebas y publica</td></tr>
-            <tr><td>bambinasigns.es</td><td><code>/var/www/bambinasigns.es/htdocs</code></td><td>estática (Astro) + API PHP 8.5</td><td>MariaDB <code>bambinasigns</code></td><td>compila y publica</td></tr>
-            <tr><td>mariasanchezfdez.es</td><td><code>/var/www/mariasanchezfdez.es</code></td><td>estática</td><td>—</td><td>publica el commit subido</td></tr>
-          </tbody>
-        </table></div>
+        <h2>Webs y copias automáticas</h2>
+        <p class="sub">Estado en directo de cada servidor. La copia diaria se hace a las 05:00 (hora de España) en cada servidor: 35 diarias y 12 mensuales en <code>/var/backups/copias-web/&lt;web&gt;/</code>. Desactivar una copia no borra las ya hechas.</p>
+        <div id="servidores"><p class="sub">Consultando los servidores…</p></div>
       </div>
 
       <div class="card wide">
@@ -76,21 +69,18 @@
       </div>
 
       <div class="card">
-        <h2>Copias de seguridad</h2><p class="sub">Cron de root en «apartamentos». Diarias: 35 · mensuales: 12 (fichaje: 60).</p>
-        <div class="scroll"><table>
-          <thead><tr><th>Qué</th><th>Hora</th><th>Dónde</th></tr></thead>
-          <tbody>
-            <tr><td>Fichaje (SQLite)</td><td>04:30 (España)</td><td><code>/var/backups/fichaje</code></td></tr>
-            <tr><td>web-playa (PostgreSQL)</td><td>05:00 (España)</td><td><code>/var/backups/webs</code></td></tr>
-            <tr><td>bambinasigns (BD + htdocs)</td><td>05:00 (España)</td><td><code>/var/backups/webs</code></td></tr>
-            <tr><td>Academia (servidor majosoft)</td><td>diaria</td><td>ver docs del repo Dev-Majosoft</td></tr>
-          </tbody>
-        </table></div>
-        <p><span class="tag warn">Pendiente</span> Las copias están en el mismo servidor; falta sacarlas fuera.</p>
+        <h2>Copias: cómo funcionan</h2><p class="sub">Script <code>copias-web</code>, igual en los tres servidores.</p>
+        <ul>
+          <li>Cada web es un fichero en <code>/etc/copias-web/webs/&lt;web&gt;.conf</code> (nombre, URL, GitHub, base de datos y carpeta).</li>
+          <li>Activa si existe <code>/etc/copias-web/activas/&lt;web&gt;</code>; el interruptor de arriba lo crea o lo borra.</li>
+          <li>Fichaje usa su propio script (guarda 5 años, por el registro de jornada) en <code>/var/backups/fichaje</code>.</li>
+          <li>El panel entra en los otros servidores con una clave que solo puede consultar, activar o desactivar.</li>
+        </ul>
+        <p><span class="tag warn">Pendiente</span> Las copias están en el mismo servidor que la web; falta sacarlas fuera.</p>
         <h3>Ver el registro</h3>
-        <pre><code>ssh apartamentos 'tail -20 /var/log/webs-copias.log'</code></pre>
+        <pre><code>ssh &lt;servidor&gt; 'tail -20 /var/log/copias-web.log'</code></pre>
         <h3>Lanzar una copia a mano</h3>
-        <pre><code>ssh apartamentos /usr/local/bin/webs-copia-diaria</code></pre>
+        <pre><code>ssh &lt;servidor&gt; copias-web ejecutar &lt;web&gt;</code></pre>
       </div>
 
       <div class="card wide">
@@ -98,9 +88,9 @@
         <div class="scroll"><table>
           <thead><tr><th>Fecha</th><th>Servidor</th><th>Ficheros</th><th>PostgreSQL</th><th>MariaDB</th></tr></thead>
           <tbody>
-            <tr><td>14-oct-2026</td><td>majosoft (academia-guiadelbombero)</td><td>1,2 GB</td><td>38 MB · <code>guiadelbombero</code></td><td>10 MB · <code>guiadelbombero_wp</code>, <code>objetivobaeza_wp</code></td></tr>
+            <tr><td>14-oct-2026</td><td>guiadelbombero (academia-guiadelbombero)</td><td>1,2 GB</td><td>38 MB · <code>guiadelbombero</code></td><td>10 MB · <code>guiadelbombero_wp</code>, <code>objetivobaeza_wp</code></td></tr>
             <tr><td>14-oct-2026</td><td>apartamentos</td><td>281 MB</td><td>12 KB · <code>duna_carraca</code></td><td>519 KB · <code>bambinasigns</code></td></tr>
-            <tr><td>14-oct-2026</td><td>objetivo (academia-objetivo)</td><td>228 MB</td><td>1,1 MB · <code>academia</code></td><td>— (el WordPress llegó después: está en la copia de «majosoft»)</td></tr>
+            <tr><td>14-oct-2026</td><td>objetivo (academia-objetivo)</td><td>228 MB</td><td>1,1 MB · <code>academia</code></td><td>— (el WordPress llegó después: está en la copia de «guiadelbombero»)</td></tr>
           </tbody>
         </table></div>
         <p>Cada copia lleva <code>ficheros.tar.gz</code> (<code>/var/www</code> sin <code>node_modules</code>, <code>/etc</code>, <code>/root</code>, <code>/usr/local/bin</code>, crontabs y, en «apartamentos», también <code>/home</code> y <code>/var/backups</code>), <code>postgres-todo.sql.gz</code> (<code>pg_dumpall</code>) y <code>mariadb-todo.sql.gz</code> (todas las bases de datos).</p>
@@ -112,11 +102,11 @@
         <h3>web-playa</h3>
         <pre><code>systemctl stop duna-carraca
 runuser -u postgres -- pg_restore --clean -d duna_carraca \
-  /var/backups/webs/diarias/duna-carraca-AAAA-MM-DD.dump
+  /var/backups/copias-web/duna-carraca/diarias/duna-carraca-bd-AAAA-MM-DD.dump
 systemctl start duna-carraca</code></pre>
         <h3>bambinasigns</h3>
-        <pre><code>zcat /var/backups/webs/diarias/bambinasigns-bd-AAAA-MM-DD.sql.gz | mariadb bambinasigns
-tar -xzf /var/backups/webs/diarias/bambinasigns-ficheros-AAAA-MM-DD.tar.gz -C /var/www/bambinasigns.es</code></pre>
+        <pre><code>zcat /var/backups/copias-web/bambinasigns/diarias/bambinasigns-bd-AAAA-MM-DD.sql.gz | mariadb bambinasigns
+tar -xzf /var/backups/copias-web/bambinasigns/diarias/bambinasigns-ficheros-AAAA-MM-DD.tar.gz -C /var/www/bambinasigns.es</code></pre>
       </div>
 
       <div class="card">
@@ -138,7 +128,7 @@ certbot certificates                 # caducidad de certificados</code></pre>
           <li>Apuntar el DNS (registro A) a <b>31.70.154.16</b>.</li>
           <li><code>certbot --nginx -d &lt;dominio&gt;</code>.</li>
           <li>Copiar el workflow de despliegue de otra web (<code>.github/workflows/</code>) para que publique con cada push a <code>main</code>.</li>
-          <li>Si tiene base de datos, añadirla a <code>/usr/local/bin/webs-copia-diaria</code>.</li>
+          <li>Crear su <code>/etc/copias-web/webs/&lt;web&gt;.conf</code> (copiar el de otra web) y activarla desde esta página.</li>
           <li>Apuntarla en esta página.</li>
         </ol>
       </div>
@@ -146,18 +136,67 @@ certbot certificates                 # caducidad de certificados</code></pre>
       <div class="card wide">
         <h2>Historial</h2>
         <ul>
-          <li><b>14-oct-2026</b> — WordPress de Objetivo Baeza trasladado del servidor «majosoft» a «objetivo» (<code>/var/www/objetivobaeza</code>, BD MariaDB <code>objetivobaeza_wp</code>, nginx en :8081, cerrado al exterior por el firewall de IONOS). La web pública <code>objetivobaeza.com</code> sigue en el hosting anterior.</li>
+          <li><b>14-oct-2026</b> — WordPress de Objetivo Baeza trasladado del servidor «guiadelbombero» a «objetivo» (<code>/var/www/objetivobaeza</code>, BD MariaDB <code>objetivobaeza_wp</code>, nginx en :8081, cerrado al exterior por el firewall de IONOS). La web pública <code>objetivobaeza.com</code> sigue en el hosting anterior.</li>
           <li><b>14-oct-2026</b> — Copia completa de los tres servidores guardada en el Mac.</li>
           <li><b>14-oct-2026</b> — Publicación automática con cada push a <code>main</code> en las cinco webs de «apartamentos».</li>
-          <li><b>14-oct-2026</b> — Limpieza de «majosoft»: borradas las copias antiguas de Bambina, Majosoft, Fichaje y María Sánchez (carpetas, nginx, certificados y BD <code>bambinasigns</code>). Archivo de lo borrado en «apartamentos»: <code>/var/backups/restos-majosoft/restos-majosoft-2026-10-14.tar.gz</code>. Copias diarias de web-playa y bambinasigns en marcha.</li>
+          <li><b>14-oct-2026</b> — Limpieza de «guiadelbombero»: borradas las copias antiguas de Bambina, Majosoft, Fichaje y María Sánchez (carpetas, nginx, certificados y BD <code>bambinasigns</code>). Archivo de lo borrado en «apartamentos»: <code>/var/backups/restos-majosoft/restos-majosoft-2026-10-14.tar.gz</code>. Copias diarias de web-playa y bambinasigns en marcha.</li>
         </ul>
       </div>
 
     </div>
   </main>
 <script type="module">
-import { mountShell } from "/admin/panel.js";
+import { mountShell, api, toast } from "/admin/panel.js";
 await mountShell("servidores");
+const esc = v => String(v ?? "").replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+const when = t => t ? new Date(t).toLocaleString("es-ES", { day: "2-digit", month: "2-digit", hour: "2-digit", minute: "2-digit" }) : "—";
+const BD = { postgres: "PostgreSQL", mariadb: "MariaDB", sqlite: "SQLite", ninguna: "—" };
+const caja = document.getElementById("servidores");
+
+function ultima(w) {
+  if (!w.ultima) return '<span class="muted">Sin copias</span>';
+  const mal = w.resultado === "error";
+  return `<span class="${mal ? "bad" : "ok"}">${mal ? "Falló" : "Correcta"}</span> · ${when(w.ultima)}<br><small class="muted">${w.copias} copias · ${esc(w.total)}</small>`;
+}
+
+function pintar(servidores) {
+  caja.innerHTML = servidores.map(s => `
+    <div class="srv">
+      <div class="srv-head"><b>${esc(s.nombre)}</b> <code>${esc(s.ip)}</code> <span class="muted">· ${esc(s.uso)}</span></div>
+      ${s.error ? `<p class="bad">${esc(s.error)}</p>` : `
+      <div class="scroll"><table>
+        <thead><tr><th>Web</th><th>GitHub</th><th>Qué se copia</th><th>Última copia</th><th>Copia diaria</th></tr></thead>
+        <tbody>${s.webs.map(w => `
+          <tr>
+            <td><b>${esc(w.nombre)}</b><br>${w.url ? `<a href="${esc(w.url)}" target="_blank" rel="noopener">${esc(w.url.replace("https://", ""))} ↗</a>` : '<small class="muted">sin dominio</small>'}</td>
+            <td>${w.github ? `<a href="${esc(w.github)}" target="_blank" rel="noopener">${esc(w.github.split("/").pop())} ↗</a>` : '<span class="muted">—</span>'}</td>
+            <td>${w.bd !== "ninguna" ? BD[w.bd] || esc(w.bd) : ""}${w.bd !== "ninguna" && w.carpeta ? " + " : ""}${w.carpeta ? "ficheros" : ""}${w.bd === "ninguna" && !w.carpeta ? "script propio" : ""}</td>
+            <td>${ultima(w)}</td>
+            <td><label class="sw"><input type="checkbox" data-srv="${esc(s.id)}" data-web="${esc(w.web)}" ${w.activa ? "checked" : ""}><span></span></label></td>
+          </tr>`).join("")}
+        </tbody>
+      </table></div>`}
+    </div>`).join("");
+}
+
+// Un solo listener para todos los interruptores (la tabla se repinta entera)
+caja.addEventListener("change", async e => {
+  const el = e.target.closest("input[data-web]");
+  if (!el) return;
+  el.disabled = true;
+  try {
+    await api("servidores/copias", { method: "POST", body: { servidor: el.dataset.srv, web: el.dataset.web, activa: el.checked } });
+    toast(el.checked ? "Copia diaria activada" : "Copia diaria desactivada");
+  } catch (err) {
+    el.checked = !el.checked;
+    toast(err.message, true);
+  } finally {
+    el.disabled = false;
+  }
+});
+
+try { pintar(await api("servidores")); }
+catch (err) { caja.innerHTML = `<p class="bad">${esc(err.message)}</p>`; }
 </script>
 </body>
 </html>
