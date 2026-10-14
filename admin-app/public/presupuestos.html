@@ -103,7 +103,7 @@
     .why { display: grid; grid-template-columns: 1fr 1fr; gap: 3mm; margin-top: 4mm; }
     .why div { background: var(--cream); border-radius: 3mm; padding: 3.5mm 4mm; break-inside: avoid; }
     .why b { display: block; font-size: 10pt; margin-bottom: 1mm; }
-    .why span { color: var(--ink2); font-size: 9pt; }
+    .why div > span { color: var(--ink2); font-size: 9pt; }
 
     .mod { display: grid; grid-template-columns: 16mm 1fr; gap: 4mm; border: 1px solid var(--line); border-radius: 4mm; padding: 5mm; margin-bottom: 4mm; break-inside: avoid; }
     .mod--cont .mod-n::after { display: none; }
@@ -131,12 +131,22 @@
     .cuota small { font-weight: 800; letter-spacing: .12em; text-transform: uppercase; font-size: 7.5pt; color: var(--lime); }
     .cuota p { margin: 2mm 0 0; color: #c9c9bd; }
     .cuota .price { font-size: 28pt; font-weight: 900; letter-spacing: -.04em; line-height: 1; text-align: right; color: var(--lime); white-space: nowrap; }
-    .cuota .price span { display: block; font-size: 8pt; font-weight: 600; letter-spacing: 0; color: #c9c9bd; margin-top: 2mm; }
+    .cuota .price .pn { display: block; font-size: 8pt; font-weight: 600; letter-spacing: 0; color: #c9c9bd; margin-top: 2mm; }
+    .ed { border-radius: 1mm; outline: 1px dashed transparent; outline-offset: 1px; transition: outline-color .15s, background .15s; cursor: text; }
+    .ed:hover { outline-color: #c9c8bc; }
+    .ed:focus { outline: 1.5px solid var(--lime2); background: rgba(214,224,34,.12); }
+    .ed[data-multi] { white-space: pre-line; }
+    .ed:empty::before { content: attr(data-ph); color: #b9b8ad; }
+    .cover .ed:hover { outline-color: #55564f; }
+    li.ed { display: list-item; }
+    @media print { .solo-pantalla { display: none !important; } }
+    /* Al imprimir no se ve el resaltado de edición (sin tocar fondos propios como el de la etiqueta de portada) */
+    @media print { .ed, .ed:hover, .ed:focus { outline: none !important; } .ed:focus:not(.kicker) { background: none !important; } .ed:empty::before { content: ""; } .ed:empty { display: none; } }
     .callout { background: var(--cream); border-left: 4px solid var(--lime); border-radius: 0 3mm 3mm 0; padding: 4mm 5mm; margin: 3mm 0; break-inside: avoid; }
     .bono { display: grid; grid-template-columns: 1fr auto; gap: 6mm; align-items: center; background: var(--lime); border-radius: 4mm; padding: 6mm; margin-top: 4mm; break-inside: avoid; }
     .bono small { font-weight: 800; letter-spacing: .12em; text-transform: uppercase; font-size: 7.5pt; }
     .bono .price { font-size: 26pt; font-weight: 900; letter-spacing: -.04em; line-height: 1; text-align: right; }
-    .bono .price span { display: block; font-size: 8pt; font-weight: 600; letter-spacing: 0; }
+    .bono .price .pn { display: block; font-size: 8pt; font-weight: 600; letter-spacing: 0; }
 
     .plans { display: grid; grid-template-columns: 1fr 1fr; gap: 4mm; margin: 4mm 0; break-inside: avoid; }
     .plan { border: 1px solid var(--line); border-radius: 4mm; padding: 5mm; }
@@ -277,6 +287,7 @@ const VACIO = {
 let D = null;
 const migrar = d => {
   d.cuota ??= { activo: false, precio: "", nota: "", etiqueta: "", detalle: "", texto: "" };
+  d.textos ??= {};
   if (d.totalConIva == null) { d.auto = true; d.totalConIva = Number(d.totalRedondeado) || Math.round(d.modulos.reduce((s, m) => s + Number(m.precio || 0), 0) * (1 + d.iva / 100)); }
   delete d.totalRedondeado; return d;
 };
@@ -312,82 +323,109 @@ function calc() {
   return { subtotal, horas, iva: Math.round((total - subtotal) * 100) / 100, total };
 }
 
+/* ===== Edición directa sobre el documento =====
+   Todos los textos llevan data-p con la ruta del dato. Los textos fijos de antes
+   (títulos de sección, etiquetas, pie) se guardan en D.textos con su valor por defecto. */
+const TEXTOS = {
+  lblCliente: "Cliente", lblInversion: "Inversión", lblLanzamiento: "Lanzamiento objetivo",
+  objetivoTitulo: "Objetivo del proyecto", resumenTitulo: "Resumen económico", pagoTitulo: "Condiciones de pago",
+  colModulo: "Módulo", colHoras: "Horas", colPrecio: "Precio", subtotal: "Subtotal (sin IVA)", ivaLabel: "IVA", totalLabel: "Total (IVA incluido)",
+  incluido: "Incluido", ivaIncluido: "IVA incluido", ivaIncl: "IVA incl.", horas: "horas", hastaEl: "hasta el",
+  incluyeTitulo: "Qué incluye", noIncluyeTitulo: "Qué no incluye", requisitosTitulo: "Requisitos por parte del cliente",
+  pie: "Majosoft · Estudio de desarrollo de software en Jaén · Presupuesto válido 30 días desde su emisión"
+};
+// Texto editable: ruta, marcador si está vacío, valor por defecto, varias líneas
+const E = (path, ph = "", { def = "", multi = false, tag = "span", cls = "" } = {}) =>
+  `<${tag} class="ed${cls ? " " + cls : ""}" contenteditable="plaintext-only" spellcheck="false" data-p="${path}" data-ph="${esc(ph)}"${multi ? ' data-multi="1"' : ""}>${esc(get(path) || def)}</${tag}>`;
+const T = key => E("textos." + key, TEXTOS[key], { def: TEXTOS[key] });
+// Párrafos editables (separados por línea en blanco); vacío: un párrafo con marcador
+const P = (path, ph = "Escribe aquí…") => {
+  const ps = String(get(path) || "").split(/\n\s*\n/).filter(x => x.trim());
+  return (ps.length ? ps : [""]).map((x, i) => `<p class="ed" contenteditable="plaintext-only" spellcheck="false" data-p="${path}" data-para="${i}" data-multi="1" data-ph="${esc(ph)}">${esc(x)}</p>`).join("");
+};
+// Listas editables: cada punto tiene su ruta (lista.0, lista.1…)
+const L = (path, cls = "b") => { const arr = get(path) || []; return arr.length ? `<ul class="${cls}">${arr.map((_, j) => E(`${path}.${j}`, "Punto", { tag: "li" })).join("")}</ul>` : ""; };
+
 function render() {
   const c = calc();
   const n = i => String(i + 1).padStart(2, "0");
-  const precioMod = m => Number(m.precio) ? `<b>${eur(m.precio)}</b><small>${m.horas ? m.horas + " horas" : ""}</small>` : `<b>Incluido</b>`;
-  const porque = D.porque.map(t => { const [a, ...b] = t.split(":"); return b.length ? `<div><b>${esc(a)}</b><span>${esc(b.join(":").trim())}</span></div>` : `<div><span>${esc(t)}</span></div>`; }).join("");
+  const precioMod = m => Number(m.precio) ? `<b>${eur(m.precio)}</b><small>${m.horas ? m.horas + " " + T("horas") : ""}</small>` : `<b>${T("incluido")}</b>`;
+  // Ventajas «Título: explicación»: las dos partes se editan por separado
+  const porque = D.porque.map((t, i) => { const [a, ...b] = t.split(":"); const pth = `porque.${i}`;
+    const part = (k, v, ph) => `<span class="ed" contenteditable="plaintext-only" spellcheck="false" data-p="${pth}" data-part="${k}" data-ph="${ph}">${esc(v)}</span>`;
+    return b.length ? `<div><b>${part("a", a.trim(), "Título")}</b>${part("b", b.join(":").trim(), "Explicación")}</div>` : `<div>${part("a", t, "Ventaja")}</div>`; }).join("");
+  const mantTitulo = D.mant.titulo || "Mantenimiento";
 
   document.getElementById("doc").innerHTML = `
   <section class="cover">
-    <div class="cover-top"><img src="/assets/logo.svg" alt="Majosoft" /><span>${esc(D.referencia)}${D.referencia && D.fecha ? " · " : ""}${fecha(D.fecha)}</span></div>
-    <span class="kicker">${esc(D.kicker)}</span>
-    <h1>${esc(D.titulo)}</h1>
-    ${D.subtitulo ? `<p class="sub">${esc(D.subtitulo)}</p>` : ""}
-    ${D.tagline ? `<p class="tag">${esc(D.tagline)}</p>` : ""}
+    <div class="cover-top"><img src="/assets/logo.svg" alt="Majosoft" /><span>${E("referencia", "Referencia")}${D.fecha ? " · " + fecha(D.fecha) : ""}</span></div>
+    ${E("kicker", "Etiqueta", { cls: "kicker" })}
+    <h1>${E("titulo", "Título del proyecto")}</h1>
+    <p class="sub${D.subtitulo ? "" : " solo-pantalla"}">${E("subtitulo", "Subtítulo")}</p>
+    <p class="tag${D.tagline ? "" : " solo-pantalla"}">${E("tagline", "Frase destacada")}</p>
     <div class="cover-meta">
-      <div><small>Cliente</small><b>${esc(D.cliente) || "—"}</b></div>
-      <div><small>Inversión</small><b>${D.cuota?.activo ? `${esc(D.cuota.precio)} ${esc(D.cuota.nota || "")}` : `${eur(c.total)} IVA incl.`}</b></div>
-      <div><small>Lanzamiento objetivo</small><b>${esc(D.lanzamiento) || "—"}</b></div>
+      <div><small>${T("lblCliente")}</small><b>${E("cliente", "Cliente")}</b></div>
+      <div><small>${T("lblInversion")}</small><b>${D.cuota?.activo ? `${E("cuota.precio", "75 €/mes")} ${E("cuota.nota", "IVA incluido")}` : `${eur(c.total)} ${T("ivaIncl")}`}</b></div>
+      <div><small>${T("lblLanzamiento")}</small><b>${E("lanzamiento", "Fecha prevista")}</b></div>
     </div>
   </section>
   <div class="body">
-    ${D.objetivo ? `<h2 class="h2">Objetivo del proyecto</h2>${paras(D.objetivo)}` : ""}
-    ${D.porque.length ? `<h2 class="h2">${esc(D.porqueTitulo || "¿Por qué este enfoque?")}</h2>${paras(D.porqueIntro)}<div class="why">${porque}</div>` : ""}
+    <h2 class="h2${D.objetivo ? "" : " solo-pantalla"}">${T("objetivoTitulo")}</h2>${P("objetivo", "Describe el objetivo del proyecto…")}
+    ${D.porque.length ? `<h2 class="h2">${E("porqueTitulo", "Título", { def: "¿Por qué este enfoque?" })}</h2>${P("porqueIntro", "Introducción (opcional)")}<div class="why">${porque}</div>` : ""}
 
-    <h2 class="h2">${esc(D.modulosTitulo || "Módulos del proyecto")}</h2>
+    <h2 class="h2">${E("modulosTitulo", "Título", { def: "Módulos del proyecto" })}</h2>
     ${D.modulos.map((m, i) => `
       <div class="mod">
         <div class="mod-n">${n(i)}</div>
         <div>
-          <div class="mod-head"><h3>${esc(m.titulo)}${m.nuevo ? '<span class="badge">Nuevo</span>' : ""}</h3><div class="mod-price">${precioMod(m)}</div></div>
-          ${m.descripcion ? `<p class="mod-desc">${esc(m.descripcion)}</p>` : ""}
-          ${list(m.items)}
+          <div class="mod-head"><h3>${E(`modulos.${i}.titulo`, "Título del módulo")}${m.nuevo ? '<span class="badge">Nuevo</span>' : ""}</h3><div class="mod-price">${precioMod(m)}</div></div>
+          ${E(`modulos.${i}.descripcion`, "Descripción del módulo", { tag: "p", cls: "mod-desc", multi: true })}
+          ${L(`modulos.${i}.items`)}
         </div>
       </div>`).join("")}
 
-    <h2 class="h2">Resumen económico</h2>
+    <h2 class="h2">${T("resumenTitulo")}</h2>
     ${D.cuota?.activo ? `
     <div class="cuota">
-      <div><small>${esc(D.cuota.etiqueta || "Cuota mensual")}</small><p>${esc(D.cuota.detalle || "")}</p></div>
-      <div class="price">${esc(D.cuota.precio)}<span>${esc(D.cuota.nota || "")}</span></div>
+      <div><small>${E("cuota.etiqueta", "Cuota mensual", { def: "" })}</small><p>${E("cuota.detalle", "Detalle")}</p></div>
+      <div class="price">${E("cuota.precio", "75 €/mes")}<span class="pn">${E("cuota.nota", "IVA incluido")}</span></div>
     </div>
-    ${D.cuota.texto ? paras(D.cuota.texto) : ""}` : `
+    ${P("cuota.texto", "Texto bajo la cuota (opcional)")}` : `
     <table class="sum">
-      <thead><tr><th>Módulo</th><th class="r">Horas</th><th class="r">Precio</th></tr></thead>
+      <thead><tr><th>${T("colModulo")}</th><th class="r">${T("colHoras")}</th><th class="r">${T("colPrecio")}</th></tr></thead>
       <tbody>
-        ${D.modulos.map(m => `<tr><td>${esc(m.titulo)}${m.nuevo ? '<span class="badge">Nuevo</span>' : ""}</td><td class="r">${m.horas ? m.horas + "h" : "—"}</td><td class="r">${Number(m.precio) ? eur(m.precio) : "Incluido"}</td></tr>`).join("")}
-        <tr class="sub"><td>Subtotal (sin IVA)</td><td class="r">${c.horas}h</td><td class="r">${eur(c.subtotal)}</td></tr>
-        <tr class="iva"><td>IVA (${D.iva}%)</td><td></td><td class="r">${eur(c.iva)}</td></tr>
-        <tr class="tot"><td>Total (IVA incluido)</td><td class="r">${c.horas}h</td><td class="r">${eur(c.total)}</td></tr>
+        ${D.modulos.map((m, i) => `<tr><td>${E(`modulos.${i}.titulo`, "Título del módulo")}${m.nuevo ? '<span class="badge">Nuevo</span>' : ""}</td><td class="r">${m.horas ? m.horas + "h" : "—"}</td><td class="r">${Number(m.precio) ? eur(m.precio) : T("incluido")}</td></tr>`).join("")}
+        <tr class="sub"><td>${T("subtotal")}</td><td class="r">${c.horas}h</td><td class="r">${eur(c.subtotal)}</td></tr>
+        <tr class="iva"><td>${T("ivaLabel")} (${D.iva}%)</td><td></td><td class="r">${eur(c.iva)}</td></tr>
+        <tr class="tot"><td>${T("totalLabel")}</td><td class="r">${c.horas}h</td><td class="r">${eur(c.total)}</td></tr>
       </tbody>
     </table>`}
 
-    <h2 class="h2">Condiciones de pago</h2>
-    <div class="callout">${esc(D.formaPago)}</div>
+    <h2 class="h2">${T("pagoTitulo")}</h2>
+    ${E("formaPago", "Forma de pago", { tag: "div", cls: "callout", multi: true })}
     ${D.bono.activo ? `
       <div class="bono">
-        <div><small>${esc(D.bono.titulo)}${D.bono.fechaLimite ? " · hasta el " + fecha(D.bono.fechaLimite) : ""}</small><p style="margin:2mm 0 0">${esc(D.bono.texto)}</p></div>
-        <div class="price">${eur(D.bono.precio)}<span>IVA incluido</span></div>
+        <div><small>${E("bono.titulo", "Nombre del bono")}${D.bono.fechaLimite ? ` · ${T("hastaEl")} ` + fecha(D.bono.fechaLimite) : ""}</small><p style="margin:2mm 0 0">${E("bono.texto", "Texto del bono", { multi: true })}</p></div>
+        <div class="price">${eur(D.bono.precio)}<span class="pn">${T("ivaIncluido")}</span></div>
       </div>` : ""}
 
     ${D.mant.activo ? `
-      <h2 class="h2">${esc(D.mant.titulo)}</h2>
-      ${paras(D.mant.intro)}
-      ${D.mant.planes.length ? `<div class="plans">${D.mant.planes.map(p => `<div class="plan"><small>${esc(p.etiqueta)}</small><div class="price">${esc(p.precio)}</div><div class="note">${esc(p.nota)}</div><div class="scope">${esc(p.alcance)}</div></div>`).join("")}</div>` : ""}
+      <h2 class="h2">${E("mant.titulo", "Título", { def: mantTitulo })}</h2>
+      ${P("mant.intro", "Introducción del mantenimiento")}
+      ${D.mant.planes.length ? `<div class="plans">${D.mant.planes.map((pl, i) => `<div class="plan"><small>${E(`mant.planes.${i}.etiqueta`, "Etiqueta")}</small><div class="price">${E(`mant.planes.${i}.precio`, "Precio")}</div><div class="note">${E(`mant.planes.${i}.nota`, "Nota")}</div><div class="scope">${E(`mant.planes.${i}.alcance`, "Alcance")}</div></div>`).join("")}</div>` : ""}
       <div class="cols">
-        ${D.mant.incluye.length ? `<div><h4>Qué incluye</h4>${list(D.mant.incluye)}</div>` : ""}
-        ${D.mant.noIncluye.length ? `<div><h4>Qué no incluye</h4>${list(D.mant.noIncluye, "b neg")}</div>` : ""}
+        ${D.mant.incluye.length ? `<div><h4>${T("incluyeTitulo")}</h4>${L("mant.incluye")}</div>` : ""}
+        ${D.mant.noIncluye.length ? `<div><h4>${T("noIncluyeTitulo")}</h4>${L("mant.noIncluye", "b neg")}</div>` : ""}
       </div>
-      ${D.mant.nota ? `<div class="callout">${esc(D.mant.nota)}</div>` : ""}` : ""}
+      ${D.mant.nota ? E("mant.nota", "Nota", { tag: "div", cls: "callout", multi: true }) : ""}` : ""}
 
-    ${D.garantia.length ? `<h2 class="h2">${esc(D.garantiaTitulo || "Garantía y arreglos")}</h2>${list(D.garantia)}` : ""}
+    ${D.garantia.length ? `<h2 class="h2">${E("garantiaTitulo", "Título", { def: "Garantía y arreglos" })}</h2>${L("garantia")}` : ""}
 
-    ${D.requisitos.length ? `<h2 class="h2">Requisitos por parte del cliente</h2>${paras(D.requisitosIntro)}
-      <div class="req">${D.requisitos.map(r => `<div><h4>${esc(r.titulo)}</h4>${list(r.items)}</div>`).join("")}</div>` : ""}
+    ${D.requisitos.length ? `<h2 class="h2">${T("requisitosTitulo")}</h2>${P("requisitosIntro", "Introducción (opcional)")}
+      <div class="req">${D.requisitos.map((r, i) => `<div><h4>${E(`requisitos.${i}.titulo`, "Grupo")}</h4>${L(`requisitos.${i}.items`)}</div>`).join("")}</div>` : ""}
 
     <div class="contact">
-      <div><b>${esc(D.contacto.nombre)}</b><span>${[D.contacto.telefono, D.contacto.email, D.contacto.web].filter(Boolean).map(esc).join("  ·  ")}</span></div>
+      <div><b>${E("contacto.nombre", "Nombre")}</b><span>${E("contacto.telefono", "Teléfono")}  ·  ${E("contacto.email", "Email")}  ·  ${E("contacto.web", "Web")}</span></div>
       <img src="/assets/logo.svg" alt="Majosoft" />
     </div>
   </div>
@@ -417,13 +455,13 @@ function paginar() {
   doc.after(flow);
   const cover = flow.querySelector(".cover");
   const bloques = [...flow.querySelector(".body").children];
-  const pie = "Majosoft · Estudio de desarrollo de software en Jaén · Presupuesto válido 30 días desde su emisión";
+  const pie = T("pie");
 
   const pages = [];
   const nueva = () => {
     const pg = document.createElement("section");
     pg.className = "page";
-    pg.innerHTML = `<div class="page-body"></div><div class="page-foot"><span>${pie}</span><span class="n"></span></div>`;
+    pg.innerHTML = `<div class="page-body"></div><div class="page-foot">${pie}<span class="n"></span></div>`;
     doc.appendChild(pg); pages.push(pg);
     return pg.querySelector(".page-body");
   };
@@ -577,6 +615,37 @@ ed.addEventListener("click", e => {
   if (b.dataset.act === "up" && i > 0) [arr[i - 1], arr[i]] = [arr[i], arr[i - 1]];
   if (b.dataset.act === "down" && i < arr.length - 1) [arr[i + 1], arr[i]] = [arr[i], arr[i + 1]];
   refresh(true);
+});
+
+/* ===== Edición directa sobre el documento ===== */
+const docEl = document.getElementById("doc");
+const txtDe = x => x.innerText.replace(/\u00a0/g, " ").replace(/\n+$/, "");
+// Puntos vacíos de las listas: se quitan al terminar de editar
+const LISTAS = () => ["porque", "garantia", "mant.incluye", "mant.noIncluye", ...D.modulos.map((_, i) => `modulos.${i}.items`), ...D.requisitos.map((_, i) => `requisitos.${i}.items`)];
+const limpiar = () => LISTAS().forEach(p => { const a = get(p); if (Array.isArray(a)) set(p, a.filter(x => String(x).trim() && String(x).trim() !== ":")); });
+docEl.addEventListener("keydown", e => {
+  const el = e.target.closest(".ed"); if (!el) return;
+  if (e.key === "Enter" && !el.dataset.multi) { e.preventDefault(); el.blur(); }
+});
+docEl.addEventListener("input", e => {
+  const el = e.target.closest(".ed"); if (!el) return;
+  const p = el.dataset.p;
+  if (el.dataset.para != null) {
+    set(p, [...docEl.querySelectorAll(`.ed[data-p="${p}"][data-para]`)].map(x => txtDe(x).trim()).filter(Boolean).join("\n\n"));
+  } else if (el.dataset.part) {
+    const partes = [...el.closest("div").querySelectorAll(`.ed[data-p="${p}"]`)].map(x => txtDe(x).trim());
+    set(p, partes.length > 1 ? `${partes[0]}: ${partes[1]}` : partes[0]);
+  } else {
+    set(p, txtDe(el).trim());
+    // El mismo dato puede salir en varios sitios (título del módulo, pie de cada hoja…)
+    docEl.querySelectorAll(`.ed[data-p="${p}"]`).forEach(x => { if (x !== el) x.textContent = txtDe(el); });
+  }
+  save();
+  if (p === "titulo") document.getElementById("docTitle").textContent = D.titulo;
+});
+docEl.addEventListener("focusout", () => {
+  // Al salir del documento se vuelve a paginar y se actualiza el formulario
+  setTimeout(() => { if (!docEl.contains(document.activeElement)) { limpiar(); refresh(true); } }, 0);
 });
 
 /* ===== Acciones ===== */
