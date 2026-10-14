@@ -31,11 +31,32 @@
     .tag { display: inline-block; padding: 2px 8px; border-radius: 999px; font-size: 11px; font-weight: 700; background: var(--lime); }
     .tag.warn { background: #fde2c4; }
     .scroll { overflow-x: auto; }
-    .srv + .srv { margin-top: 22px; }
-    .srv-head { margin-bottom: 6px; font-size: 13.5px; }
+    #servidores { display: grid; gap: 18px; }
+    .srv { border-radius: 18px; background: color-mix(in srgb, var(--c) 6%, #fff); border: 1px solid color-mix(in srgb, var(--c) 22%, var(--line)); padding: 18px; }
+    .srv-head { display: flex; align-items: center; gap: 12px; margin-bottom: 14px; }
+    .srv-head h2 { font-size: 16px; margin: 0; color: var(--c); }
+    .srv-head p { margin: 2px 0 0; color: var(--muted); font-size: 12.5px; }
+    .srv-head code { margin-left: auto; background: #fff; border: 1px solid var(--line); }
+    .srv-ico { width: 42px; height: 42px; border-radius: 12px; display: grid; place-items: center; font-size: 22px; background: color-mix(in srgb, var(--c) 14%, #fff); }
+    .webs { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 12px; }
+    .web { background: #fff; border: 1px solid var(--line); border-radius: 14px; padding: 14px; display: flex; flex-direction: column; gap: 10px; transition: box-shadow .15s, transform .15s; }
+    .web:hover { box-shadow: 0 6px 20px rgba(0,0,0,.06); transform: translateY(-1px); }
+    .web header { display: flex; align-items: center; gap: 8px; }
+    .web h3 { font-size: 14px; margin: 0; flex: 1; line-height: 1.3; }
+    .dot { width: 10px; height: 10px; border-radius: 50%; flex: none; }
+    .dot.ok { background: var(--ok); box-shadow: 0 0 0 4px color-mix(in srgb, var(--ok) 18%, transparent); }
+    .dot.bad { background: var(--bad); box-shadow: 0 0 0 4px color-mix(in srgb, var(--bad) 18%, transparent); }
+    .dot.warn { background: var(--warn); } .dot.off { background: var(--line); }
+    .links { display: flex; flex-wrap: wrap; gap: 6px; }
+    .chip { display: inline-flex; align-items: center; gap: 5px; padding: 4px 9px; border-radius: 999px; background: var(--cream); color: var(--ink); text-decoration: none; font-size: 12px; font-weight: 600; max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    a.chip:hover { background: var(--lime); }
+    .chip.ghost { color: var(--muted); font-weight: 500; }
+    .web dl { display: grid; grid-template-columns: 1fr 1fr; gap: 8px 12px; margin: 0; padding-top: 10px; border-top: 1px dashed var(--line); }
+    .web dt { font-size: 10.5px; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }
+    .web dd { margin: 2px 0 0; font-size: 12.5px; font-weight: 600; }
+    dd.ok { color: var(--ok); } dd.bad { color: var(--bad); } dd.warn { color: var(--warn); } dd.off { color: var(--muted); }
     .muted { color: var(--muted); }
-    .ok { color: var(--ok); font-weight: 700; } .bad { color: var(--bad); font-weight: 700; }
-    td a { color: var(--ink); font-weight: 600; }
+    .bad { color: var(--bad); font-weight: 700; }
     .sw { position: relative; display: inline-block; width: 40px; height: 22px; cursor: pointer; }
     .sw input { opacity: 0; width: 0; height: 0; }
     .sw span { position: absolute; inset: 0; background: var(--line); border-radius: 999px; transition: background .15s; }
@@ -153,30 +174,56 @@ const when = t => t ? new Date(t).toLocaleString("es-ES", { day: "2-digit", mont
 const BD = { postgres: "PostgreSQL", mariadb: "MariaDB", sqlite: "SQLite", ninguna: "—" };
 const caja = document.getElementById("servidores");
 
-function ultima(w) {
-  if (!w.ultima) return '<span class="muted">Sin copias</span>';
-  const mal = w.resultado === "error";
-  return `<span class="${mal ? "bad" : "ok"}">${mal ? "Falló" : "Correcta"}</span> · ${when(w.ultima)}<br><small class="muted">${w.copias} copias · ${esc(w.total)}</small>`;
+const COLOR = { guiadelbombero: "#c8102e", objetivo: "#1f6f43", apartamentos: "#1d6fa5" };
+const EMOJI = { guiadelbombero: "🚒", objetivo: "🛡️", apartamentos: "🏖️" };
+const GH = '<svg viewBox="0 0 16 16" width="14" height="14" fill="currentColor"><path d="M8 0a8 8 0 0 0-2.53 15.59c.4.07.55-.17.55-.38v-1.33c-2.23.48-2.7-1.07-2.7-1.07-.36-.92-.89-1.17-.89-1.17-.73-.5.06-.49.06-.49.8.06 1.23.83 1.23.83.72 1.22 1.88.87 2.34.66.07-.52.28-.87.5-1.07-1.78-.2-3.65-.89-3.65-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82a7.6 7.6 0 0 1 4 0c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.28.82 2.15 0 3.07-1.87 3.75-3.66 3.95.29.25.54.73.54 1.48v2.2c0 .21.15.46.55.38A8 8 0 0 0 8 0z"/></svg>';
+
+function que(w) {
+  const p = [];
+  if (w.bd !== "ninguna") p.push(BD[w.bd] || w.bd);
+  if (w.carpeta) p.push("ficheros");
+  return p.length ? p.join(" + ") : "script propio";
+}
+
+function estadoCopia(w) {
+  if (!w.activa) return { cls: "off", txt: "Copia desactivada" };
+  if (!w.ultima) return { cls: "warn", txt: "Aún sin copias" };
+  if (w.resultado === "error") return { cls: "bad", txt: "La última copia falló" };
+  return { cls: "ok", txt: "Copia al día" };
+}
+
+function tarjeta(s, w) {
+  const e = estadoCopia(w);
+  return `
+    <article class="web">
+      <header>
+        <span class="dot ${e.cls}" title="${e.txt}"></span>
+        <h3>${esc(w.nombre)}</h3>
+        <label class="sw" title="Copia diaria"><input type="checkbox" data-srv="${esc(s.id)}" data-web="${esc(w.web)}" ${w.activa ? "checked" : ""}><span></span></label>
+      </header>
+      <div class="links">
+        ${w.url ? `<a class="chip" href="${esc(w.url)}" target="_blank" rel="noopener">🌐 ${esc(w.url.replace("https://", ""))}</a>` : '<span class="chip ghost">Sin dominio</span>'}
+        ${w.github ? `<a class="chip" href="${esc(w.github)}" target="_blank" rel="noopener">${GH} ${esc(w.github.split("/").pop())}</a>` : ""}
+      </div>
+      <dl>
+        <div><dt>Copia</dt><dd class="${e.cls}">${e.txt}</dd></div>
+        <div><dt>Última</dt><dd>${when(w.ultima)}</dd></div>
+        <div><dt>Qué guarda</dt><dd>${esc(que(w))}</dd></div>
+        <div><dt>Guardadas</dt><dd>${w.copias} · ${esc(w.total || "0")}</dd></div>
+      </dl>
+    </article>`;
 }
 
 function pintar(servidores) {
   caja.innerHTML = servidores.map(s => `
-    <div class="srv">
-      <div class="srv-head"><b>${esc(s.nombre)}</b> <code>${esc(s.ip)}</code> <span class="muted">· ${esc(s.uso)}</span></div>
-      ${s.error ? `<p class="bad">${esc(s.error)}</p>` : `
-      <div class="scroll"><table>
-        <thead><tr><th>Web</th><th>GitHub</th><th>Qué se copia</th><th>Última copia</th><th>Copia diaria</th></tr></thead>
-        <tbody>${s.webs.map(w => `
-          <tr>
-            <td><b>${esc(w.nombre)}</b><br>${w.url ? `<a href="${esc(w.url)}" target="_blank" rel="noopener">${esc(w.url.replace("https://", ""))} ↗</a>` : '<small class="muted">sin dominio</small>'}</td>
-            <td>${w.github ? `<a href="${esc(w.github)}" target="_blank" rel="noopener">${esc(w.github.split("/").pop())} ↗</a>` : '<span class="muted">—</span>'}</td>
-            <td>${w.bd !== "ninguna" ? BD[w.bd] || esc(w.bd) : ""}${w.bd !== "ninguna" && w.carpeta ? " + " : ""}${w.carpeta ? "ficheros" : ""}${w.bd === "ninguna" && !w.carpeta ? "script propio" : ""}</td>
-            <td>${ultima(w)}</td>
-            <td><label class="sw"><input type="checkbox" data-srv="${esc(s.id)}" data-web="${esc(w.web)}" ${w.activa ? "checked" : ""}><span></span></label></td>
-          </tr>`).join("")}
-        </tbody>
-      </table></div>`}
-    </div>`).join("");
+    <section class="srv" style="--c:${COLOR[s.id] || "var(--ink)"}">
+      <div class="srv-head">
+        <span class="srv-ico">${EMOJI[s.id] || "🖥️"}</span>
+        <div><h2>${esc(s.nombre)}</h2><p>${esc(s.uso)}</p></div>
+        <code>${esc(s.ip)}</code>
+      </div>
+      ${s.error ? `<p class="bad">${esc(s.error)}</p>` : `<div class="webs">${s.webs.map(w => tarjeta(s, w)).join("")}</div>`}
+    </section>`).join("");
 }
 
 // Un solo listener para todos los interruptores (la tabla se repinta entera)
@@ -187,6 +234,9 @@ caja.addEventListener("change", async e => {
   try {
     await api("servidores/copias", { method: "POST", body: { servidor: el.dataset.srv, web: el.dataset.web, activa: el.checked } });
     toast(el.checked ? "Copia diaria activada" : "Copia diaria desactivada");
+    const dot = el.closest(".web").querySelector(".dot"), dd = el.closest(".web").querySelector("dl dd");
+    if (!el.checked) { dot.className = "dot off"; dd.className = "off"; dd.textContent = "Copia desactivada"; }
+    else { dot.className = "dot ok"; dd.className = "ok"; dd.textContent = "Activada"; }
   } catch (err) {
     el.checked = !el.checked;
     toast(err.message, true);
