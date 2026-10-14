@@ -93,6 +93,9 @@
 <script type="module">
 import { mountShell, api } from "/admin/panel.js";
 const me = await mountShell("home");
+// Fecha local en formato aaaa-mm-dd (toISOString usa UTC: en España, de 00:00 a 02:00 daba el día anterior)
+const isoLocal = (d = new Date()) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+
 const h = new Date().getHours();
 document.getElementById("hello").textContent = `${h < 14 ? "Buenos días" : h < 21 ? "Buenas tardes" : "Buenas noches"}, ${(me.name || me.email).split(" ")[0]}`;
 
@@ -116,7 +119,7 @@ document.getElementById("kpis").innerHTML = `
 
 // Últimos 12 meses
 const now = new Date(), months = [];
-for (let i = 11; i >= 0; i--) { const d = new Date(now.getFullYear(), now.getMonth() - i, 1); months.push(d.toISOString().slice(0, 7)); }
+for (let i = 11; i >= 0; i--) { const d = new Date(now.getFullYear(), now.getMonth() - i, 1); months.push(isoLocal(d).slice(0, 7)); }
 // Cada barra separa lo cobrado (facturas pagadas) de lo pendiente de cobro
 const delMes = m => emitidas.filter(f => f.fecha.startsWith(m));
 const cob = months.map(m => sum(delMes(m).filter(f => f.estado === "pagada")));
@@ -128,7 +131,7 @@ document.getElementById("chartSub").textContent = `Últimos 12 meses · ${eur(to
 document.getElementById("bars").innerHTML = months.map((m, i) => `
   <div class="bar ${i === 11 ? "now" : ""}" data-v="${vals[i] ? eur(vals[i]) : ""}" title="${vals[i] ? `Cobrado ${eur(cob[i])} · Pendiente ${eur(pen[i])}` : eur(0)}">
     <div class="stack" style="height:${(vals[i] / max) * 150}px"><i class="pend" style="height:${vals[i] ? pen[i] / vals[i] * 100 : 0}%"></i><i class="cob" style="height:${vals[i] ? cob[i] / vals[i] * 100 : 0}%"></i></div>
-    <span>${new Date(m + "-01").toLocaleDateString("es-ES", { month: "short" }).replace(".", "")}</span></div>`).join("");
+    <span>${new Date(m + "-01T12:00").toLocaleDateString("es-ES", { month: "short" }).replace(".", "")}</span></div>`).join("");
 
 document.getElementById("lastInv").innerHTML = fac.length ? [...fac].sort((a, b) => String(b.numero).localeCompare(String(a.numero), "es", { numeric: true })).slice(0, 6).map(f => `
   <tr class="click" data-href="/admin/facturas#${f.id}"><td><b>${esc(f.numero)}</b> · ${esc(f.cliente.nombre)}</td><td><span class="pill ${f.estado}">${f.estado}</span></td><td class="r"><b>${eur(totalF(f))}</b></td></tr>`).join("")

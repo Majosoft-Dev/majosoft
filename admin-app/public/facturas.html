@@ -215,6 +215,9 @@
 <script type="module">
 import { mountShell, api, autosaver, toast } from "/admin/panel.js";
 await mountShell("facturas");
+// Fecha local en formato aaaa-mm-dd (toISOString usa UTC: en España, de 00:00 a 02:00 daba el día anterior)
+const isoLocal = (d = new Date()) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+
 
 /* ===== Datos (guardados en el servidor del panel) ===== */
 const EMISOR = { nombre: "Majosoft", titular: "José Manuel Borrás Rodríguez", empresa: "Majosoft · Estudio de desarrollo de software", nif: "", direccion: "Jaén, España", email: "dev@majosoft.es", telefono: "648 867 950", iban: "" };
@@ -478,7 +481,7 @@ formEl.addEventListener("change", async ev => {
   }
   if (ev.target.id === "conVenc") {
     // Vencimiento opcional: al activarlo se propone a 30 días de la fecha de la factura
-    if (ev.target.checked) { const d = new Date((cur.fecha || new Date().toISOString().slice(0, 10)) + "T12:00"); d.setDate(d.getDate() + 30); cur.vencimiento = d.toISOString().slice(0, 10); }
+    if (ev.target.checked) { const d = new Date((cur.fecha || isoLocal()) + "T12:00"); d.setDate(d.getDate() + 30); cur.vencimiento = isoLocal(d); }
     else cur.vencimiento = "";
     form(); sheet(); save(); return;
   }
@@ -565,7 +568,7 @@ const refrescar = async () => { store = await api("docs/facturas"); };
 document.getElementById("bNew").onclick = async () => {
   await refrescar();
   const ult = store.at(-1);
-  const hoy = new Date().toISOString().slice(0, 10);
+  const hoy = isoLocal();
   const f = { id: "f" + Date.now(), numero: siguienteNumero(), fecha: hoy, vencimiento: "", estado: "borrador",
     cliente: { nombre: "Nuevo cliente", nif: "", direccion: "", cpCiudad: "", email: "", logo: "" }, periodo: { desde: "", hasta: "" },
     lineas: [{ concepto: "", detalle: "", cantidad: 1, precio: 0 }], iva: 21, notas: "", emisor: EMISOR_G };
@@ -573,7 +576,7 @@ document.getElementById("bNew").onclick = async () => {
 };
 document.getElementById("bDup").onclick = async () => {
   await refrescar();
-  const f = { ...structuredClone(cur), id: "f" + Date.now(), numero: siguienteNumero(), estado: "borrador", fecha: new Date().toISOString().slice(0, 10) };
+  const f = { ...structuredClone(cur), id: "f" + Date.now(), numero: siguienteNumero(), estado: "borrador", fecha: isoLocal() };
   store.push(f); await put(f); editar(f.id);
 };
 document.getElementById("bDel").onclick = async () => {
@@ -584,7 +587,7 @@ document.getElementById("bDel").onclick = async () => {
 document.getElementById("bExport").onclick = () => {
   const a = document.createElement("a");
   a.href = URL.createObjectURL(new Blob([JSON.stringify(store, null, 2)], { type: "application/json" }));
-  a.download = `facturas-majosoft-${new Date().toISOString().slice(0, 10)}.json`; a.click(); URL.revokeObjectURL(a.href);
+  a.download = `facturas-majosoft-${isoLocal()}.json`; a.click(); URL.revokeObjectURL(a.href);
 };
 const file = document.getElementById("file");
 document.getElementById("bImport").onclick = () => file.click();
