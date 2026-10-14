@@ -92,3 +92,19 @@ tbody tr:nth-child(5) { animation-delay: .08s; } tbody tr:nth-child(n+6) { anima
   *, *::before, *::after { animation-duration: .01ms !important; animation-delay: 0s !important; transition-duration: .01ms !important; }
 }
 @media print { * { animation: none !important; } }
+
+/* ===== Campos de formulario en tablet y móvil ===== */
+/* Los campos nunca se salen de su columna (en iPad las fechas eran más anchas que la rejilla) */
+.row > *, .row3 > * { min-width: 0; }
+label.f input, label.f select, label.f textarea { min-width: 0; max-width: 100%; }
+body .add { color: var(--ink); } /* Safari en iPad pinta los botones en azul */
+input[type="checkbox"] { width: 16px; height: 16px; flex: none; }
+/* Safari en iOS/iPadOS: fecha alineada a la izquierda y con la misma altura que el resto */
+@supports (-webkit-touch-callout: none) {
+  body label.f input[type="date"] { -webkit-appearance: none; appearance: none; min-height: 2.75em; text-align: left; }
+  label.f input[type="date"]::-webkit-date-and-time-value { text-align: left; margin: 0; }
+}
+/* Pantallas táctiles: letra de 16 px en los campos para que el iPad no haga zoom al escribir */
+@media (pointer: coarse) {
+  body label.f input, body label.f select, body label.f textarea, body .search { font-size: 16px; }
+}
