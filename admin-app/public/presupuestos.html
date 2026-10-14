@@ -139,6 +139,9 @@
     .ed:empty::before { content: attr(data-ph); color: #b9b8ad; }
     .cover .ed:hover { outline-color: #55564f; }
     li.ed { display: list-item; }
+    ul.b li.add-pt { color: #9a998e; font-size: .9em; cursor: pointer; user-select: none; }
+    ul.b li.add-pt::before { background: none; border: 1px dashed #c9c8bc; }
+    ul.b li.add-pt:hover { color: var(--ink, #222); }
     @media print { .solo-pantalla { display: none !important; } }
     /* Al imprimir no se ve el resaltado de edición (sin tocar fondos propios como el de la etiqueta de portada) */
     @media print { .ed, .ed:hover, .ed:focus { outline: none !important; } .ed:focus:not(.kicker) { background: none !important; } .ed:empty::before { content: ""; } .ed:empty { display: none; } }
@@ -347,7 +350,8 @@ const P = (path, ph = "Escribe aquí…") => {
   return (ps.length ? ps : [""]).map((x, i) => `<p class="ed" contenteditable="plaintext-only" spellcheck="false" data-p="${path}" data-para="${i}" data-multi="1" data-ph="${esc(ph)}">${esc(x)}</p>`).join("");
 };
 // Listas editables: cada punto tiene su ruta (lista.0, lista.1…)
-const L = (path, cls = "b") => { const arr = get(path) || []; return arr.length ? `<ul class="${cls}">${arr.map((_, j) => E(`${path}.${j}`, "Punto", { tag: "li" })).join("")}</ul>` : ""; };
+// Al final de cada lista, un botón (solo en pantalla) para añadir puntos; Enter en un punto también crea otro
+const L = (path, cls = "b") => { const arr = get(path) || []; return `<ul class="${cls}">${arr.map((_, j) => E(`${path}.${j}`, "Punto", { tag: "li" })).join("")}<li class="add-pt solo-pantalla" data-addpt="${path}">+ Añadir punto</li></ul>`; };
 
 function render() {
   const c = calc();
@@ -628,7 +632,24 @@ const LISTAS = () => ["porque", "garantia", "mant.incluye", "mant.noIncluye", ..
 const limpiar = () => LISTAS().forEach(p => { const a = get(p); if (Array.isArray(a)) set(p, a.filter(x => String(x).trim() && String(x).trim() !== ":")); });
 docEl.addEventListener("keydown", e => {
   const el = e.target.closest(".ed"); if (!el) return;
-  if (e.key === "Enter" && !el.dataset.multi) { e.preventDefault(); el.blur(); }
+  if (e.key === "Enter" && !el.dataset.multi) {
+    e.preventDefault();
+    const m = el.tagName === "LI" && el.dataset.p.match(/^(.*)\.(\d+)$/);
+    if (m) return nuevoPunto(m[1], +m[2] + 1);
+    el.blur();
+  }
+});
+// Inserta un punto vacío en la lista y lo deja listo para escribir
+function nuevoPunto(path, pos) {
+  const arr = get(path); if (!Array.isArray(arr)) return;
+  arr.splice(pos ?? arr.length, 0, "");
+  render();
+  docEl.querySelector(`.ed[data-p="${path}.${pos ?? arr.length - 1}"]`)?.focus();
+  save();
+}
+docEl.addEventListener("mousedown", e => {
+  const b = e.target.closest(".add-pt"); if (!b) return;
+  e.preventDefault(); nuevoPunto(b.dataset.addpt);
 });
 docEl.addEventListener("input", e => {
   const el = e.target.closest(".ed"); if (!el) return;
