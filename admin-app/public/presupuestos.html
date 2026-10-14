@@ -208,6 +208,9 @@
 <script type="module">
 import { mountShell, api, autosaver, toast } from "/admin/panel.js";
 await mountShell("presupuestos");
+// Fecha local en formato aaaa-mm-dd (toISOString usa UTC: en España, de 00:00 a 02:00 daba el día anterior)
+const isoLocal = (d = new Date()) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+
 // Clientes conocidos (de facturas y presupuestos) para el desplegable
 const clientes = await Promise.all([api("docs/facturas"), api("docs/presupuestos")]).then(([f, p]) =>
   [...new Set([...f.map(x => x.cliente?.nombre), ...p.map(x => x.cliente)].map(n => String(n || "").trim()).filter(n => n && n !== "Nombre del cliente" && n !== "Nuevo cliente"))].sort((a, b) => a.localeCompare(b, "es")));
@@ -275,7 +278,7 @@ const EJEMPLO = {
 
 const VACIO = {
   kicker: "Propuesta de proyecto", titulo: "Nuevo proyecto", subtitulo: "", tagline: "", cliente: "", referencia: "",
-  fecha: new Date().toISOString().slice(0, 10), lanzamiento: "", objetivo: "", porqueTitulo: "", porqueIntro: "", porque: [],
+  fecha: isoLocal(), lanzamiento: "", objetivo: "", porqueTitulo: "", porqueIntro: "", porque: [],
   modulos: [{ titulo: "Módulo 1", nuevo: false, horas: 0, precio: 0, descripcion: "", items: [] }],
   iva: 21, auto: true, totalConIva: 0, formaPago: "Forma de pago habitual: 25% al inicio del proyecto + 75% a la entrega.",
   bono: { activo: false, titulo: "", precio: "", fechaLimite: "", texto: "" },
@@ -660,7 +663,7 @@ document.getElementById("bSave").onclick = () => {
 const file = document.getElementById("file");
 const nuevoId = () => "p" + Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
 async function crear(base) {
-  const d = migrar({ ...structuredClone(VACIO), ...structuredClone(base), id: nuevoId(), fecha: new Date().toISOString().slice(0, 10) });
+  const d = migrar({ ...structuredClone(VACIO), ...structuredClone(base), id: nuevoId(), fecha: isoLocal() });
   await api(`docs/presupuestos/${d.id}`, { method: "PUT", body: d });
   location.href = "/admin/presupuestos?id=" + d.id;
 }
