@@ -83,6 +83,8 @@
     .chk-venc { display: flex; align-items: center; gap: 6px; height: 1.25em; }
     .chk-venc input { width: 14px !important; height: 14px !important; margin: 0 !important; accent-color: var(--ink); }
     label.f input:disabled { opacity: .45; }
+    label.f input.ro { background: var(--cream); color: var(--muted); cursor: default; }
+    label.f input.ro:focus { outline: none; border-color: var(--line); }
     .line { background: #fafaf5; border: 1px solid #eeede5; border-radius: 11px; padding: 4px 12px 12px; margin-top: 12px; position: relative; }
     .line .x { position: absolute; top: 8px; right: 8px; border: 1px solid var(--line); background: #fff; border-radius: 7px; width: 26px; height: 26px; cursor: pointer; color: var(--muted); }
     .line .x:hover { color: #b42318; border-color: #b42318; }
@@ -288,7 +290,7 @@ function panel() {
   history.replaceState(null, "", "/admin/facturas");
   const q = document.getElementById("q").value.toLowerCase();
   const lista = store.filter(f => (!filtro || f.estado === filtro) && (!q || [f.numero, f.cliente.nombre, ...f.lineas.map(l => l.concepto)].join(" ").toLowerCase().includes(q)))
-    .sort((a, b) => b.numero.localeCompare(a.numero));
+    .sort((a, b) => String(b.numero).localeCompare(String(a.numero), "es", { numeric: true }));
   const y = String(new Date().getFullYear());
   const sum = arr => arr.reduce((s, f) => s + totales(f).total, 0);
   const año = store.filter(f => f.fecha.startsWith(y) && f.estado !== "borrador");
@@ -340,7 +342,7 @@ function editar(id) {
 function form() {
   document.getElementById("form").innerHTML = `
     <section class="sec"><h3>Factura</h3>
-      <div class="row">${fld("Número", "numero")}<label class="f">Estado<select data-p="estado">${["borrador", "pendiente", "pagada"].map(e => `<option ${cur.estado === e ? "selected" : ""}>${e}</option>`).join("")}</select></label></div>
+      <div class="row"><label class="f">Número (automático)<input type="text" value="${esc(cur.numero)}" readonly tabindex="-1" class="ro" title="Se asigna solo al crear la factura" /></label><label class="f">Estado<select data-p="estado">${["borrador", "pendiente", "pagada"].map(e => `<option ${cur.estado === e ? "selected" : ""}>${e}</option>`).join("")}</select></label></div>
       <div class="row">${fld("Fecha", "fecha", "date")}
         <label class="f"><span class="chk-venc"><input type="checkbox" id="conVenc" ${cur.vencimiento ? "checked" : ""} /> Vencimiento</span>
           <input type="date" data-p="vencimiento" value="${esc(cur.vencimiento || "")}" ${cur.vencimiento ? "" : "disabled"} /></label></div>
@@ -405,7 +407,7 @@ function sheet() {
   document.getElementById("sheet").innerHTML = `
     <div class="s-top">
       <div class="me"><div class="mark"><img src="/assets/logo.svg" alt="" /><span>majosoft<i>.</i></span></div><h1>Factura</h1></div>
-      <div class="meta"><b>Nº ${ed("numero", "00")}</b>Fecha: ${edFecha("fecha")}${f.vencimiento ? `<br />Vencimiento: ${edFecha("vencimiento")}` : ""}</div>
+      <div class="meta"><b>Nº ${esc(f.numero)}</b>Fecha: ${edFecha("fecha")}${f.vencimiento ? `<br />Vencimiento: ${edFecha("vencimiento")}` : ""}</div>
     </div>
     <div class="parties">
       <div><span class="lbl">Emisor</span><b>${ed("emisor.titular", "Nombre del emisor")}</b>${ed("emisor.empresa", "Actividad o empresa")}<br />NIF: ${ed("emisor.nif", "NIF")}<br />${ed("emisor.direccion", "Calle y número")}<br />${ed("emisor.cpCiudad", "C.P. y ciudad")}<br />${ed("emisor.email", "Email")} · ${ed("emisor.telefono", "Teléfono")}</div>
@@ -535,7 +537,10 @@ document.getElementById("tabs").onclick = e => {
 };
 document.getElementById("toPanel").onclick = ev => { ev.preventDefault(); panel(); };
 document.getElementById("bPrint").onclick = () => window.print();
+// Antes de numerar se recarga la lista del servidor, por si se creó otra factura en otro dispositivo
+const refrescar = async () => { store = await api("docs/facturas"); };
 document.getElementById("bNew").onclick = async () => {
+  await refrescar();
   const ult = store.at(-1);
   const hoy = new Date().toISOString().slice(0, 10);
   const f = { id: "f" + Date.now(), numero: siguienteNumero(), fecha: hoy, vencimiento: "", estado: "borrador",
@@ -544,13 +549,14 @@ document.getElementById("bNew").onclick = async () => {
   store.push(f); await put(f); editar(f.id);
 };
 document.getElementById("bDup").onclick = async () => {
+  await refrescar();
   const f = { ...structuredClone(cur), id: "f" + Date.now(), numero: siguienteNumero(), estado: "borrador", fecha: new Date().toISOString().slice(0, 10) };
   store.push(f); await put(f); editar(f.id);
 };
 document.getElementById("bDel").onclick = async () => {
   if (!confirm(`¿Eliminar la factura ${cur.numero}?`)) return;
   await api(`docs/facturas/${cur.id}`, { method: "DELETE" });
-  store = store.filter(f => f !== cur); toast("Factura eliminada"); panel();
+  store = store.filter(f => f.id !== cur.id); toast("Factura eliminada"); panel();
 };
 document.getElementById("bExport").onclick = () => {
   const a = document.createElement("a");

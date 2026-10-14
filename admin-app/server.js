@@ -13,6 +13,8 @@ import {
 
 const PORT = +process.env.PORT || 3060;
 const ORIGIN = process.env.ADMIN_ORIGIN || "https://majosoft.es";
+// La web también responde en www: se aceptan las dos direcciones como propias
+const ORIGINS = new Set([ORIGIN, ORIGIN.replace("://", "://www.")]);
 const PUBLIC = path.join(path.dirname(fileURLToPath(import.meta.url)), "public");
 
 const SESSION_TTL = 8 * 3600e3;    // duración máxima de una sesión
@@ -26,6 +28,14 @@ const app = express();
 app.disable("x-powered-by");
 app.set("trust proxy", "loopback");
 app.use(express.json({ limit: "3mb" }));
+
+/* ===== El panel siempre en la dirección principal (sin www) ===== */
+// Si se entra por www.majosoft.es se redirige a majosoft.es, para que la sesión sea siempre la misma
+app.use("/admin", (req, res, next) => {
+  const host = new URL(ORIGIN).host;
+  if (req.method === "GET" && req.hostname === "www." + host) return res.redirect(301, ORIGIN + req.originalUrl);
+  next();
+});
 
 /* ===== Cabeceras de seguridad ===== */
 app.use((req, res, next) => {
@@ -52,7 +62,7 @@ const clearCookie = (res, name) => res.append("Set-Cookie", `${name}=; Path=/adm
 app.use("/admin/api", (req, res, next) => {
   if (req.method === "GET") return next();
   const origin = req.get("origin");
-  if (req.get("x-requested-with") !== "majosoft" || (origin && origin !== ORIGIN)) {
+  if (req.get("x-requested-with") !== "majosoft" || (origin && !ORIGINS.has(origin))) {
     return res.status(403).json({ error: "Petición no permitida" });
   }
   next();
@@ -170,7 +180,7 @@ app.post("/admin/api/logout", (req, res) => {
 const contactos = new Map(); // ip -> marcas de tiempo recientes
 app.post("/api/contacto", (req, res) => {
   const origin = req.get("origin");
-  if (origin && origin !== ORIGIN && origin !== ORIGIN.replace("://", "://www.")) return res.status(403).json({ ok: false });
+  if (origin && !ORIGINS.has(origin)) return res.status(403).json({ ok: false });
   const { nombre, email, mensaje, botcheck } = req.body || {};
   if (botcheck) return res.json({ ok: true }); // bot: se descarta sin avisar
   const n = String(nombre || "").trim().slice(0, 120), e = String(email || "").trim().slice(0, 200), m = String(mensaje || "").trim().slice(0, 5000);
