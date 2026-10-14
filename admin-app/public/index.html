@@ -35,7 +35,7 @@
     .card-head { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; }
     .card-head a { font-size: 12.5px; font-weight: 700; color: var(--ink); text-decoration: none; border-bottom: 2px solid var(--lime); }
     .bars { display: grid; grid-template-columns: repeat(12, 1fr); gap: 8px; align-items: end; height: 190px; padding-top: 10px; }
-    .bar { display: flex; flex-direction: column; align-items: center; gap: 6px; height: 100%; justify-content: flex-end; }
+    .bar { display: flex; flex-direction: column; align-items: center; gap: 6px; height: 100%; justify-content: flex-end; position: relative; outline: none; }
     .bar .stack { display: flex; flex-direction: column; justify-content: flex-end; width: 100%; max-width: 30px; border-radius: 4px 4px 0 0; overflow: hidden; min-height: 2px; background: #eeede5; }
     .bar .stack i { display: block; width: 100%; }
     .bar .stack i.pend { background: #c9c8bc; }
@@ -43,7 +43,16 @@
     .legend { display: flex; gap: 14px; font-size: 12px; color: var(--muted); font-weight: 600; margin-top: 4px; }
     .legend i { display: inline-block; width: 10px; height: 10px; border-radius: 3px; margin-right: 6px; vertical-align: -1px; }
     .bar span { font-size: 10.5px; color: var(--muted); font-weight: 600; }
-    .bar[data-v]:hover::before { content: attr(data-v); font-size: 11px; font-weight: 700; }
+    /* Etiqueta flotante: no mueve el gráfico ni se corta en los bordes */
+    .tip { position: absolute; left: 50%; transform: translate(-50%, 4px); z-index: 3; background: var(--ink); color: var(--cream); border-radius: 10px; padding: 9px 11px; font-size: 12px; line-height: 1.45; white-space: nowrap; box-shadow: 0 10px 24px rgba(21,22,26,.22); opacity: 0; pointer-events: none; transition: opacity .15s, transform .15s; }
+    .tip b { display: block; font-size: 13px; margin-bottom: 2px; }
+    .tip i { display: inline-block; width: 8px; height: 8px; border-radius: 2px; margin-right: 6px; }
+    .tip span { color: #a9a99c; }
+    .bar:nth-child(-n+2) .tip { left: 0; transform: translate(0, 4px); }
+    .bar:nth-last-child(-n+2) .tip { left: auto; right: 0; transform: translate(0, 4px); }
+    .bar:hover .tip, .bar:focus .tip { opacity: 1; transform: translate(-50%, 0); }
+    .bar:nth-child(-n+2):hover .tip, .bar:nth-child(-n+2):focus .tip, .bar:nth-last-child(-n+2):hover .tip, .bar:nth-last-child(-n+2):focus .tip { transform: none; }
+    .bar:hover .stack, .bar:focus .stack { filter: brightness(1.08); }
     table { width: 100%; border-collapse: collapse; }
     td { padding: 11px 0; border-top: 1px solid #eeede5; font-size: 13.5px; }
     td.r { text-align: right; white-space: nowrap; }
@@ -127,9 +136,11 @@ const pen = months.map(m => sum(delMes(m).filter(f => f.estado !== "pagada")));
 const vals = months.map((_, i) => cob[i] + pen[i]);
 const max = Math.max(...vals, 1);
 const tot = a => a.reduce((x, y) => x + y, 0);
+const mesLargo = m => { const t = new Date(m + "-01T12:00").toLocaleDateString("es-ES", { month: "long", year: "numeric" }); return t[0].toUpperCase() + t.slice(1); };
 document.getElementById("chartSub").textContent = `Últimos 12 meses · ${eur(tot(vals))} · cobrado ${eur(tot(cob))}`;
 document.getElementById("bars").innerHTML = months.map((m, i) => `
-  <div class="bar ${i === 11 ? "now" : ""}" data-v="${vals[i] ? eur(vals[i]) : ""}" title="${vals[i] ? `Cobrado ${eur(cob[i])} · Pendiente ${eur(pen[i])}` : eur(0)}">
+  <div class="bar ${i === 11 ? "now" : ""}" tabindex="0" aria-label="${mesLargo(m)}: ${eur(vals[i])}, cobrado ${eur(cob[i])}, pendiente ${eur(pen[i])}">
+    <div class="tip" style="bottom:${(vals[i] / max) * 150 + 30}px"><b>${mesLargo(m)}</b>${eur(vals[i])}<br /><i style="background:var(--lime2)"></i><span>Cobrado</span> ${eur(cob[i])}<br /><i style="background:#c9c8bc"></i><span>Pendiente</span> ${eur(pen[i])}</div>
     <div class="stack" style="height:${(vals[i] / max) * 150}px"><i class="pend" style="height:${vals[i] ? pen[i] / vals[i] * 100 : 0}%"></i><i class="cob" style="height:${vals[i] ? cob[i] / vals[i] * 100 : 0}%"></i></div>
     <span>${new Date(m + "-01T12:00").toLocaleDateString("es-ES", { month: "short" }).replace(".", "")}</span></div>`).join("");
 
