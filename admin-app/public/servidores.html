@@ -45,8 +45,8 @@
           <thead><tr><th>Servidor</th><th>IP</th><th>Alias SSH</th><th>Uso</th></tr></thead>
           <tbody>
             <tr><td><b>apartamentos</b></td><td>31.70.154.16</td><td><code>apartamentos</code></td><td>Webs de Majosoft y clientes (todo lo que no es de bomberos)</td></tr>
-            <tr><td><b>academia-guiadelbombero</b></td><td>217.154.107.19</td><td><code>majosoft</code></td><td>Solo Guía del Bombero: academia (+ objetivobaeza y WordPress pendientes de decidir)</td></tr>
-            <tr><td><b>academia-objetivo</b></td><td>31.70.141.235</td><td>—</td><td>Sin configurar en el Mac</td></tr>
+            <tr><td><b>academia-guiadelbombero</b></td><td>217.154.107.19</td><td><code>majosoft</code></td><td>Guía del Bombero: academia y WordPress (migración a medias)</td></tr>
+            <tr><td><b>academia-objetivo</b></td><td>31.70.141.235</td><td><code>objetivo</code></td><td>Objetivo Baeza (guardias civiles): academia (academia.objetivobaeza.com) y WordPress</td></tr>
           </tbody>
         </table></div>
       </div>
@@ -100,7 +100,7 @@
           <tbody>
             <tr><td>14-oct-2026</td><td>majosoft (academia-guiadelbombero)</td><td>1,2 GB</td><td>38 MB · <code>guiadelbombero</code></td><td>10 MB · <code>guiadelbombero_wp</code>, <code>objetivobaeza_wp</code></td></tr>
             <tr><td>14-oct-2026</td><td>apartamentos</td><td>281 MB</td><td>12 KB · <code>duna_carraca</code></td><td>519 KB · <code>bambinasigns</code></td></tr>
-            <tr><td>—</td><td>academia-objetivo</td><td colspan="3"><span class="tag warn">Sin copia</span> falta el acceso SSH</td></tr>
+            <tr><td>14-oct-2026</td><td>objetivo (academia-objetivo)</td><td>228 MB</td><td>1,1 MB · <code>academia</code></td><td>— (el WordPress llegó después: está en la copia de «majosoft»)</td></tr>
           </tbody>
         </table></div>
         <p>Cada copia lleva <code>ficheros.tar.gz</code> (<code>/var/www</code> sin <code>node_modules</code>, <code>/etc</code>, <code>/root</code>, <code>/usr/local/bin</code>, crontabs y, en «apartamentos», también <code>/home</code> y <code>/var/backups</code>), <code>postgres-todo.sql.gz</code> (<code>pg_dumpall</code>) y <code>mariadb-todo.sql.gz</code> (todas las bases de datos).</p>
@@ -146,7 +146,8 @@ certbot certificates                 # caducidad de certificados</code></pre>
       <div class="card wide">
         <h2>Historial</h2>
         <ul>
-          <li><b>14-oct-2026</b> — Copia completa de «majosoft» y «apartamentos» guardada en el Mac.</li>
+          <li><b>14-oct-2026</b> — WordPress de Objetivo Baeza trasladado del servidor «majosoft» a «objetivo» (<code>/var/www/objetivobaeza</code>, BD MariaDB <code>objetivobaeza_wp</code>, nginx en :8081, cerrado al exterior por el firewall de IONOS). La web pública <code>objetivobaeza.com</code> sigue en el hosting anterior.</li>
+          <li><b>14-oct-2026</b> — Copia completa de los tres servidores guardada en el Mac.</li>
           <li><b>14-oct-2026</b> — Publicación automática con cada push a <code>main</code> en las cinco webs de «apartamentos».</li>
           <li><b>14-oct-2026</b> — Limpieza de «majosoft»: borradas las copias antiguas de Bambina, Majosoft, Fichaje y María Sánchez (carpetas, nginx, certificados y BD <code>bambinasigns</code>). Archivo de lo borrado en «apartamentos»: <code>/var/backups/restos-majosoft/restos-majosoft-2026-10-14.tar.gz</code>. Copias diarias de web-playa y bambinasigns en marcha.</li>
         </ul>
