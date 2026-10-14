@@ -93,6 +93,20 @@
         <pre><code>ssh apartamentos /usr/local/bin/webs-copia-diaria</code></pre>
       </div>
 
+      <div class="card wide">
+        <h2>Copias completas de los servidores</h2><p class="sub">Copia total hecha a mano, guardada fuera de los servidores, en el Mac: <code>~/Copias-servidores/&lt;fecha&gt;/&lt;servidor&gt;/</code>.</p>
+        <div class="scroll"><table>
+          <thead><tr><th>Fecha</th><th>Servidor</th><th>Ficheros</th><th>PostgreSQL</th><th>MariaDB</th></tr></thead>
+          <tbody>
+            <tr><td>14-oct-2026</td><td>majosoft (academia-guiadelbombero)</td><td>1,2 GB</td><td>38 MB · <code>guiadelbombero</code></td><td>10 MB · <code>guiadelbombero_wp</code>, <code>objetivobaeza_wp</code></td></tr>
+            <tr><td>14-oct-2026</td><td>apartamentos</td><td>281 MB</td><td>12 KB · <code>duna_carraca</code></td><td>519 KB · <code>bambinasigns</code></td></tr>
+            <tr><td>—</td><td>academia-objetivo</td><td colspan="3"><span class="tag warn">Sin copia</span> falta el acceso SSH</td></tr>
+          </tbody>
+        </table></div>
+        <p>Cada copia lleva <code>ficheros.tar.gz</code> (<code>/var/www</code> sin <code>node_modules</code>, <code>/etc</code>, <code>/root</code>, <code>/usr/local/bin</code>, crontabs y, en «apartamentos», también <code>/home</code> y <code>/var/backups</code>), <code>postgres-todo.sql.gz</code> (<code>pg_dumpall</code>) y <code>mariadb-todo.sql.gz</code> (todas las bases de datos).</p>
+        <p><span class="tag warn">Ojo</span> Las copias incluyen <code>/etc</code> y los <code>.env</code>, así que llevan contraseñas y claves: no compartirlas ni subirlas a ningún repo.</p>
+      </div>
+
       <div class="card">
         <h2>Restaurar</h2><p class="sub">Siempre sobre una copia concreta; hacer antes otra copia del estado actual.</p>
         <h3>web-playa</h3>
@@ -132,6 +146,7 @@ certbot certificates                 # caducidad de certificados</code></pre>
       <div class="card wide">
         <h2>Historial</h2>
         <ul>
+          <li><b>14-oct-2026</b> — Copia completa de «majosoft» y «apartamentos» guardada en el Mac.</li>
           <li><b>14-oct-2026</b> — Publicación automática con cada push a <code>main</code> en las cinco webs de «apartamentos».</li>
           <li><b>14-oct-2026</b> — Limpieza de «majosoft»: borradas las copias antiguas de Bambina, Majosoft, Fichaje y María Sánchez (carpetas, nginx, certificados y BD <code>bambinasigns</code>). Archivo de lo borrado en «apartamentos»: <code>/var/backups/restos-majosoft/restos-majosoft-2026-10-14.tar.gz</code>. Copias diarias de web-playa y bambinasigns en marcha.</li>
         </ul>
