@@ -1,5 +1,5 @@
 // Webs de cada servidor y sus copias de seguridad automáticas (script copias-web, igual en los tres).
-// El panel corre en «apartamentos»: ahí se llama al script directamente; en los otros dos, por SSH
+// El panel corre en el servidor Majosoft («apartamentos» en IONOS): ahí se llama al script directamente; en los otros dos, por SSH
 // con una clave que solo puede lanzar copias-web-remoto (estado / activar / desactivar).
 import { execFile } from "node:child_process";
 
@@ -8,7 +8,7 @@ const CLAVE = process.env.COPIAS_CLAVE || "/root/.ssh/copias_panel";
 export const SERVIDORES = [
   { id: "guiadelbombero", nombre: "Guía del Bombero", ip: "217.154.107.19", uso: "Academia de bomberos y su WordPress" },
   { id: "objetivo", nombre: "Objetivo Baeza", ip: "31.70.141.235", uso: "Academia de guardias civiles y su WordPress" },
-  { id: "apartamentos", nombre: "Apartamentos", ip: "31.70.154.16", uso: "Majosoft, Bambina, María Sánchez, Duna Beach y Fichaje", local: true },
+  { id: "apartamentos", nombre: "Majosoft", ip: "31.70.154.16", uso: "Webs de Majosoft y clientes: panel, Fichaje, Bambina, María Sánchez y Duna Beach", local: true },
 ];
 
 function lanzar(servidor, args) {

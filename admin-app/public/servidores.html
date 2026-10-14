@@ -14,7 +14,7 @@
     * { box-sizing: border-box; }
     body { margin: 0; font-family: Inter, system-ui, sans-serif; background: var(--cream); color: var(--ink); font-size: 14px; }
     main { max-width: 1180px; padding: 34px 32px 60px; }
-    .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    .grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 14px; }
     .card { background: #fff; border: 1px solid var(--line); border-radius: 16px; padding: 20px; min-width: 0; }
     .card.wide { grid-column: 1 / -1; }
     .card h2 { font-size: 15px; margin: 0 0 4px; }
@@ -25,7 +25,7 @@
     table { width: 100%; border-collapse: collapse; }
     th { text-align: left; font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); padding: 8px 10px; border-bottom: 1px solid var(--line); }
     td { padding: 10px; border-bottom: 1px solid #eeede5; font-size: 13px; vertical-align: top; }
-    code { font-size: 12px; background: var(--cream); padding: 1px 5px; border-radius: 5px; }
+    code { overflow-wrap: anywhere; font-size: 12px; background: var(--cream); padding: 1px 5px; border-radius: 5px; }
     pre { background: var(--ink); color: var(--cream); padding: 12px 14px; border-radius: 10px; font-size: 12px; overflow-x: auto; margin: 6px 0; }
     pre code { background: none; padding: 0; }
     .tag { display: inline-block; padding: 2px 8px; border-radius: 999px; font-size: 11px; font-weight: 700; background: var(--lime); }
@@ -38,7 +38,9 @@
     .srv-head p { margin: 2px 0 0; color: var(--muted); font-size: 12.5px; }
     .srv-head code { margin-left: auto; background: #fff; border: 1px solid var(--line); }
     .srv-ico { width: 42px; height: 42px; border-radius: 12px; display: grid; place-items: center; font-size: 22px; background: color-mix(in srgb, var(--c) 14%, #fff); }
-    .webs { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 12px; }
+    .webs { display: grid; grid-template-columns: repeat(var(--n, 3), minmax(0, 1fr)); gap: 14px; }
+    @media (max-width: 1100px) { .webs { grid-template-columns: repeat(min(var(--n, 3), 2), minmax(0, 1fr)); } }
+    @media (max-width: 640px) { .webs { grid-template-columns: 1fr; } .srv-head code { display: none; } }
     .web { background: #fff; border: 1px solid var(--line); border-radius: 14px; padding: 14px; display: flex; flex-direction: column; gap: 10px; transition: box-shadow .15s, transform .15s; }
     .web:hover { box-shadow: 0 6px 20px rgba(0,0,0,.06); transform: translateY(-1px); }
     .web header { display: flex; align-items: center; gap: 8px; }
@@ -65,7 +67,7 @@
     .sw input:checked + span::before { transform: translateX(18px); }
     .sw input:disabled + span { opacity: .5; cursor: wait; }
     .sw input:focus-visible + span { outline: 3px solid rgba(214,224,34,.5); }
-    @media (max-width: 900px) { .grid { grid-template-columns: 1fr; } main { padding: 24px 16px 40px; } }
+    @media (max-width: 900px) { .grid { grid-template-columns: minmax(0, 1fr); } main { padding: 24px 16px 40px; } }
   </style>
 </head>
 <body>
@@ -82,7 +84,7 @@
       <div class="card wide">
         <h2>Despliegue</h2><p class="sub">GitHub Actions en las cinco webs.</p>
         <ul>
-          <li>Cada <b>push a <code>main</code></b> publica en «apartamentos». La rama <code>produccion</code> también publica, pero ya no hace falta.</li>
+          <li>Cada <b>push a <code>main</code></b> publica en «majosoft». La rama <code>produccion</code> también publica, pero ya no hace falta.</li>
           <li>Antes de publicar se comprueba (sintaxis, pruebas de fichaje o compilación). Si algo falla, no se publica y la web sigue con la versión anterior.</li>
           <li>Para subir un commit sin publicar: añadir <code>[skip ci]</code> al mensaje.</li>
           <li>El estado de cada publicación se ve en la pestaña <b>Actions</b> del repo en GitHub.</li>
@@ -110,11 +112,11 @@
           <thead><tr><th>Fecha</th><th>Servidor</th><th>Ficheros</th><th>PostgreSQL</th><th>MariaDB</th></tr></thead>
           <tbody>
             <tr><td>14-oct-2026</td><td>guiadelbombero (academia-guiadelbombero)</td><td>1,2 GB</td><td>38 MB · <code>guiadelbombero</code></td><td>10 MB · <code>guiadelbombero_wp</code>, <code>objetivobaeza_wp</code></td></tr>
-            <tr><td>14-oct-2026</td><td>apartamentos</td><td>281 MB</td><td>12 KB · <code>duna_carraca</code></td><td>519 KB · <code>bambinasigns</code></td></tr>
+            <tr><td>14-oct-2026</td><td>majosoft</td><td>281 MB</td><td>12 KB · <code>duna_carraca</code></td><td>519 KB · <code>bambinasigns</code></td></tr>
             <tr><td>14-oct-2026</td><td>objetivo (academia-objetivo)</td><td>228 MB</td><td>1,1 MB · <code>academia</code></td><td>— (el WordPress llegó después: está en la copia de «guiadelbombero»)</td></tr>
           </tbody>
         </table></div>
-        <p>Cada copia lleva <code>ficheros.tar.gz</code> (<code>/var/www</code> sin <code>node_modules</code>, <code>/etc</code>, <code>/root</code>, <code>/usr/local/bin</code>, crontabs y, en «apartamentos», también <code>/home</code> y <code>/var/backups</code>), <code>postgres-todo.sql.gz</code> (<code>pg_dumpall</code>) y <code>mariadb-todo.sql.gz</code> (todas las bases de datos).</p>
+        <p>Cada copia lleva <code>ficheros.tar.gz</code> (<code>/var/www</code> sin <code>node_modules</code>, <code>/etc</code>, <code>/root</code>, <code>/usr/local/bin</code>, crontabs y, en «majosoft», también <code>/home</code> y <code>/var/backups</code>), <code>postgres-todo.sql.gz</code> (<code>pg_dumpall</code>) y <code>mariadb-todo.sql.gz</code> (todas las bases de datos).</p>
         <p><span class="tag warn">Ojo</span> Las copias incluyen <code>/etc</code> y los <code>.env</code>, así que llevan contraseñas y claves: no compartirlas ni subirlas a ningún repo.</p>
       </div>
 
@@ -131,7 +133,7 @@ tar -xzf /var/backups/copias-web/bambinasigns/diarias/bambinasigns-ficheros-AAAA
       </div>
 
       <div class="card">
-        <h2>Comandos habituales</h2><p class="sub">En «apartamentos».</p>
+        <h2>Comandos habituales</h2><p class="sub">En «majosoft».</p>
         <pre><code>systemctl status duna-carraca        # web-playa
 journalctl -u duna-carraca -n 50     # logs web-playa
 pm2 ls                               # panel y fichaje
@@ -141,7 +143,7 @@ certbot certificates                 # caducidad de certificados</code></pre>
       </div>
 
       <div class="card">
-        <h2>Añadir una web nueva</h2><p class="sub">Webs que no son de bomberos van a «apartamentos».</p>
+        <h2>Añadir una web nueva</h2><p class="sub">Webs que no son de bomberos van a «majosoft».</p>
         <ol>
           <li>Subir el código a <code>/var/www/&lt;web&gt;</code>.</li>
           <li>Crear <code>/etc/nginx/sites-available/&lt;web&gt;</code> y enlazarlo en <code>sites-enabled</code>.</li>
@@ -159,8 +161,8 @@ certbot certificates                 # caducidad de certificados</code></pre>
         <ul>
           <li><b>14-oct-2026</b> — WordPress de Objetivo Baeza trasladado del servidor «guiadelbombero» a «objetivo» (<code>/var/www/objetivobaeza</code>, BD MariaDB <code>objetivobaeza_wp</code>, nginx en :8081, cerrado al exterior por el firewall de IONOS). La web pública <code>objetivobaeza.com</code> sigue en el hosting anterior.</li>
           <li><b>14-oct-2026</b> — Copia completa de los tres servidores guardada en el Mac.</li>
-          <li><b>14-oct-2026</b> — Publicación automática con cada push a <code>main</code> en las cinco webs de «apartamentos».</li>
-          <li><b>14-oct-2026</b> — Limpieza de «guiadelbombero»: borradas las copias antiguas de Bambina, Majosoft, Fichaje y María Sánchez (carpetas, nginx, certificados y BD <code>bambinasigns</code>). Archivo de lo borrado en «apartamentos»: <code>/var/backups/restos-majosoft/restos-majosoft-2026-10-14.tar.gz</code>. Copias diarias de web-playa y bambinasigns en marcha.</li>
+          <li><b>14-oct-2026</b> — Publicación automática con cada push a <code>main</code> en las cinco webs de «majosoft».</li>
+          <li><b>14-oct-2026</b> — Limpieza de «guiadelbombero»: borradas las copias antiguas de Bambina, Majosoft, Fichaje y María Sánchez (carpetas, nginx, certificados y BD <code>bambinasigns</code>). Archivo de lo borrado en «majosoft»: <code>/var/backups/restos-majosoft/restos-majosoft-2026-10-14.tar.gz</code>. Copias diarias de web-playa y bambinasigns en marcha.</li>
         </ul>
       </div>
 
@@ -175,7 +177,7 @@ const BD = { postgres: "PostgreSQL", mariadb: "MariaDB", sqlite: "SQLite", ningu
 const caja = document.getElementById("servidores");
 
 const COLOR = { guiadelbombero: "#c8102e", objetivo: "#1f6f43", apartamentos: "#1d6fa5" };
-const EMOJI = { guiadelbombero: "🚒", objetivo: "🛡️", apartamentos: "🏖️" };
+const EMOJI = { guiadelbombero: "🚒", objetivo: "🛡️", apartamentos: "💼" };
 const GH = '<svg viewBox="0 0 16 16" width="14" height="14" fill="currentColor"><path d="M8 0a8 8 0 0 0-2.53 15.59c.4.07.55-.17.55-.38v-1.33c-2.23.48-2.7-1.07-2.7-1.07-.36-.92-.89-1.17-.89-1.17-.73-.5.06-.49.06-.49.8.06 1.23.83 1.23.83.72 1.22 1.88.87 2.34.66.07-.52.28-.87.5-1.07-1.78-.2-3.65-.89-3.65-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82a7.6 7.6 0 0 1 4 0c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.28.82 2.15 0 3.07-1.87 3.75-3.66 3.95.29.25.54.73.54 1.48v2.2c0 .21.15.46.55.38A8 8 0 0 0 8 0z"/></svg>';
 
 function que(w) {
@@ -222,7 +224,7 @@ function pintar(servidores) {
         <div><h2>${esc(s.nombre)}</h2><p>${esc(s.uso)}</p></div>
         <code>${esc(s.ip)}</code>
       </div>
-      ${s.error ? `<p class="bad">${esc(s.error)}</p>` : `<div class="webs">${s.webs.map(w => tarjeta(s, w)).join("")}</div>`}
+      ${s.error ? `<p class="bad">${esc(s.error)}</p>` : `<div class="webs" style="--n:${Math.min(s.webs.length, 3)}">${s.webs.map(w => tarjeta(s, w)).join("")}</div>`}
     </section>`).join("");
 }
 
