@@ -36,8 +36,12 @@
     .card-head a { font-size: 12.5px; font-weight: 700; color: var(--ink); text-decoration: none; border-bottom: 2px solid var(--lime); }
     .bars { display: grid; grid-template-columns: repeat(12, 1fr); gap: 8px; align-items: end; height: 190px; padding-top: 10px; }
     .bar { display: flex; flex-direction: column; align-items: center; gap: 6px; height: 100%; justify-content: flex-end; }
-    .bar i { display: block; width: 100%; max-width: 30px; background: var(--ink); border-radius: 4px 4px 0 0; min-height: 2px; }
-    .bar.now i { background: var(--lime2); }
+    .bar .stack { display: flex; flex-direction: column; justify-content: flex-end; width: 100%; max-width: 30px; border-radius: 4px 4px 0 0; overflow: hidden; min-height: 2px; background: #eeede5; }
+    .bar .stack i { display: block; width: 100%; }
+    .bar .stack i.pend { background: #c9c8bc; }
+    .bar .stack i.cob { background: var(--lime2); }
+    .legend { display: flex; gap: 14px; font-size: 12px; color: var(--muted); font-weight: 600; margin-top: 4px; }
+    .legend i { display: inline-block; width: 10px; height: 10px; border-radius: 3px; margin-right: 6px; vertical-align: -1px; }
     .bar span { font-size: 10.5px; color: var(--muted); font-weight: 600; }
     .bar[data-v]:hover::before { content: attr(data-v); font-size: 11px; font-weight: 700; }
     table { width: 100%; border-collapse: collapse; }
@@ -68,6 +72,7 @@
     <div class="grid">
       <div class="card">
         <h2>Facturación mensual</h2><p class="sub" id="chartSub"></p>
+        <div class="legend"><span><i style="background:var(--lime2)"></i>Cobrado</span><span><i style="background:#c9c8bc"></i>Pendiente de cobro</span></div>
         <div class="bars" id="bars"></div>
       </div>
       <div class="card">
@@ -112,14 +117,20 @@ document.getElementById("kpis").innerHTML = `
 // Últimos 12 meses
 const now = new Date(), months = [];
 for (let i = 11; i >= 0; i--) { const d = new Date(now.getFullYear(), now.getMonth() - i, 1); months.push(d.toISOString().slice(0, 7)); }
-const vals = months.map(m => sum(emitidas.filter(f => f.fecha.startsWith(m))));
+// Cada barra separa lo cobrado (facturas pagadas) de lo pendiente de cobro
+const delMes = m => emitidas.filter(f => f.fecha.startsWith(m));
+const cob = months.map(m => sum(delMes(m).filter(f => f.estado === "pagada")));
+const pen = months.map(m => sum(delMes(m).filter(f => f.estado !== "pagada")));
+const vals = months.map((_, i) => cob[i] + pen[i]);
 const max = Math.max(...vals, 1);
-document.getElementById("chartSub").textContent = `Últimos 12 meses · ${eur(vals.reduce((a, b) => a + b, 0))}`;
+const tot = a => a.reduce((x, y) => x + y, 0);
+document.getElementById("chartSub").textContent = `Últimos 12 meses · ${eur(tot(vals))} · cobrado ${eur(tot(cob))}`;
 document.getElementById("bars").innerHTML = months.map((m, i) => `
-  <div class="bar ${i === 11 ? "now" : ""}" data-v="${vals[i] ? eur(vals[i]) : ""}" title="${eur(vals[i])}">
-    <i style="height:${(vals[i] / max) * 150}px"></i><span>${new Date(m + "-01").toLocaleDateString("es-ES", { month: "short" }).replace(".", "")}</span></div>`).join("");
+  <div class="bar ${i === 11 ? "now" : ""}" data-v="${vals[i] ? eur(vals[i]) : ""}" title="${vals[i] ? `Cobrado ${eur(cob[i])} · Pendiente ${eur(pen[i])}` : eur(0)}">
+    <div class="stack" style="height:${(vals[i] / max) * 150}px"><i class="pend" style="height:${vals[i] ? pen[i] / vals[i] * 100 : 0}%"></i><i class="cob" style="height:${vals[i] ? cob[i] / vals[i] * 100 : 0}%"></i></div>
+    <span>${new Date(m + "-01").toLocaleDateString("es-ES", { month: "short" }).replace(".", "")}</span></div>`).join("");
 
-document.getElementById("lastInv").innerHTML = fac.length ? [...fac].sort((a, b) => b.numero.localeCompare(a.numero)).slice(0, 6).map(f => `
+document.getElementById("lastInv").innerHTML = fac.length ? [...fac].sort((a, b) => String(b.numero).localeCompare(String(a.numero), "es", { numeric: true })).slice(0, 6).map(f => `
   <tr class="click" data-href="/admin/facturas#${f.id}"><td><b>${esc(f.numero)}</b> · ${esc(f.cliente.nombre)}</td><td><span class="pill ${f.estado}">${f.estado}</span></td><td class="r"><b>${eur(totalF(f))}</b></td></tr>`).join("")
   : `<tr><td class="empty">Aún no hay facturas.</td></tr>`;
 document.getElementById("lastBud").innerHTML = pre.length ? pre.slice(0, 6).map(p => `
