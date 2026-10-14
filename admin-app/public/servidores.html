@@ -52,6 +52,8 @@
     .links { display: flex; flex-wrap: wrap; gap: 6px; }
     .chip { display: inline-flex; align-items: center; gap: 5px; padding: 4px 9px; border-radius: 999px; background: var(--cream); color: var(--ink); text-decoration: none; font-size: 12px; font-weight: 600; max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
     a.chip:hover { background: var(--lime); }
+    .gestion { display: block; padding: 8px 10px; border-radius: 10px; background: color-mix(in srgb, var(--c) 10%, #fff); color: var(--c); font-size: 12px; font-weight: 700; text-decoration: none; }
+    .gestion:hover { background: color-mix(in srgb, var(--c) 18%, #fff); }
     .chip.ghost { color: var(--muted); font-weight: 500; }
     .web dl { display: grid; grid-template-columns: 1fr 1fr; gap: 8px 12px; margin: 0; padding-top: 10px; border-top: 1px dashed var(--line); }
     .web dt { font-size: 10.5px; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }
@@ -96,7 +98,7 @@
         <ul>
           <li>Cada web es un fichero en <code>/etc/copias-web/webs/&lt;web&gt;.conf</code> (nombre, URL, GitHub, base de datos y carpeta).</li>
           <li>Activa si existe <code>/etc/copias-web/activas/&lt;web&gt;</code>; el interruptor de arriba lo crea o lo borra.</li>
-          <li>Fichaje usa su propio script (guarda 5 años, por el registro de jornada) en <code>/var/backups/fichaje</code>.</li>
+          <li>Fichaje gestiona las copias de su BD desde su app (pestaña Sistema: copia manual, restaurar y Google Drive cifrado), con su script propio a las 04:30 (guarda 5 años, por el registro de jornada). Aquí solo se guardan sus ficheros.</li>
           <li>El panel entra en los otros servidores con una clave que solo puede consultar, activar o desactivar.</li>
         </ul>
         <p><span class="tag warn">Pendiente</span> Las copias están en el mismo servidor que la web; falta sacarlas fuera.</p>
@@ -160,6 +162,7 @@ certbot certificates                 # caducidad de certificados</code></pre>
         <h2>Historial</h2>
         <ul>
           <li><b>14-oct-2026</b> — WordPress de Objetivo Baeza trasladado del servidor «guiadelbombero» a «objetivo» (<code>/var/www/objetivobaeza</code>, BD MariaDB <code>objetivobaeza_wp</code>, nginx en :8081, cerrado al exterior por el firewall de IONOS). La web pública <code>objetivobaeza.com</code> sigue en el hosting anterior.</li>
+          <li><b>14-oct-2026</b> — Las copias diarias guardan la web entera (BD, código con <code>.env</code>, nginx, servicio y certificados) para poder reconstruirla. Fichaje vuelve a gestionar su BD desde su app.</li>
           <li><b>14-oct-2026</b> — Copia completa de los tres servidores guardada en el Mac.</li>
           <li><b>14-oct-2026</b> — Publicación automática con cada push a <code>main</code> en las cinco webs de «majosoft».</li>
           <li><b>14-oct-2026</b> — Limpieza de «guiadelbombero»: borradas las copias antiguas de Bambina, Majosoft, Fichaje y María Sánchez (carpetas, nginx, certificados y BD <code>bambinasigns</code>). Archivo de lo borrado en «majosoft»: <code>/var/backups/restos-majosoft/restos-majosoft-2026-10-14.tar.gz</code>. Copias diarias de web-playa y bambinasigns en marcha.</li>
@@ -183,8 +186,9 @@ const GH = '<svg viewBox="0 0 16 16" width="14" height="14" fill="currentColor">
 function que(w) {
   const p = [];
   if (w.bd !== "ninguna") p.push(BD[w.bd] || w.bd);
+  if (w.gestion) p.push("BD (en su app)");
   if (w.carpeta) p.push("ficheros");
-  return p.length ? p.join(" + ") : "script propio";
+  return p.length ? p.join(" + ") : "—";
 }
 
 function estadoCopia(w) {
@@ -201,12 +205,13 @@ function tarjeta(s, w) {
       <header>
         <span class="dot ${e.cls}" title="${e.txt}"></span>
         <h3>${esc(w.nombre)}</h3>
-        <label class="sw" title="Copia diaria"><input type="checkbox" data-srv="${esc(s.id)}" data-web="${esc(w.web)}" ${w.activa ? "checked" : ""}><span></span></label>
+        ${w.gestion ? "" : `<label class="sw" title="Copia diaria"><input type="checkbox" data-srv="${esc(s.id)}" data-web="${esc(w.web)}" ${w.activa ? "checked" : ""}><span></span></label>`}
       </header>
       <div class="links">
         ${w.url ? `<a class="chip" href="${esc(w.url)}" target="_blank" rel="noopener">🌐 ${esc(w.url.replace("https://", ""))}</a>` : '<span class="chip ghost">Sin dominio</span>'}
         ${w.github ? `<a class="chip" href="${esc(w.github)}" target="_blank" rel="noopener">${GH} ${esc(w.github.split("/").pop())}</a>` : ""}
       </div>
+      ${w.gestion ? `<a class="gestion" href="${esc(w.gestion)}" target="_blank" rel="noopener">⚙️ Copias gestionadas desde su app (pestaña Sistema) ↗</a>` : ""}
       <dl>
         <div><dt>Copia</dt><dd class="${e.cls}">${e.txt}</dd></div>
         <div><dt>Última</dt><dd>${when(w.ultima)}</dd></div>
