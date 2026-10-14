@@ -31,34 +31,38 @@
     .tag { display: inline-block; padding: 2px 8px; border-radius: 999px; font-size: 11px; font-weight: 700; background: var(--lime); }
     .tag.warn { background: #fde2c4; }
     .scroll { overflow-x: auto; }
-    #servidores { display: grid; gap: 18px; }
-    .srv { border-radius: 18px; background: color-mix(in srgb, var(--c) 6%, #fff); border: 1px solid color-mix(in srgb, var(--c) 22%, var(--line)); padding: 18px; }
-    .srv-head { display: flex; align-items: center; gap: 12px; margin-bottom: 14px; }
-    .srv-head h2 { font-size: 16px; margin: 0; color: var(--c); }
-    .srv-head p { margin: 2px 0 0; color: var(--muted); font-size: 12.5px; }
-    .srv-head code { margin-left: auto; background: #fff; border: 1px solid var(--line); }
-    .srv-ico { width: 42px; height: 42px; border-radius: 12px; display: grid; place-items: center; font-size: 22px; background: color-mix(in srgb, var(--c) 14%, #fff); }
-    .webs { display: grid; grid-template-columns: repeat(var(--n, 3), minmax(0, 1fr)); gap: 14px; }
-    @media (max-width: 1100px) { .webs { grid-template-columns: repeat(min(var(--n, 3), 2), minmax(0, 1fr)); } }
-    @media (max-width: 640px) { .webs { grid-template-columns: 1fr; } .srv-head code { display: none; } }
-    .web { background: #fff; border: 1px solid var(--line); border-radius: 14px; padding: 14px; display: flex; flex-direction: column; gap: 10px; transition: box-shadow .15s, transform .15s; }
-    .web:hover { box-shadow: 0 6px 20px rgba(0,0,0,.06); transform: translateY(-1px); }
-    .web header { display: flex; align-items: center; gap: 8px; }
-    .web h3 { font-size: 14px; margin: 0; flex: 1; line-height: 1.3; }
-    .dot { width: 10px; height: 10px; border-radius: 50%; flex: none; }
-    .dot.ok { background: var(--ok); box-shadow: 0 0 0 4px color-mix(in srgb, var(--ok) 18%, transparent); }
-    .dot.bad { background: var(--bad); box-shadow: 0 0 0 4px color-mix(in srgb, var(--bad) 18%, transparent); }
-    .dot.warn { background: var(--warn); } .dot.off { background: var(--line); }
-    .links { display: flex; flex-wrap: wrap; gap: 6px; }
-    .chip { display: inline-flex; align-items: center; gap: 5px; padding: 4px 9px; border-radius: 999px; background: var(--cream); color: var(--ink); text-decoration: none; font-size: 12px; font-weight: 600; max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-    a.chip:hover { background: var(--lime); }
-    .gestion { display: block; padding: 8px 10px; border-radius: 10px; background: color-mix(in srgb, var(--c) 10%, #fff); color: var(--c); font-size: 12px; font-weight: 700; text-decoration: none; }
-    .gestion:hover { background: color-mix(in srgb, var(--c) 18%, #fff); }
-    .chip.ghost { color: var(--muted); font-weight: 500; }
-    .web dl { display: grid; grid-template-columns: 1fr 1fr; gap: 8px 12px; margin: 0; padding-top: 10px; border-top: 1px dashed var(--line); }
-    .web dt { font-size: 10.5px; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }
-    .web dd { margin: 2px 0 0; font-size: 12.5px; font-weight: 600; }
-    dd.ok { color: var(--ok); } dd.bad { color: var(--bad); } dd.warn { color: var(--warn); } dd.off { color: var(--muted); }
+    #servidores { display: grid; gap: 26px; }
+    .srv-head { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+    .srv-head h2 { font-size: 15px; margin: 0; }
+    .srv-head p { margin: 1px 0 0; color: var(--muted); font-size: 12.5px; }
+    .srv-head code { margin-left: auto; color: var(--muted); }
+    .srv-ico { width: 34px; height: 34px; border-radius: 10px; display: grid; place-items: center; font-size: 17px; background: color-mix(in srgb, var(--c) 12%, #fff); box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--c) 25%, transparent); }
+    .filas { border: 1px solid var(--line); border-radius: 14px; overflow: hidden; }
+    .fila { display: grid; grid-template-columns: minmax(0, 2.4fr) minmax(0, 1.3fr) minmax(0, 1fr) minmax(0, .9fr) 56px; gap: 16px; align-items: center; padding: 13px 16px; }
+    .fila + .fila { border-top: 1px solid #eeede5; }
+    .fila.cab { padding: 9px 16px; background: var(--cream); font-size: 10.5px; letter-spacing: .07em; text-transform: uppercase; color: var(--muted); font-weight: 600; }
+    .fila.cab > :last-child { text-align: right; }
+    .nombre { display: flex; align-items: center; gap: 9px; min-width: 0; }
+    .nombre h3 { font-size: 13.5px; margin: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .nombre > div { min-width: 0; }
+    .links { display: flex; flex-wrap: wrap; gap: 4px 12px; margin-top: 3px; }
+    .links a, .links span { display: inline-flex; align-items: center; gap: 4px; font-size: 12px; color: var(--muted); text-decoration: none; }
+    .links a:hover { color: var(--ink); text-decoration: underline; }
+    .dato { font-size: 12.5px; }
+    .dato small { display: block; color: var(--muted); font-size: 11.5px; }
+    .dot { width: 8px; height: 8px; border-radius: 50%; flex: none; }
+    .dot.ok { background: var(--ok); } .dot.bad { background: var(--bad); } .dot.warn { background: var(--warn); } .dot.off { background: var(--line); }
+    .ctrl { display: flex; justify-content: flex-end; }
+    .gestion { font-size: 12px; font-weight: 600; color: var(--muted); text-decoration: none; white-space: nowrap; }
+    .gestion:hover { color: var(--ink); }
+    @media (max-width: 760px) {
+      .fila.cab { display: none; }
+      .fila { grid-template-columns: minmax(0, 1fr) auto; gap: 6px 12px; }
+      .nombre { grid-column: 1; } .ctrl { grid-column: 2; grid-row: 1; }
+      .dato { grid-column: 1 / -1; padding-left: 17px; }
+      .dato small { display: inline; margin-left: 4px; }
+      .srv-head code { display: none; }
+    }
     .muted { color: var(--muted); }
     .bad { color: var(--bad); font-weight: 700; }
     .sw { position: relative; display: inline-block; width: 40px; height: 22px; cursor: pointer; }
@@ -74,12 +78,12 @@
 </head>
 <body>
   <main>
-    <div class="page-head"><div><div class="crumbs">Sistemas</div><h1>Servidores</h1><p>Qué hay en cada servidor, copias de seguridad y procedimientos. Actualizado: 14-oct-2026.</p></div></div>
+    <div class="page-head"><div><div class="crumbs">Sistemas</div><h1>Servidores</h1><p>Qué hay en cada servidor y el estado de sus copias. Actualizado: 14-oct-2026.</p></div></div>
     <div class="grid">
 
       <div class="card wide">
         <h2>Webs y copias automáticas</h2>
-        <p class="sub">Estado en directo de cada servidor. La copia diaria se hace a las 05:00 (hora de España) en cada servidor: 35 diarias y 12 mensuales en <code>/var/backups/copias-web/&lt;web&gt;/</code>. Desactivar una copia no borra las ya hechas.</p>
+        <p class="sub">Estado en directo. Copia diaria a las 05:00; se guardan 35 diarias y 12 mensuales. Desactivar una copia no borra las ya hechas.</p>
         <div id="servidores"><p class="sub">Consultando los servidores…</p></div>
       </div>
 
@@ -123,38 +127,35 @@ function estadoCopia(w) {
   return { cls: "ok", txt: "Copia al día" };
 }
 
-function tarjeta(s, w) {
+function fila(s, w) {
   const e = estadoCopia(w);
+  const dominio = w.url ? `<a href="${esc(w.url)}" target="_blank" rel="noopener">🌐 ${esc(w.url.replace("https://", ""))}</a>` : "<span>Sin dominio</span>";
+  const repo = w.github ? `<a href="${esc(w.github)}" target="_blank" rel="noopener">${GH} ${esc(w.github.split("/").pop())}</a>` : "";
+  const ctrl = w.gestion
+    ? `<a class="gestion" href="${esc(w.gestion)}" target="_blank" rel="noopener" title="Copias de la BD gestionadas desde su app (pestaña Sistema)">En su app ↗</a>`
+    : `<label class="sw" title="Copia diaria"><input type="checkbox" data-srv="${esc(s.id)}" data-web="${esc(w.web)}" ${w.activa ? "checked" : ""}><span></span></label>`;
   return `
-    <article class="web">
-      <header>
-        <span class="dot ${e.cls}" title="${e.txt}"></span>
-        <h3>${esc(w.nombre)}</h3>
-        ${w.gestion ? "" : `<label class="sw" title="Copia diaria"><input type="checkbox" data-srv="${esc(s.id)}" data-web="${esc(w.web)}" ${w.activa ? "checked" : ""}><span></span></label>`}
-      </header>
-      <div class="links">
-        ${w.url ? `<a class="chip" href="${esc(w.url)}" target="_blank" rel="noopener">🌐 ${esc(w.url.replace("https://", ""))}</a>` : '<span class="chip ghost">Sin dominio</span>'}
-        ${w.github ? `<a class="chip" href="${esc(w.github)}" target="_blank" rel="noopener">${GH} ${esc(w.github.split("/").pop())}</a>` : ""}
-      </div>
-      ${w.gestion ? `<a class="gestion" href="${esc(w.gestion)}" target="_blank" rel="noopener">⚙️ Copias gestionadas desde su app (pestaña Sistema) ↗</a>` : ""}
-      <dl>
-        <div><dt>Copia</dt><dd class="${e.cls}">${e.txt}</dd></div>
-        <div><dt>Última</dt><dd>${when(w.ultima)}</dd></div>
-        <div><dt>Qué guarda</dt><dd>${esc(que(w))}</dd></div>
-        <div><dt>Guardadas</dt><dd>${w.copias} · ${esc(w.total || "0")}</dd></div>
-      </dl>
-    </article>`;
+    <div class="fila">
+      <div class="nombre"><span class="dot ${e.cls}" title="${e.txt}"></span><div><h3>${esc(w.nombre)}</h3><div class="links">${dominio}${repo}</div></div></div>
+      <div class="dato">${esc(que(w))}</div>
+      <div class="dato estado">${when(w.ultima)}<small>${e.txt}</small></div>
+      <div class="dato">${w.copias} copias<small>${esc(w.total || "0")}</small></div>
+      <div class="ctrl">${ctrl}</div>
+    </div>`;
 }
 
 function pintar(servidores) {
   caja.innerHTML = servidores.map(s => `
-    <section class="srv" style="--c:${COLOR[s.id] || "var(--ink)"}">
+    <section style="--c:${COLOR[s.id] || "var(--ink)"}">
       <div class="srv-head">
         <span class="srv-ico">${EMOJI[s.id] || "🖥️"}</span>
         <div><h2>${esc(s.nombre)}</h2><p>${esc(s.uso)}</p></div>
         <code>${esc(s.ip)}</code>
       </div>
-      ${s.error ? `<p class="bad">${esc(s.error)}</p>` : `<div class="webs" style="--n:${Math.min(s.webs.length, 3)}">${s.webs.map(w => tarjeta(s, w)).join("")}</div>`}
+      ${s.error ? `<p class="bad">${esc(s.error)}</p>` : `<div class="filas">
+        <div class="fila cab"><div>Web</div><div>Qué guarda</div><div>Última copia</div><div>Guardadas</div><div>Diaria</div></div>
+        ${s.webs.map(w => fila(s, w)).join("")}
+      </div>`}
     </section>`).join("");
 }
 
@@ -166,9 +167,9 @@ caja.addEventListener("change", async e => {
   try {
     await api("servidores/copias", { method: "POST", body: { servidor: el.dataset.srv, web: el.dataset.web, activa: el.checked } });
     toast(el.checked ? "Copia diaria activada" : "Copia diaria desactivada");
-    const dot = el.closest(".web").querySelector(".dot"), dd = el.closest(".web").querySelector("dl dd");
-    if (!el.checked) { dot.className = "dot off"; dd.className = "off"; dd.textContent = "Copia desactivada"; }
-    else { dot.className = "dot ok"; dd.className = "ok"; dd.textContent = "Activada"; }
+    const f = el.closest(".fila"), dot = f.querySelector(".dot"), txt = f.querySelector(".estado small");
+    dot.className = el.checked ? "dot ok" : "dot off";
+    txt.textContent = el.checked ? "Activada" : "Copia desactivada";
   } catch (err) {
     el.checked = !el.checked;
     toast(err.message, true);
