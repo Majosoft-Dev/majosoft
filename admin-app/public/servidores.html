@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Servidores · Panel Majosoft</title>
+  <meta name="robots" content="noindex, nofollow" />
+  <link rel="icon" type="image/svg+xml" href="/assets/favicon.svg" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/admin/panel.css" />
+  <style>
+    * { box-sizing: border-box; }
+    body { margin: 0; font-family: Inter, system-ui, sans-serif; background: var(--cream); color: var(--ink); font-size: 14px; }
+    main { max-width: 1180px; padding: 34px 32px 60px; }
+    .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    .card { background: #fff; border: 1px solid var(--line); border-radius: 16px; padding: 20px; min-width: 0; }
+    .card.wide { grid-column: 1 / -1; }
+    .card h2 { font-size: 15px; margin: 0 0 4px; }
+    .card h3 { font-size: 13px; margin: 18px 0 6px; }
+    .card .sub { color: var(--muted); font-size: 12.5px; margin: 0 0 14px; line-height: 1.5; }
+    .card p, .card li { line-height: 1.55; }
+    .card ol, .card ul { padding-left: 20px; margin: 6px 0; }
+    table { width: 100%; border-collapse: collapse; }
+    th { text-align: left; font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); padding: 8px 10px; border-bottom: 1px solid var(--line); }
+    td { padding: 10px; border-bottom: 1px solid #eeede5; font-size: 13px; vertical-align: top; }
+    code { font-size: 12px; background: var(--cream); padding: 1px 5px; border-radius: 5px; }
+    pre { background: var(--ink); color: var(--cream); padding: 12px 14px; border-radius: 10px; font-size: 12px; overflow-x: auto; margin: 6px 0; }
+    pre code { background: none; padding: 0; }
+    .tag { display: inline-block; padding: 2px 8px; border-radius: 999px; font-size: 11px; font-weight: 700; background: var(--lime); }
+    .tag.warn { background: #fde2c4; }
+    .scroll { overflow-x: auto; }
+    @media (max-width: 900px) { .grid { grid-template-columns: 1fr; } main { padding: 24px 16px 40px; } }
+  </style>
+</head>
+<body>
+  <main>
+    <div class="page-head"><div><div class="crumbs">Sistemas</div><h1>Servidores</h1><p>Qué hay en cada servidor, copias de seguridad y procedimientos. Actualizado: 14-oct-2026.</p></div></div>
+    <div class="grid">
+
+      <div class="card wide">
+        <h2>Servidores</h2><p class="sub">VPS de IONOS (Ubuntu 24.04). Se entra con <code>ssh &lt;alias&gt;</code> desde el Mac.</p>
+        <div class="scroll"><table>
+          <thead><tr><th>Servidor</th><th>IP</th><th>Alias SSH</th><th>Uso</th></tr></thead>
+          <tbody>
+            <tr><td><b>apartamentos</b></td><td>31.70.154.16</td><td><code>apartamentos</code></td><td>Webs de Majosoft y clientes (todo lo que no es de bomberos)</td></tr>
+            <tr><td><b>academia-guiadelbombero</b></td><td>217.154.107.19</td><td><code>majosoft</code></td><td>Solo Guía del Bombero: academia (+ objetivobaeza y WordPress pendientes de decidir)</td></tr>
+            <tr><td><b>academia-objetivo</b></td><td>31.70.141.235</td><td>—</td><td>Sin configurar en el Mac</td></tr>
+          </tbody>
+        </table></div>
+      </div>
+
+      <div class="card wide">
+        <h2>Webs en «apartamentos»</h2><p class="sub">nginx delante de todo. Certificados Let's Encrypt con renovación automática (<code>certbot.timer</code>).</p>
+        <div class="scroll"><table>
+          <thead><tr><th>Web</th><th>Carpeta</th><th>Cómo corre</th><th>Base de datos</th><th>Despliegue</th></tr></thead>
+          <tbody>
+            <tr><td>apartamentos.majosoft.es <span class="tag">web-playa</span></td><td><code>/var/www/duna-carraca</code></td><td>systemd <code>duna-carraca</code> (Astro, :4321)</td><td>PostgreSQL <code>duna_carraca</code></td><td>compila y publica</td></tr>
+            <tr><td>majosoft.es + /admin</td><td><code>/var/www/devmajosoft/Majosoft</code></td><td>estática + PM2 <code>majosoft-admin</code> (:3060)</td><td>SQLite del panel</td><td>publica el commit subido</td></tr>
+            <tr><td>fichaje.majosoft.es</td><td><code>/var/www/fichaje-majosoft-app</code></td><td>PM2 <code>fichaje-majosoft</code> (:3050)</td><td>SQLite</td><td>pasa las pruebas y publica</td></tr>
+            <tr><td>bambinasigns.es</td><td><code>/var/www/bambinasigns.es/htdocs</code></td><td>estática (Astro) + API PHP 8.5</td><td>MariaDB <code>bambinasigns</code></td><td>compila y publica</td></tr>
+            <tr><td>mariasanchezfdez.es</td><td><code>/var/www/mariasanchezfdez.es</code></td><td>estática</td><td>—</td><td>publica el commit subido</td></tr>
+          </tbody>
+        </table></div>
+      </div>
+
+      <div class="card wide">
+        <h2>Despliegue</h2><p class="sub">GitHub Actions en las cinco webs.</p>
+        <ul>
+          <li>Cada <b>push a <code>main</code></b> publica en «apartamentos». La rama <code>produccion</code> también publica, pero ya no hace falta.</li>
+          <li>Antes de publicar se comprueba (sintaxis, pruebas de fichaje o compilación). Si algo falla, no se publica y la web sigue con la versión anterior.</li>
+          <li>Para subir un commit sin publicar: añadir <code>[skip ci]</code> al mensaje.</li>
+          <li>El estado de cada publicación se ve en la pestaña <b>Actions</b> del repo en GitHub.</li>
+        </ul>
+      </div>
+
+      <div class="card">
+        <h2>Copias de seguridad</h2><p class="sub">Cron de root en «apartamentos». Diarias: 35 · mensuales: 12 (fichaje: 60).</p>
+        <div class="scroll"><table>
+          <thead><tr><th>Qué</th><th>Hora</th><th>Dónde</th></tr></thead>
+          <tbody>
+            <tr><td>Fichaje (SQLite)</td><td>04:30 (España)</td><td><code>/var/backups/fichaje</code></td></tr>
+            <tr><td>web-playa (PostgreSQL)</td><td>05:00 (España)</td><td><code>/var/backups/webs</code></td></tr>
+            <tr><td>bambinasigns (BD + htdocs)</td><td>05:00 (España)</td><td><code>/var/backups/webs</code></td></tr>
+            <tr><td>Academia (servidor majosoft)</td><td>diaria</td><td>ver docs del repo Dev-Majosoft</td></tr>
+          </tbody>
+        </table></div>
+        <p><span class="tag warn">Pendiente</span> Las copias están en el mismo servidor; falta sacarlas fuera.</p>
+        <h3>Ver el registro</h3>
+        <pre><code>ssh apartamentos 'tail -20 /var/log/webs-copias.log'</code></pre>
+        <h3>Lanzar una copia a mano</h3>
+        <pre><code>ssh apartamentos /usr/local/bin/webs-copia-diaria</code></pre>
+      </div>
+
+      <div class="card">
+        <h2>Restaurar</h2><p class="sub">Siempre sobre una copia concreta; hacer antes otra copia del estado actual.</p>
+        <h3>web-playa</h3>
+        <pre><code>systemctl stop duna-carraca
+runuser -u postgres -- pg_restore --clean -d duna_carraca \
+  /var/backups/webs/diarias/duna-carraca-AAAA-MM-DD.dump
+systemctl start duna-carraca</code></pre>
+        <h3>bambinasigns</h3>
+        <pre><code>zcat /var/backups/webs/diarias/bambinasigns-bd-AAAA-MM-DD.sql.gz | mariadb bambinasigns
+tar -xzf /var/backups/webs/diarias/bambinasigns-ficheros-AAAA-MM-DD.tar.gz -C /var/www/bambinasigns.es</code></pre>
+      </div>
+
+      <div class="card">
+        <h2>Comandos habituales</h2><p class="sub">En «apartamentos».</p>
+        <pre><code>systemctl status duna-carraca        # web-playa
+journalctl -u duna-carraca -n 50     # logs web-playa
+pm2 ls                               # panel y fichaje
+pm2 logs majosoft-admin --lines 50
+nginx -t &amp;&amp; systemctl reload nginx   # tras tocar nginx
+certbot certificates                 # caducidad de certificados</code></pre>
+      </div>
+
+      <div class="card">
+        <h2>Añadir una web nueva</h2><p class="sub">Webs que no son de bomberos van a «apartamentos».</p>
+        <ol>
+          <li>Subir el código a <code>/var/www/&lt;web&gt;</code>.</li>
+          <li>Crear <code>/etc/nginx/sites-available/&lt;web&gt;</code> y enlazarlo en <code>sites-enabled</code>.</li>
+          <li><code>nginx -t &amp;&amp; systemctl reload nginx</code>.</li>
+          <li>Apuntar el DNS (registro A) a <b>31.70.154.16</b>.</li>
+          <li><code>certbot --nginx -d &lt;dominio&gt;</code>.</li>
+          <li>Copiar el workflow de despliegue de otra web (<code>.github/workflows/</code>) para que publique con cada push a <code>main</code>.</li>
+          <li>Si tiene base de datos, añadirla a <code>/usr/local/bin/webs-copia-diaria</code>.</li>
+          <li>Apuntarla en esta página.</li>
+        </ol>
+      </div>
+
+      <div class="card wide">
+        <h2>Historial</h2>
+        <ul>
+          <li><b>14-oct-2026</b> — Publicación automática con cada push a <code>main</code> en las cinco webs de «apartamentos».</li>
+          <li><b>14-oct-2026</b> — Limpieza de «majosoft»: borradas las copias antiguas de Bambina, Majosoft, Fichaje y María Sánchez (carpetas, nginx, certificados y BD <code>bambinasigns</code>). Archivo de lo borrado en «apartamentos»: <code>/var/backups/restos-majosoft/restos-majosoft-2026-10-14.tar.gz</code>. Copias diarias de web-playa y bambinasigns en marcha.</li>
+        </ul>
+      </div>
+
+    </div>
+  </main>
+<script type="module">
+import { mountShell } from "/admin/panel.js";
+await mountShell("servidores");
+</script>
+</body>
+</html>

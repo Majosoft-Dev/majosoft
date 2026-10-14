@@ -322,7 +322,7 @@ app.get("/admin/api/correo/mensajes/:uid/adjuntos/:i", wrap(async (req, res) => 
 }));
 
 /* ===== Páginas privadas ===== */
-const PAGES = { "": "index.html", presupuestos: "presupuestos.html", facturas: "facturas.html", correo: "correo.html", mensajes: "mensajes.html", seguridad: "seguridad.html" };
+const PAGES = { "": "index.html", presupuestos: "presupuestos.html", facturas: "facturas.html", correo: "correo.html", mensajes: "mensajes.html", seguridad: "seguridad.html", servidores: "servidores.html" };
 app.get("/admin/panel.js", (req, res) => res.sendFile(path.join(PUBLIC, "panel.js")));
 app.get(["/admin", "/admin/:page"], (req, res, next) => {
   const f = PAGES[(req.params.page || "").replace(/\.html$/, "")];
