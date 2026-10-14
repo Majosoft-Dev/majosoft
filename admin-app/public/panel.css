@@ -101,6 +101,9 @@ body .add { color: var(--ink); } /* Safari en iPad pinta los botones en azul */
 input[type="checkbox"] { width: 16px; height: 16px; flex: none; }
 /* Todas las cajas de una línea miden lo mismo: texto, números, fechas y desplegables */
 body label.f input:not([type="checkbox"]):not([type="radio"]):not([type="file"]), body label.f select { height: 42px; line-height: normal; }
+/* El texto escrito no hereda la negrita de la etiqueta */
+body label.f input, body label.f select, body label.f textarea { font-weight: 500; }
+body label.f input::placeholder, body label.f textarea::placeholder { font-weight: 400; color: #a3a297; }
 /* Safari en iOS/iPadOS: fecha alineada a la izquierda y con la misma altura que el resto */
 @supports (-webkit-touch-callout: none) {
   body label.f input[type="date"] { -webkit-appearance: none; appearance: none; text-align: left; }

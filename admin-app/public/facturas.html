@@ -96,11 +96,12 @@
     /* Tablet y móvil: formulario arriba (secciones en dos columnas) y la factura debajo, ajustada al ancho */
     @media (max-width: 1279px) {
       .edit { grid-template-columns: 1fr; height: auto; }
-      .form { border-right: none; display: grid; grid-template-columns: 1fr 1fr; gap: 12px; align-items: start; padding: 16px 16px 4px; }
-      .form .sec { margin: 0; }
+      /* Secciones en dos columnas que se rellenan de arriba abajo: sin huecos cuando una sección es más corta */
+      .form { border-right: none; columns: 2; column-gap: 12px; padding: 16px 16px 4px; }
+      .form .sec { break-inside: avoid; margin: 0 0 12px; }
       .prev { padding: 16px; overflow: hidden; }
     }
-    @media (max-width: 700px) { .form { grid-template-columns: 1fr; } }
+    @media (max-width: 700px) { .form { columns: 1; } }
 
     /* ===== Factura A4 ===== */
     .sheet { width: 210mm; height: 297mm; margin: 0 auto; background: #fff; box-shadow: 0 20px 60px rgba(21,22,26,.18); display: flex; flex-direction: column; font-size: 9.5pt; line-height: 1.5; padding: 16mm 18mm 0; position: relative; overflow: hidden; }
