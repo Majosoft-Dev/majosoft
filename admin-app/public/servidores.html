@@ -36,7 +36,9 @@
     .srv-head h2 { font-size: 15px; margin: 0; }
     .srv-head p { margin: 1px 0 0; color: var(--muted); font-size: 12.5px; }
     .srv-head code { margin-left: auto; color: var(--muted); }
-    .srv-ico { width: 34px; height: 34px; border-radius: 10px; display: grid; place-items: center; font-size: 17px; background: color-mix(in srgb, var(--c) 12%, #fff); box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--c) 25%, transparent); }
+    .srv-ico { width: 40px; height: 40px; border-radius: 10px; flex: none; display: grid; place-items: center; overflow: hidden; background: var(--c); }
+    .srv-ico img { width: 100%; height: 100%; object-fit: contain; padding: 5px; }
+    .srv-ico.propio { background: none; } .srv-ico.propio img { padding: 0; }
     .filas { border: 1px solid var(--line); border-radius: 14px; overflow: hidden; }
     .fila { display: grid; grid-template-columns: minmax(0, 2.4fr) minmax(0, 1.3fr) minmax(0, 1fr) minmax(0, .9fr) 56px; gap: 16px; align-items: center; padding: 13px 16px; }
     .fila + .fila { border-top: 1px solid #eeede5; }
@@ -109,7 +111,8 @@ const BD = { postgres: "PostgreSQL", mariadb: "MariaDB", sqlite: "SQLite", ningu
 const caja = document.getElementById("servidores");
 
 const COLOR = { guiadelbombero: "#c8102e", objetivo: "#1f6f43", apartamentos: "#1d6fa5" };
-const EMOJI = { guiadelbombero: "🚒", objetivo: "🛡️", apartamentos: "💼" };
+// Logos oficiales (blancos sobre el color de la marca; el de Majosoft ya trae su fondo)
+const LOGO = { guiadelbombero: "/assets/servidores/guiadelbombero.png", objetivo: "/assets/servidores/objetivo.png", apartamentos: "/assets/servidores/majosoft.svg" };
 const GH = '<svg viewBox="0 0 16 16" width="14" height="14" fill="currentColor"><path d="M8 0a8 8 0 0 0-2.53 15.59c.4.07.55-.17.55-.38v-1.33c-2.23.48-2.7-1.07-2.7-1.07-.36-.92-.89-1.17-.89-1.17-.73-.5.06-.49.06-.49.8.06 1.23.83 1.23.83.72 1.22 1.88.87 2.34.66.07-.52.28-.87.5-1.07-1.78-.2-3.65-.89-3.65-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82a7.6 7.6 0 0 1 4 0c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.28.82 2.15 0 3.07-1.87 3.75-3.66 3.95.29.25.54.73.54 1.48v2.2c0 .21.15.46.55.38A8 8 0 0 0 8 0z"/></svg>';
 
 function que(w) {
@@ -148,7 +151,7 @@ function pintar(servidores) {
   caja.innerHTML = servidores.map(s => `
     <section style="--c:${COLOR[s.id] || "var(--ink)"}">
       <div class="srv-head">
-        <span class="srv-ico">${EMOJI[s.id] || "🖥️"}</span>
+        <span class="srv-ico${s.id === "apartamentos" ? " propio" : ""}">${LOGO[s.id] ? `<img src="${LOGO[s.id]}" alt="">` : "🖥️"}</span>
         <div><h2>${esc(s.nombre)}</h2><p>${esc(s.uso)}</p></div>
         <code>${esc(s.ip)}</code>
       </div>
