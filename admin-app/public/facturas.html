@@ -79,8 +79,9 @@
     label.f input:focus, label.f textarea:focus, label.f select:focus { outline: 3px solid rgba(214,224,34,.5); border-color: var(--ink); background: #fff; }
     label.f textarea { min-height: 64px; resize: vertical; }
     .row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-    .chk-venc { display: flex; align-items: center; gap: 6px; }
-    .chk-venc input { width: auto !important; margin: 0 !important; accent-color: var(--ink); }
+    /* La casilla ocupa la misma altura que el texto de las demás etiquetas, para que las cajas queden alineadas */
+    .chk-venc { display: flex; align-items: center; gap: 6px; height: 1.25em; }
+    .chk-venc input { width: 14px !important; height: 14px !important; margin: 0 !important; accent-color: var(--ink); }
     label.f input:disabled { opacity: .45; }
     .line { background: #fafaf5; border: 1px solid #eeede5; border-radius: 11px; padding: 4px 12px 12px; margin-top: 12px; position: relative; }
     .line .x { position: absolute; top: 8px; right: 8px; border: 1px solid var(--line); background: #fff; border-radius: 7px; width: 26px; height: 26px; cursor: pointer; color: var(--muted); }

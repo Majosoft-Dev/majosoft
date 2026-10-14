@@ -99,9 +99,11 @@ tbody tr:nth-child(5) { animation-delay: .08s; } tbody tr:nth-child(n+6) { anima
 label.f input, label.f select, label.f textarea { min-width: 0; max-width: 100%; }
 body .add { color: var(--ink); } /* Safari en iPad pinta los botones en azul */
 input[type="checkbox"] { width: 16px; height: 16px; flex: none; }
+/* Todas las cajas de una línea miden lo mismo: texto, números, fechas y desplegables */
+body label.f input:not([type="checkbox"]):not([type="radio"]):not([type="file"]), body label.f select { height: 42px; line-height: normal; }
 /* Safari en iOS/iPadOS: fecha alineada a la izquierda y con la misma altura que el resto */
 @supports (-webkit-touch-callout: none) {
-  body label.f input[type="date"] { -webkit-appearance: none; appearance: none; min-height: 2.75em; text-align: left; }
+  body label.f input[type="date"] { -webkit-appearance: none; appearance: none; text-align: left; }
   label.f input[type="date"]::-webkit-date-and-time-value { text-align: left; margin: 0; }
 }
 /* Pantallas táctiles: letra de 16 px en los campos para que el iPad no haga zoom al escribir */
