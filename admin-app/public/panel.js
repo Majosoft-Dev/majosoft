@@ -11,10 +11,13 @@ const ICONS = {
 const icon = n => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">${ICONS[n]}</svg>`;
 
 export async function api(path, { method = "GET", body } = {}) {
+  const json = body ? JSON.stringify(body) : undefined;
   const res = await fetch("/admin/api/" + path, {
     method, credentials: "same-origin",
     headers: { "X-Requested-With": "majosoft", ...(body ? { "Content-Type": "application/json" } : {}) },
-    body: body ? JSON.stringify(body) : undefined,
+    body: json,
+    // keepalive: la petición termina aunque se cambie de página (el navegador lo limita a ~64 KB)
+    keepalive: method !== "GET" && (!json || json.length < 60000),
   });
   if (res.status === 401) { location.href = "/admin/login"; throw new Error("Sesión caducada"); }
   const data = await res.json().catch(() => ({}));
@@ -30,16 +33,22 @@ export function toast(msg, err = false) {
   clearTimeout(toastT); toastT = setTimeout(() => toastEl.className = "toast", 2600);
 }
 
-// Guardado automático con espera: agrupa cambios seguidos en una sola petición
+// Guardado automático con espera: agrupa cambios seguidos en una sola petición.
+// save.flush() guarda ya lo pendiente; también se guarda solo al salir de la página.
+const pendientes = new Set();
+addEventListener("pagehide", () => pendientes.forEach(f => f()));
+document.addEventListener("visibilitychange", () => { if (document.visibilityState === "hidden") pendientes.forEach(f => f()); });
 export function autosaver(fn, delay = 700) {
   let t, el;
   const state = s => { el ??= document.querySelector("[data-save-state]"); if (el) el.textContent = s; };
-  return () => {
-    state("Guardando…"); clearTimeout(t);
-    t = setTimeout(async () => {
-      try { await fn(); state("Guardado ✓"); } catch (e) { state("Sin guardar"); toast(e.message, true); }
-    }, delay);
+  const run = async () => {
+    clearTimeout(t); pendientes.delete(flush);
+    try { await fn(); state("Guardado ✓"); } catch (e) { state("Sin guardar"); toast(e.message, true); }
   };
+  const flush = () => pendientes.has(flush) ? run() : Promise.resolve();
+  const save = () => { state("Guardando…"); clearTimeout(t); pendientes.add(flush); t = setTimeout(run, delay); };
+  save.flush = flush;
+  return save;
 }
 
 export async function mountShell(active) {
