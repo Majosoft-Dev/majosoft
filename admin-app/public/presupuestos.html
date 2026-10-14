@@ -156,11 +156,11 @@
     .contact span { color: #a9a99c; font-size: 9pt; }
     .contact img { height: 22px; filter: invert(1); }
 
-    @media (max-width: 900px) {
+    /* Tablet y móvil: editor arriba y el documento debajo, ajustado al ancho */
+    @media (max-width: 1279px) {
       .app { grid-template-columns: 1fr; height: auto; }
-      .editor { border-right: none; }
-      .preview-wrap { padding: 16px; }
-      .doc { zoom: .45; }
+      .editor { border-right: none; padding-bottom: 8px; }
+      .preview-wrap { padding: 16px; overflow: hidden; }
     }
     @page { size: A4; margin: 0; }
     @media print {
@@ -401,8 +401,9 @@ function render() {
 // La vista previa se ajusta al ancho disponible: se ve la hoja entera, sin zoom ni desplazamiento lateral
 function ajustarVista() {
   const wrap = document.querySelector(".preview-wrap"), doc = document.getElementById("doc");
-  if (!wrap || !doc || matchMedia("(max-width: 900px)").matches) return;
-  const disponible = wrap.clientWidth - 64, hoja = 210 * 96 / 25.4;
+  if (!wrap || !doc || !wrap.clientWidth) return;
+  const cs = getComputedStyle(wrap), hoja = 210 * 96 / 25.4;
+  const disponible = wrap.clientWidth - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight);
   doc.style.zoom = Math.min(1, disponible / hoja).toFixed(3);
 }
 addEventListener("resize", ajustarVista);

@@ -79,6 +79,9 @@
     label.f input:focus, label.f textarea:focus, label.f select:focus { outline: 3px solid rgba(214,224,34,.5); border-color: var(--ink); background: #fff; }
     label.f textarea { min-height: 64px; resize: vertical; }
     .row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .chk-venc { display: flex; align-items: center; gap: 6px; }
+    .chk-venc input { width: auto !important; margin: 0 !important; accent-color: var(--ink); }
+    label.f input:disabled { opacity: .45; }
     .line { background: #fafaf5; border: 1px solid #eeede5; border-radius: 11px; padding: 4px 12px 12px; margin-top: 12px; position: relative; }
     .line .x { position: absolute; top: 8px; right: 8px; border: 1px solid var(--line); background: #fff; border-radius: 7px; width: 26px; height: 26px; cursor: pointer; color: var(--muted); }
     .line .x:hover { color: #b42318; border-color: #b42318; }
@@ -89,8 +92,14 @@
     .logo-row { display: flex; align-items: center; gap: 12px; margin-top: 10px; }
     .logo-prev { height: 40px; width: auto; }
     .logo-row .add { width: auto; margin: 0; padding: 7px 12px; }
-    @media (max-width: 900px) { .edit { height: auto; } }
-    @media screen and (min-width: 901px) and (max-width: 1700px) { .prev .sheet { zoom: .8; } }
+    /* Tablet y móvil: formulario arriba (secciones en dos columnas) y la factura debajo, ajustada al ancho */
+    @media (max-width: 1279px) {
+      .edit { grid-template-columns: 1fr; height: auto; }
+      .form { border-right: none; display: grid; grid-template-columns: 1fr 1fr; gap: 12px; align-items: start; padding: 16px 16px 4px; }
+      .form .sec { margin: 0; }
+      .prev { padding: 16px; overflow: hidden; }
+    }
+    @media (max-width: 700px) { .form { grid-template-columns: 1fr; } }
 
     /* ===== Factura A4 ===== */
     .sheet { width: 210mm; height: 297mm; margin: 0 auto; background: #fff; box-shadow: 0 20px 60px rgba(21,22,26,.18); display: flex; flex-direction: column; font-size: 9.5pt; line-height: 1.5; padding: 16mm 18mm 0; position: relative; overflow: hidden; }
@@ -146,18 +155,13 @@
     .thanks span { font-size: 7.5pt; color: var(--muted); max-width: 85mm; text-align: right; }
     .s-foot { display: flex; justify-content: space-between; color: var(--muted); font-size: 7.5pt; padding: 4mm 0 8mm; border-top: 1px solid var(--line); }
 
-    @media (max-width: 900px) {
-      .edit { grid-template-columns: 1fr; height: auto; }
-      .prev { padding: 16px; }
-      .sheet { zoom: .45; }
-    }
     @page { size: A4; margin: 0; }
     @media print {
       body { background: #fff; }
       .topbar, .form, .panel { display: none !important; }
       .edit { display: block; height: auto; }
       .prev { padding: 0; background: #fff; overflow: visible; }
-      .sheet { box-shadow: none; zoom: 1; }
+      .sheet { box-shadow: none; zoom: 1 !important; }
     }
     [hidden] { display: none !important; }
   </style>
@@ -326,7 +330,9 @@ function form() {
   document.getElementById("form").innerHTML = `
     <section class="sec"><h3>Factura</h3>
       <div class="row">${fld("Número", "numero")}<label class="f">Estado<select data-p="estado">${["borrador", "pendiente", "pagada"].map(e => `<option ${cur.estado === e ? "selected" : ""}>${e}</option>`).join("")}</select></label></div>
-      <div class="row">${fld("Fecha", "fecha", "date")}${fld("Vencimiento", "vencimiento", "date")}</div>
+      <div class="row">${fld("Fecha", "fecha", "date")}
+        <label class="f"><span class="chk-venc"><input type="checkbox" id="conVenc" ${cur.vencimiento ? "checked" : ""} /> Vencimiento</span>
+          <input type="date" data-p="vencimiento" value="${esc(cur.vencimiento || "")}" ${cur.vencimiento ? "" : "disabled"} /></label></div>
       <div class="row">${fld("Periodo desde", "periodo.desde", "date")}${fld("Periodo hasta", "periodo.hasta", "date")}</div>
       ${fld("Resumen (si no hay periodo)", "resumen")}
     </section>
@@ -424,7 +430,17 @@ function sheet() {
       <div class="s-foot"><span>Majosoft · Estudio de desarrollo de software · majosoft.es</span><span>Factura ${esc(f.numero)} · Página 1 de 1</span></div>
     </div>`;
   document.title = `Factura ${f.numero} · ${f.cliente.nombre}`;
+  ajustarVista();
 }
+
+// La hoja A4 se escala para verse entera en el ancho disponible (sin desplazamiento lateral)
+function ajustarVista() {
+  const prev = document.querySelector(".prev"), hoja = document.getElementById("sheet");
+  if (!prev || !hoja || !prev.clientWidth) return;
+  const cs = getComputedStyle(prev), libre = prev.clientWidth - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight);
+  hoja.style.zoom = Math.min(1, libre / (210 * 96 / 25.4)).toFixed(3);
+}
+addEventListener("resize", ajustarVista);
 
 /* ===== Eventos ===== */
 const formEl = document.getElementById("form");
@@ -432,6 +448,7 @@ formEl.addEventListener("input", ev => {
   const p = ev.target.dataset.p; if (!p) return;
   const ks = p.split("."), last = ks.pop(), o = ks.reduce((o, k) => o[k], cur);
   o[last] = ev.target.type === "number" ? Number(ev.target.value) : ev.target.value;
+  if (p === "vencimiento" && !ev.target.value) { form(); }
   sheet(); save();
 });
 formEl.addEventListener("change", async ev => {
@@ -440,6 +457,12 @@ formEl.addEventListener("change", async ev => {
     const c = clientesConocidos().find(x => x.nombre.toLowerCase() === ev.target.value.trim().toLowerCase());
     if (c) { Object.assign(cur.cliente, { nif: c.nif || "", direccion: c.direccion || "", email: c.email || "", logo: c.logo || cur.cliente.logo || "" }); form(); sheet(); save(); toast(`Datos de ${c.nombre} completados`); }
     return;
+  }
+  if (ev.target.id === "conVenc") {
+    // Vencimiento opcional: al activarlo se propone a 30 días de la fecha de la factura
+    if (ev.target.checked) { const d = new Date((cur.fecha || new Date().toISOString().slice(0, 10)) + "T12:00"); d.setDate(d.getDate() + 30); cur.vencimiento = d.toISOString().slice(0, 10); }
+    else cur.vencimiento = "";
+    form(); sheet(); save(); return;
   }
   if (ev.target.id === "emisorPropio") {
     if (ev.target.checked) { cur.emisor = structuredClone(EMISOR_G); cur.emisorPropio = true; }
