@@ -5,3 +5,7 @@
 
 # Dependencias
 node_modules/
+
+# Documentos de clientes: nunca al repo (es público y se publica en la web)
+*.docx
+*.pdf
