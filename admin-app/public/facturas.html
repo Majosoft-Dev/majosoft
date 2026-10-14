@@ -215,14 +215,14 @@ const EMISOR = { nombre: "Majosoft", titular: "José Manuel Borrás Rodríguez",
 
 const SEMILLA = [{
   id: "f1", numero: "01", fecha: "2026-10-01", vencimiento: "2026-10-31", estado: "pendiente",
-  cliente: { nombre: "Fisioma Úbeda", nif: "", direccion: "Úbeda, Jaén", email: "", logo: "/assets/clientes/fisioma.svg" },
+  cliente: { nombre: "Fisioma Úbeda", nif: "", direccion: "", cpCiudad: "Úbeda (Jaén)", email: "", logo: "/assets/clientes/fisioma.svg" },
   periodo: { desde: "2026-10-01", hasta: "2027-09-30" },
   lineas: [{ concepto: "Licencia anual App de Fichaje", detalle: "fichaje.majosoft.es · Registro de jornada · Por empleado y año", cantidad: 1, precio: 30 }],
   iva: 21, notas: "Servicio de suscripción anual. Renovación automática salvo aviso previo de 30 días.",
   emisor: { ...EMISOR }
 }, {
   id: "f100", numero: "02", fecha: "2026-10-04", vencimiento: "", estado: "pendiente",
-  cliente: { nombre: "Nombre del cliente", nif: "", direccion: "", email: "", logo: "" },
+  cliente: { nombre: "Nombre del cliente", nif: "", direccion: "", cpCiudad: "", email: "", logo: "" },
   periodo: { desde: "", hasta: "" }, resumen: "Proyecto + 2 meses de mantenimiento",
   lineas: [
     { concepto: "Desarrollo de proyecto", detalle: "Importe con IVA incluido: 4.950,00 €", cantidad: 1, precio: 4090.91 },
@@ -312,11 +312,20 @@ const fld = (label, path, type = "text") => {
   return `<label class="f">${label}<input type="${type}" data-p="${path}" value="${esc(v)}" ${type === "number" ? 'step="0.01"' : ""}/></label>`;
 };
 
+// Direcciones antiguas en un solo campo: la primera línea es la calle y el resto, C.P. y ciudad
+const separarDireccion = o => {
+  if (!o || o.cpCiudad != null) return;
+  const [calle = "", ...resto] = String(o.direccion || "").split(/\n+/).map(x => x.trim()).filter(Boolean);
+  o.direccion = calle; o.cpCiudad = resto.join(", ");
+};
+
 function editar(id) {
   cur = store.find(f => f.id === id);
+  separarDireccion(cur.cliente);
   cur.emisor ??= { ...EMISOR };
   cur.emisor.empresa ??= EMISOR.empresa;
   enlazarEmisor(cur);
+  separarDireccion(cur.emisor);
   document.getElementById("panel").hidden = true;
   document.getElementById("edit").hidden = false;
   document.getElementById("editBtns").hidden = false;
@@ -340,7 +349,8 @@ function form() {
       <label class="f">Nombre / razón social<input type="text" data-p="cliente.nombre" value="${esc(cur.cliente.nombre || "")}" list="clientesList" autocomplete="off" placeholder="Elige o escribe un cliente" /></label>
       <datalist id="clientesList">${clientesConocidos().map(c => `<option value="${esc(c.nombre)}">${esc(c.nif || "")}</option>`).join("")}</datalist>
       <div class="row">${fld("NIF / CIF", "cliente.nif")}${fld("Email", "cliente.email")}</div>
-      ${fld("Dirección", "cliente.direccion", "area")}
+      ${fld("Dirección (calle y número)", "cliente.direccion")}
+      ${fld("C.P. y ciudad", "cliente.cpCiudad")}
       <label class="f">Logo del cliente<input type="file" accept="image/*" id="logo" /></label>
       ${cur.cliente.logo ? `<div class="logo-row"><img class="logo-prev" src="${cur.cliente.logo}" alt="" /><button class="add" id="logoDel">Quitar logo</button></div>` : ""}
     </section>
@@ -356,7 +366,8 @@ function form() {
       <p class="hint-own">${cur.emisorPropio ? "Esta factura usa sus propios datos de emisor y cobro." : "Datos globales: los cambios se aplican a todas las facturas."}</p>
       <div class="row">${fld("Titular", "emisor.titular")}${fld("NIF", "emisor.nif")}</div>
       ${fld("Actividad / empresa", "emisor.empresa")}
-      ${fld("Dirección", "emisor.direccion")}
+      ${fld("Dirección (calle y número)", "emisor.direccion")}
+      ${fld("C.P. y ciudad", "emisor.cpCiudad")}
       <div class="row">${fld("Email", "emisor.email")}${fld("Teléfono", "emisor.telefono")}</div>
       ${fld("IBAN para transferencia", "emisor.iban")}
     </section>
@@ -395,8 +406,8 @@ function sheet() {
       <div class="meta"><b>Nº ${ed("numero", "00")}</b>Fecha: ${edFecha("fecha")}${f.vencimiento ? `<br />Vencimiento: ${edFecha("vencimiento")}` : ""}</div>
     </div>
     <div class="parties">
-      <div><span class="lbl">Emisor</span><b>${ed("emisor.titular", "Nombre del emisor")}</b>${ed("emisor.empresa", "Actividad o empresa")}<br />NIF: ${ed("emisor.nif", "NIF")}<br />${ed("emisor.direccion", "Dirección fiscal", true)}<br />${ed("emisor.email", "Email")} · ${ed("emisor.telefono", "Teléfono")}</div>
-      <div class="to">${c.logo ? `<img src="${c.logo}" alt="" />` : ""}<span class="lbl">Facturar a</span><b>${ed("cliente.nombre", "Nombre del cliente")}</b>NIF/CIF: ${ed("cliente.nif", "NIF/CIF")}<br />${ed("cliente.direccion", "Dirección", true)}<br />${ed("cliente.email", "Email")}</div>
+      <div><span class="lbl">Emisor</span><b>${ed("emisor.titular", "Nombre del emisor")}</b>${ed("emisor.empresa", "Actividad o empresa")}<br />NIF: ${ed("emisor.nif", "NIF")}<br />${ed("emisor.direccion", "Calle y número")}<br />${ed("emisor.cpCiudad", "C.P. y ciudad")}<br />${ed("emisor.email", "Email")} · ${ed("emisor.telefono", "Teléfono")}</div>
+      <div class="to">${c.logo ? `<img src="${c.logo}" alt="" />` : ""}<span class="lbl">Facturar a</span><b>${ed("cliente.nombre", "Nombre del cliente")}</b>NIF/CIF: ${ed("cliente.nif", "NIF/CIF")}<br />${ed("cliente.direccion", "Calle y número")}<br />${ed("cliente.cpCiudad", "C.P. y ciudad")}<br />${ed("cliente.email", "Email")}</div>
     </div>
     <div class="strip${f.vencimiento ? "" : " strip--2"}">
       <div><small>Fecha de emisión</small><b>${edFecha("fecha")}</b></div>
@@ -455,7 +466,7 @@ formEl.addEventListener("change", async ev => {
   // Al elegir un cliente conocido se completan sus datos
   if (ev.target.dataset.p === "cliente.nombre") {
     const c = clientesConocidos().find(x => x.nombre.toLowerCase() === ev.target.value.trim().toLowerCase());
-    if (c) { Object.assign(cur.cliente, { nif: c.nif || "", direccion: c.direccion || "", email: c.email || "", logo: c.logo || cur.cliente.logo || "" }); form(); sheet(); save(); toast(`Datos de ${c.nombre} completados`); }
+    if (c) { Object.assign(cur.cliente, { nif: c.nif || "", direccion: c.direccion || "", cpCiudad: c.cpCiudad || "", email: c.email || "", logo: c.logo || cur.cliente.logo || "" }); form(); sheet(); save(); toast(`Datos de ${c.nombre} completados`); }
     return;
   }
   if (ev.target.id === "conVenc") {
@@ -526,7 +537,7 @@ document.getElementById("bNew").onclick = async () => {
   const ult = store.at(-1);
   const hoy = new Date().toISOString().slice(0, 10);
   const f = { id: "f" + Date.now(), numero: siguienteNumero(), fecha: hoy, vencimiento: "", estado: "borrador",
-    cliente: { nombre: "Nuevo cliente", nif: "", direccion: "", email: "", logo: "" }, periodo: { desde: "", hasta: "" },
+    cliente: { nombre: "Nuevo cliente", nif: "", direccion: "", cpCiudad: "", email: "", logo: "" }, periodo: { desde: "", hasta: "" },
     lineas: [{ concepto: "", detalle: "", cantidad: 1, precio: 0 }], iva: 21, notas: "", emisor: EMISOR_G };
   store.push(f); await put(f); editar(f.id);
 };
