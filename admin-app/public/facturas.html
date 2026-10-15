@@ -478,6 +478,18 @@ formEl.addEventListener("input", ev => {
   if (p === "estado") { saveCur.flush(); toast(`Factura ${cur.numero}: ${cur.estado}`); }
 });
 formEl.addEventListener("change", async ev => {
+  // Datos del cliente cambiados: se copian a sus otras facturas en borrador.
+  // Las emitidas (pendientes o pagadas) no se tocan.
+  const p = ev.target.dataset.p;
+  if (p?.startsWith("cliente.") && p !== "cliente.nombre") {
+    const k = p.split(".")[1], n = String(cur.cliente.nombre || "").trim().toLowerCase();
+    const otras = store.filter(f => f.id !== cur.id && f.estado === "borrador" && String(f.cliente?.nombre || "").trim().toLowerCase() === n && f.cliente[k] !== cur.cliente[k]);
+    if (n && otras.length) {
+      otras.forEach(f => { f.cliente[k] = cur.cliente[k]; });
+      try { await Promise.all(otras.map(put)); toast(`Actualizado también en ${otras.length} ${otras.length === 1 ? "borrador" : "borradores"} de ${cur.cliente.nombre}`); }
+      catch (e) { toast(e.message, true); }
+    }
+  }
   // Desplegable de clientes guardados: copia todos sus datos a la factura
   if (ev.target.id === "cliElegir") {
     const c = clientesConocidos()[+ev.target.value]; if (!c) return;
