@@ -65,6 +65,8 @@
     .pill.borrador { background: #eeede5; color: var(--muted); }
     button.pill { border: 1px solid transparent; font: inherit; font-size: 11.5px; font-weight: 700; cursor: pointer; }
     button.pill:hover { border-color: currentColor; }
+    .del-row { border: 0; background: none; cursor: pointer; font-size: 14px; opacity: .35; padding: 2px 6px; border-radius: 6px; }
+    .del-row:hover { opacity: 1; background: #fbe4e4; }
     .empty { text-align: center; padding: 48px; color: var(--muted); }
     .scroll { overflow-x: auto; }
     @media (max-width: 1100px) { .kpis { grid-template-columns: repeat(2, 1fr); } }
@@ -201,7 +203,7 @@
         <input class="search" id="q" placeholder="Buscar cliente, número o concepto" />
       </div>
       <div class="scroll"><table class="list">
-        <thead><tr><th>Nº</th><th>Cliente</th><th>Concepto</th><th>Fecha</th><th>Estado</th><th class="r">Total</th></tr></thead>
+        <thead><tr><th>Nº</th><th>Cliente</th><th>Concepto</th><th>Fecha</th><th>Estado</th><th class="r">Total</th><th></th></tr></thead>
         <tbody id="rows"></tbody>
       </table></div>
     </div>
@@ -281,7 +283,10 @@ const clientesConocidos = () => {
   const m = new Map();
   [...store].sort((a, b) => (a.updated_at || 0) - (b.updated_at || 0)).forEach(f => {
     const n = String(f.cliente?.nombre || "").trim();
-    if (n && n !== "Nuevo cliente" && n !== "Nombre del cliente") m.set(n.toLowerCase(), { ...f.cliente });
+    if (!n || n === "Nuevo cliente" || n === "Nombre del cliente") return;
+    // Los datos vacíos de una factura nueva no borran los que ya se conocían
+    const prev = m.get(n.toLowerCase()) || {};
+    m.set(n.toLowerCase(), { ...prev, ...Object.fromEntries(Object.entries(f.cliente).filter(([, v]) => String(v ?? "").trim())) });
   });
   return [...m.values()].sort((a, b) => a.nombre.localeCompare(b.nombre, "es"));
 };
@@ -310,8 +315,8 @@ function panel() {
     <tr data-id="${f.id}"><td class="num">${esc(f.numero)}</td>
     <td><span class="cli">${f.cliente.logo ? `<img src="${esc(f.cliente.logo)}" alt="" />` : `<i>${esc(ini(f.cliente.nombre))}</i>`}${esc(f.cliente.nombre)}</span></td>
     <td class="muted">${esc(f.resumen || f.lineas[0]?.concepto || "")}</td><td class="muted">${fecha(f.fecha)}</td>
-    <td>${f.estado === "borrador" ? `<span class="pill borrador">borrador</span>` : `<button class="pill ${f.estado}" data-toggle="${esc(f.id)}" title="Marcar como ${f.estado === "pagada" ? "pendiente" : "pagada"}">${f.estado}</button>`}</td><td class="r"><b>${eur(totales(f).total)}</b></td></tr>`).join("")
-    : `<tr><td colspan="6" class="empty">${store.length ? "Ninguna factura coincide con el filtro." : "Aún no hay facturas. Crea la primera con «+ Nueva factura»."}</td></tr>`;
+    <td>${f.estado === "borrador" ? `<span class="pill borrador">borrador</span>` : `<button class="pill ${f.estado}" data-toggle="${esc(f.id)}" title="Marcar como ${f.estado === "pagada" ? "pendiente" : "pagada"}">${f.estado}</button>`}</td><td class="r"><b>${eur(totales(f).total)}</b></td><td class="r"><button class="del-row" data-del-row="${esc(f.id)}" title="Eliminar factura">🗑</button></td></tr>`).join("")
+    : `<tr><td colspan="7" class="empty">${store.length ? "Ninguna factura coincide con el filtro." : "Aún no hay facturas. Crea la primera con «+ Nueva factura»."}</td></tr>`;
 }
 
 /* ===== Editor ===== */
@@ -355,8 +360,8 @@ function form() {
       ${fld("Resumen (si no hay periodo)", "resumen")}
     </section>
     <section class="sec"><h3>Cliente</h3>
-      <label class="f">Nombre / razón social<input type="text" data-p="cliente.nombre" value="${esc(cur.cliente.nombre || "")}" list="clientesList" autocomplete="off" placeholder="Elige o escribe un cliente" /></label>
-      <datalist id="clientesList">${clientesConocidos().map(c => `<option value="${esc(c.nombre)}">${esc(c.nif || "")}</option>`).join("")}</datalist>
+      <label class="f">Cliente guardado<select id="cliElegir"><option value="">— Elegir un cliente guardado (${clientesConocidos().length}) —</option>${clientesConocidos().map((c, i) => `<option value="${i}">${esc(c.nombre)}${c.nif ? " · " + esc(c.nif) : ""}</option>`).join("")}</select></label>
+      <label class="f">Nombre / razón social<input type="text" data-p="cliente.nombre" value="${esc(cur.cliente.nombre || "")}" autocomplete="off" placeholder="Escribe el cliente" /></label>
       <div class="row">${fld("NIF / CIF", "cliente.nif")}${fld("Email", "cliente.email")}</div>
       ${fld("Dirección (calle y número)", "cliente.direccion")}
       ${fld("C.P. y ciudad", "cliente.cpCiudad")}
@@ -473,7 +478,14 @@ formEl.addEventListener("input", ev => {
   if (p === "estado") { saveCur.flush(); toast(`Factura ${cur.numero}: ${cur.estado}`); }
 });
 formEl.addEventListener("change", async ev => {
-  // Al elegir un cliente conocido se completan sus datos
+  // Desplegable de clientes guardados: copia todos sus datos a la factura
+  if (ev.target.id === "cliElegir") {
+    const c = clientesConocidos()[+ev.target.value]; if (!c) return;
+    cur.cliente = { ...cur.cliente, nombre: c.nombre, nif: c.nif || "", direccion: c.direccion || "", cpCiudad: c.cpCiudad || "", email: c.email || "", logo: c.logo || "" };
+    form(); sheet(); save(); toast(`Datos de ${c.nombre} completados`);
+    return;
+  }
+  // Al escribir el nombre de un cliente conocido se completan sus datos
   if (ev.target.dataset.p === "cliente.nombre") {
     const c = clientesConocidos().find(x => x.nombre.toLowerCase() === ev.target.value.trim().toLowerCase());
     if (c) { Object.assign(cur.cliente, { nif: c.nif || "", direccion: c.direccion || "", cpCiudad: c.cpCiudad || "", email: c.email || "", logo: c.logo || cur.cliente.logo || "" }); form(); sheet(); save(); toast(`Datos de ${c.nombre} completados`); }
@@ -544,6 +556,16 @@ document.getElementById("rows").onclick = async ev => {
     try { await put(f); toast(`Factura ${f.numero}: ${f.estado}`); }
     catch (e) { toast(e.message, true); try { await refrescar(); } catch {} panel(); }
     return;
+  }
+  // Eliminar desde el listado
+  const del = ev.target.closest("button[data-del-row]");
+  if (del) {
+    ev.stopPropagation();
+    const f = store.find(x => x.id === del.dataset.delRow); if (!f) return;
+    if (!confirm(`¿Eliminar la factura ${f.numero || "sin número"} de ${f.cliente.nombre}?`)) return;
+    try { await api(`docs/facturas/${f.id}`, { method: "DELETE" }); store = store.filter(x => x.id !== f.id); toast("Factura eliminada"); }
+    catch (e) { toast(e.message, true); }
+    panel(); return;
   }
   const tr = ev.target.closest("tr[data-id]"); if (!tr) return;
   try { await refrescar(); } catch {}
