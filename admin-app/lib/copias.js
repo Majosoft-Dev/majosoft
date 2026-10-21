@@ -8,7 +8,7 @@ const CLAVE = process.env.COPIAS_CLAVE || "/root/.ssh/copias_panel";
 export const SERVIDORES = [
   { id: "guiadelbombero", nombre: "Guía del Bombero", ip: "217.154.107.19", uso: "Academia de bomberos y su WordPress" },
   { id: "objetivo", nombre: "Objetivo Baeza", ip: "31.70.141.235", uso: "Academia de guardias civiles y su WordPress" },
-  { id: "apartamentos", nombre: "Majosoft", ip: "31.70.154.16", uso: "Webs de Majosoft y clientes: panel, Fichaje, Bambina, María Sánchez y Duna Beach", local: true },
+  { id: "apartamentos", nombre: "Majosoft", ip: "31.70.154.16", uso: "Webs de Majosoft y clientes: panel, Fichaje, Arbitraje, Bambina, María Sánchez y Apartamentos Mar de Dunas", local: true },
 ];
 
 function lanzar(servidor, args) {
