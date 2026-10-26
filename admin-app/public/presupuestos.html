@@ -200,6 +200,7 @@
       <a class="btn" href="/admin/presupuestos">← Presupuestos</a>
       <span class="doc-title" id="docTitle"></span>
       <span class="save-state" data-save-state></span>
+      <a class="btn" id="bBono" hidden>Ver consumo de horas</a>
       <button class="btn" id="bSave">Exportar JSON</button>
       <button class="btn btn--lime" id="bPrint">Exportar PDF</button>
       <input type="file" id="file" accept="application/json" hidden />
@@ -710,6 +711,8 @@ if (D) {
   document.getElementById("app").hidden = false;
   document.getElementById("docTitle").textContent = D.titulo;
   buildEditor(); render(); syncEditor();
+  // Si este presupuesto es un bono de horas, enlace a su registro de consumo
+  api("docs/bonos").then(bs => { const b = bs.find(x => x.presupuesto === D.id); if (b) Object.assign(document.getElementById("bBono"), { hidden: false, href: "/admin/bonos?id=" + encodeURIComponent(b.id) }); }).catch(() => {});
   document.fonts?.ready.then(render); // las medidas cambian al cargar Inter
 } else {
   document.getElementById("plist").hidden = false;
