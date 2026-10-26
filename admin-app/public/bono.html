@@ -17,9 +17,9 @@
     .top .in, main { max-width: 900px; margin: 0 auto; padding: 0 20px; }
     .top .in { padding-top: 28px; padding-bottom: 34px; }
     .brand { display: flex; align-items: center; gap: 10px; font-weight: 800; }
-    .brand img { height: 16px; }
+    .brand img { height: 26px; }
     .top small { display: block; color: #a9a99c; font-weight: 700; font-size: 12px; margin-top: 26px; text-transform: uppercase; letter-spacing: .08em; }
-    .top h1 { margin: 6px 0 4px; font-size: 28px; letter-spacing: -.03em; }
+    .top h1 { margin: 6px 0 4px; font-size: 28px; letter-spacing: -.03em; overflow-wrap: anywhere; }
     .top p { margin: 0; color: #cfcfc4; }
     main { padding-top: 22px; padding-bottom: 50px; }
     .kpis { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-top: -40px; }
@@ -42,12 +42,12 @@
     tr.mes td { background: #fafaf5; font-weight: 700; font-size: 12.5px; }
     .empty { padding: 30px; text-align: center; color: var(--muted); }
     .pie { color: var(--muted); font-size: 12.5px; margin-top: 18px; line-height: 1.6; }
-    @media (max-width: 640px) { .kpis { grid-template-columns: 1fr; } td.f { white-space: normal; } }
+    @media (max-width: 640px) { .kpis { grid-template-columns: 1fr; } .top h1 { font-size: 23px; } td, th { padding: 10px 12px; } td.f { white-space: normal; width: 74px; } }
   </style>
 </head>
-<body>
+<body class="no-side">
   <div class="top"><div class="in">
-    <div class="brand"><img src="/assets/logo.svg" alt="" /> majosoft.</div>
+    <div class="brand"><img src="/assets/favicon.svg" alt="" /> majosoft.</div>
     <small id="cli"></small>
     <h1 id="tit">Bono de horas</h1>
     <p id="sub"></p>
