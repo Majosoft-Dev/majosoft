@@ -629,6 +629,9 @@ file.onchange = async () => {
   try {
     const d = JSON.parse(await file.files[0].text()); if (!Array.isArray(d)) throw 0;
     if (!confirm(`Se importarán ${d.length} facturas (las que tengan el mismo identificador se sobrescriben). ¿Continuar?`)) return;
+    // Las que llegan sin número reciben el siguiente correlativo
+    await refrescar();
+    d.forEach(f => { if (!String(f.numero ?? "").trim()) { f.numero = siguienteNumero(); store.push(f); } });
     await Promise.all(d.map(put)); store = await api("docs/facturas"); toast("Facturas importadas"); panel();
   } catch { toast("El archivo no es una copia válida", true); }
   file.value = "";
