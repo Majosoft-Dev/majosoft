@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Bono de horas · Majosoft</title>
+  <meta name="robots" content="noindex, nofollow" />
+  <link rel="icon" type="image/svg+xml" href="/assets/favicon.svg" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/admin/panel.css" />
+  <style>
+    * { box-sizing: border-box; }
+    body { margin: 0; font-family: Inter, system-ui, sans-serif; background: var(--cream); color: var(--ink); font-size: 14px; }
+    .top { background: var(--ink); color: var(--cream); }
+    .top .in, main { max-width: 900px; margin: 0 auto; padding: 0 20px; }
+    .top .in { padding-top: 28px; padding-bottom: 34px; }
+    .brand { display: flex; align-items: center; gap: 10px; font-weight: 800; }
+    .brand img { height: 16px; }
+    .top small { display: block; color: #a9a99c; font-weight: 700; font-size: 12px; margin-top: 26px; text-transform: uppercase; letter-spacing: .08em; }
+    .top h1 { margin: 6px 0 4px; font-size: 28px; letter-spacing: -.03em; }
+    .top p { margin: 0; color: #cfcfc4; }
+    main { padding-top: 22px; padding-bottom: 50px; }
+    .kpis { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-top: -40px; }
+    .kpi { background: #fff; border: 1px solid var(--line); border-radius: 16px; padding: 16px 18px; }
+    .kpi small { color: var(--muted); font-size: 12px; font-weight: 700; }
+    .kpi b { display: block; font-size: 26px; letter-spacing: -.03em; margin-top: 4px; }
+    .kpi.dark { background: var(--lime); border-color: var(--lime); }
+    .bar { height: 10px; border-radius: 99px; background: #e4e3d8; overflow: hidden; margin: 18px 0 6px; }
+    .bar i { display: block; height: 100%; background: var(--ink); border-radius: 99px; }
+    .bar.aviso i { background: #c77700; }
+    .pct { color: var(--muted); font-size: 12.5px; }
+    .card { background: #fff; border: 1px solid var(--line); border-radius: 16px; margin-top: 18px; overflow: hidden; }
+    .card h2 { margin: 0; padding: 16px 18px; font-size: 15px; border-bottom: 1px solid var(--line); }
+    table { width: 100%; border-collapse: collapse; }
+    td, th { padding: 12px 18px; text-align: left; vertical-align: top; border-bottom: 1px solid #eeede5; }
+    th { font-size: 11.5px; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); }
+    td.r, th.r { text-align: right; white-space: nowrap; }
+    td small { display: block; color: var(--muted); margin-top: 3px; white-space: pre-line; }
+    td.f { white-space: nowrap; color: var(--muted); }
+    tr.mes td { background: #fafaf5; font-weight: 700; font-size: 12.5px; }
+    .empty { padding: 30px; text-align: center; color: var(--muted); }
+    .pie { color: var(--muted); font-size: 12.5px; margin-top: 18px; line-height: 1.6; }
+    @media (max-width: 640px) { .kpis { grid-template-columns: 1fr; } td.f { white-space: normal; } }
+  </style>
+</head>
+<body>
+  <div class="top"><div class="in">
+    <div class="brand"><img src="/assets/logo.svg" alt="" /> majosoft.</div>
+    <small id="cli"></small>
+    <h1 id="tit">Bono de horas</h1>
+    <p id="sub"></p>
+  </div></div>
+  <main id="main"><p class="empty">Cargando…</p></main>
+<script>
+const esc = s => String(s ?? "").replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+const hm = min => { const h = Math.floor(min / 60), m = Math.round(min % 60); return m ? `${h} h ${m} min` : `${h} h`; };
+const fecha = s => s ? new Date(s + "T12:00").toLocaleDateString("es-ES", { day: "numeric", month: "short", year: "numeric" }) : "";
+const mes = s => new Date(s + "T12:00").toLocaleDateString("es-ES", { month: "long", year: "numeric" });
+
+fetch(location.pathname.replace(/\/$/, "") + "/datos").then(r => r.ok ? r.json() : Promise.reject()).then(b => {
+  document.getElementById("cli").textContent = b.cliente || "";
+  document.getElementById("tit").textContent = b.titulo || "Bono de horas";
+  document.getElementById("sub").textContent = [b.referencia, b.inicio ? "Desde el " + fecha(b.inicio) : ""].filter(Boolean).join(" · ");
+  const total = b.horas * 60, usado = b.entradas.reduce((s, e) => s + e.minutos, 0), queda = total - usado;
+  const pct = total ? Math.min(100, Math.round(usado / total * 100)) : 0;
+  const ents = [...b.entradas].sort((a, c) => String(c.fecha).localeCompare(String(a.fecha)));
+  let mesAnt = "", filas = "";
+  for (const e of ents) {
+    const m = e.fecha ? mes(e.fecha) : "";
+    if (m !== mesAnt) {
+      const tot = ents.filter(x => (x.fecha ? mes(x.fecha) : "") === m).reduce((s, x) => s + x.minutos, 0);
+      filas += `<tr class="mes"><td colspan="2">${esc(m.charAt(0).toUpperCase() + m.slice(1))}</td><td class="r">${hm(tot)}</td></tr>`;
+      mesAnt = m;
+    }
+    filas += `<tr><td class="f">${fecha(e.fecha)}</td><td><b>${esc(e.tarea)}</b>${e.detalle ? `<small>${esc(e.detalle)}</small>` : ""}</td><td class="r">${hm(e.minutos)}</td></tr>`;
+  }
+  document.getElementById("main").innerHTML = `
+    <div class="kpis">
+      <div class="kpi"><small>Horas contratadas</small><b>${hm(total)}</b></div>
+      <div class="kpi"><small>Consumidas</small><b>${hm(usado)}</b></div>
+      <div class="kpi dark"><small>Disponibles</small><b>${queda < 0 ? "−" + hm(-queda) : hm(queda)}</b></div>
+    </div>
+    <div class="bar${queda < 180 ? " aviso" : ""}"><i style="width:${pct}%"></i></div>
+    <div class="pct">${pct} % del bono consumido${queda < 0 ? " · Se han superado las horas del bono" : ""}</div>
+    <div class="card"><h2>Detalle de intervenciones</h2>
+      ${ents.length ? `<table><thead><tr><th>Fecha</th><th>Tarea</th><th class="r">Tiempo</th></tr></thead><tbody>${filas}</tbody></table>` : `<p class="empty">Todavía no se ha consumido ninguna hora del bono.</p>`}
+    </div>
+    <p class="pie">El tiempo se descuenta en fracciones de 15 minutos según el trabajo real dedicado. Para cualquier duda: dev@majosoft.es · 648 867 950</p>`;
+  document.title = `${b.titulo || "Bono de horas"} · ${b.cliente || "Majosoft"}`;
+}).catch(() => { document.getElementById("main").innerHTML = '<p class="empty">No se pudo cargar el bono.</p>'; });
+</script>
+</body>
+</html>

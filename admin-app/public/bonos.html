@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Bonos de horas · Panel Majosoft</title>
+  <meta name="robots" content="noindex, nofollow" />
+  <link rel="icon" type="image/svg+xml" href="/assets/favicon.svg" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/admin/panel.css" />
+  <style>
+    * { box-sizing: border-box; }
+    body { margin: 0; font-family: Inter, system-ui, sans-serif; background: var(--cream); color: var(--ink); font-size: 14px; }
+    main { max-width: 1180px; padding: 34px 32px 60px; }
+    .btn { display: inline-flex; align-items: center; gap: 6px; padding: 9px 15px; border-radius: 10px; border: 1px solid var(--line); background: #fff; color: var(--ink); font: inherit; font-weight: 700; font-size: 13px; cursor: pointer; text-decoration: none; }
+    .btn:hover { border-color: var(--ink); }
+    .btn--ink { background: var(--ink); color: var(--cream); border-color: var(--ink); }
+    .btn--danger:hover { border-color: var(--bad); color: var(--bad); }
+    .wrap { display: grid; grid-template-columns: 300px 1fr; gap: 14px; align-items: start; }
+    .card { background: #fff; border: 1px solid var(--line); border-radius: 16px; overflow: hidden; }
+    .card-tools { padding: 12px; border-bottom: 1px solid var(--line); }
+    .item { display: block; width: 100%; text-align: left; border: none; border-bottom: 1px solid #eeede5; background: #fff; padding: 13px 16px; cursor: pointer; font: inherit; color: inherit; }
+    .item:hover { background: #fafaf5; }
+    .item.on { background: #f3f4dc; }
+    .item b { display: block; }
+    .item small { color: var(--muted); }
+    .mini { height: 5px; border-radius: 9px; background: #e4e3d8; margin-top: 8px; overflow: hidden; }
+    .mini i { display: block; height: 100%; background: var(--ink); }
+    .empty { padding: 40px 20px; text-align: center; color: var(--muted); }
+    .ed { padding: 22px 24px; }
+    .row { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; margin-bottom: 10px; }
+    label.f { display: flex; flex-direction: column; gap: 5px; font-size: 12px; font-weight: 700; color: var(--muted); }
+    label.f input, label.f textarea { font: inherit; font-size: 14px; color: var(--ink); padding: 9px 11px; border: 1px solid var(--line); border-radius: 10px; background: #fcfcf8; font-weight: 500; }
+    label.f textarea { min-height: 38px; resize: vertical; }
+    .kpis { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin: 16px 0; }
+    .kpi { background: var(--cream); border-radius: 12px; padding: 12px 14px; }
+    .kpi small { color: var(--muted); font-size: 11.5px; font-weight: 700; }
+    .kpi b { display: block; font-size: 20px; letter-spacing: -.02em; margin-top: 2px; }
+    .share { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; background: #f3f4dc; border-radius: 12px; padding: 12px 14px; margin-bottom: 18px; }
+    .share code { flex: 1; min-width: 200px; font-size: 12px; word-break: break-all; }
+    .share label { display: flex; gap: 6px; align-items: center; font-size: 12.5px; font-weight: 700; }
+    h3 { font-size: 14px; margin: 22px 0 10px; }
+    .nueva { display: grid; grid-template-columns: 140px 1fr 1fr 90px 90px auto; gap: 8px; align-items: end; background: #fafaf5; border: 1px solid #eeede5; border-radius: 12px; padding: 12px; }
+    table { width: 100%; border-collapse: collapse; margin-top: 12px; }
+    td, th { padding: 9px 8px; text-align: left; border-bottom: 1px solid #eeede5; vertical-align: top; }
+    th { font-size: 11.5px; color: var(--muted); text-transform: uppercase; letter-spacing: .05em; }
+    td.r, th.r { text-align: right; white-space: nowrap; }
+    td small { display: block; color: var(--muted); }
+    .x { border: 0; background: none; cursor: pointer; opacity: .4; font-size: 14px; }
+    .x:hover { opacity: 1; }
+    @media (max-width: 1000px) { .wrap { grid-template-columns: 1fr; } .nueva { grid-template-columns: 1fr 1fr; } main { padding: 24px 16px 40px; } }
+  </style>
+</head>
+<body>
+  <main>
+    <div class="page-head"><div><div class="crumbs">Comercial</div><h1>Bonos de horas</h1><p>Apunta cada intervención y comparte con el cliente un enlace donde ve el detalle y las horas que le quedan.</p></div></div>
+    <div class="wrap">
+      <div class="card">
+        <div class="card-tools"><button class="btn btn--ink" id="bNew">+ Nuevo bono</button></div>
+        <div id="list"></div>
+      </div>
+      <div class="card" id="ed"><div class="empty">Selecciona un bono.</div></div>
+    </div>
+  </main>
+<script type="module">
+import { mountShell, api, autosaver, toast } from "/admin/panel.js";
+await mountShell("bonos");
+const $ = id => document.getElementById(id);
+const esc = s => String(s ?? "").replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+const hm = min => { const h = Math.floor(Math.abs(min) / 60), m = Math.round(Math.abs(min) % 60); return (min < 0 ? "−" : "") + (m ? `${h} h ${m} min` : `${h} h`); };
+const fecha = s => s ? new Date(s + "T12:00").toLocaleDateString("es-ES", { day: "2-digit", month: "2-digit", year: "numeric" }) : "";
+const hoy = () => { const d = new Date(); return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`; };
+const token = () => btoa(String.fromCharCode(...crypto.getRandomValues(new Uint8Array(24)))).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
+const usado = b => (b.entradas || []).reduce((s, e) => s + Number(e.minutos || 0), 0);
+const enlace = b => `${location.origin}/admin/bono/${b.token}`;
+
+const put = b => api(`docs/bonos/${b.id}`, { method: "PUT", body: b });
+let store = await api("docs/bonos");
+// Primera vez: el bono de GDBFORMACION (presupuesto MJS-2026-SOP20)
+if (!store.length) {
+  store = [{ id: "b-gdb-sop20", cliente: "GDBFORMACION SL", titulo: "Bono de soporte técnico · 20 horas", referencia: "MJS-2026-SOP20", inicio: hoy(), horas: 20, token: token(), compartido: true, entradas: [] }];
+  await put(store[0]);
+}
+let cur = null;
+const save = autosaver(() => cur && put(cur));
+
+function lista() {
+  $("list").innerHTML = store.length ? store.map(b => {
+    const u = usado(b), t = Number(b.horas || 0) * 60;
+    return `<button class="item${cur?.id === b.id ? " on" : ""}" data-id="${esc(b.id)}"><b>${esc(b.cliente || "Sin cliente")}</b><small>${esc(b.titulo || "")} · quedan ${hm(t - u)}</small><div class="mini"><i style="width:${t ? Math.min(100, u / t * 100) : 0}%"></i></div></button>`;
+  }).join("") : `<p class="empty">Aún no hay bonos.</p>`;
+}
+
+function editor() {
+  const b = cur; if (!b) return;
+  const u = usado(b), t = Number(b.horas || 0) * 60;
+  const ents = [...(b.entradas || [])].map((e, i) => ({ ...e, i })).sort((a, c) => String(c.fecha).localeCompare(String(a.fecha)));
+  $("ed").innerHTML = `<div class="ed">
+    <div class="row">
+      <label class="f">Cliente<input data-p="cliente" value="${esc(b.cliente)}" /></label>
+      <label class="f">Título<input data-p="titulo" value="${esc(b.titulo)}" /></label>
+    </div>
+    <div class="row">
+      <label class="f">Referencia del presupuesto<input data-p="referencia" value="${esc(b.referencia)}" /></label>
+      <label class="f">Inicio<input type="date" data-p="inicio" value="${esc(b.inicio)}" /></label>
+      <label class="f">Horas contratadas<input type="number" min="0" step="1" data-p="horas" value="${esc(b.horas)}" /></label>
+    </div>
+    <div class="kpis">
+      <div class="kpi"><small>Contratadas</small><b>${hm(t)}</b></div>
+      <div class="kpi"><small>Consumidas</small><b>${hm(u)}</b></div>
+      <div class="kpi"><small>Disponibles</small><b>${hm(t - u)}</b></div>
+    </div>
+    <div class="share">
+      <label><input type="checkbox" id="compartido" ${b.compartido !== false ? "checked" : ""}/> Enlace del cliente activo</label>
+      <code>${b.compartido !== false ? esc(enlace(b)) : "Desactivado: el enlace no funciona"}</code>
+      ${b.compartido !== false ? `<button class="btn" id="bCopy">Copiar enlace</button><a class="btn" href="${esc(enlace(b))}" target="_blank" rel="noopener">Ver como cliente ↗</a>` : ""}
+      <button class="btn" id="bToken" title="El enlace anterior deja de funcionar">Cambiar enlace</button>
+    </div>
+    <h3>Apuntar intervención</h3>
+    <div class="nueva">
+      <label class="f">Fecha<input type="date" id="nFecha" value="${hoy()}" /></label>
+      <label class="f">Tarea<input id="nTarea" placeholder="Qué se ha hecho" /></label>
+      <label class="f">Detalle (opcional)<input id="nDetalle" placeholder="Más información para el cliente" /></label>
+      <label class="f">Horas<input type="number" id="nH" min="0" step="1" value="0" /></label>
+      <label class="f">Minutos<input type="number" id="nM" min="0" max="45" step="15" value="15" /></label>
+      <button class="btn btn--ink" id="bAdd">Añadir</button>
+    </div>
+    <h3>Intervenciones (${ents.length})</h3>
+    ${ents.length ? `<table><thead><tr><th>Fecha</th><th>Tarea</th><th class="r">Tiempo</th><th></th></tr></thead><tbody>
+      ${ents.map(e => `<tr><td>${fecha(e.fecha)}</td><td><b>${esc(e.tarea)}</b>${e.detalle ? `<small>${esc(e.detalle)}</small>` : ""}</td><td class="r">${hm(Number(e.minutos || 0))}</td><td class="r"><button class="x" data-del="${e.i}" title="Eliminar">🗑</button></td></tr>`).join("")}
+    </tbody></table>` : `<p class="empty">Todavía no hay intervenciones.</p>`}
+    <p style="margin-top:22px"><button class="btn btn--danger" id="bDel">Eliminar bono</button></p>
+  </div>`;
+}
+
+function abrir(id) { cur = store.find(b => b.id === id) || null; lista(); editor(); }
+
+$("list").onclick = e => { const b = e.target.closest("[data-id]"); if (b) abrir(b.dataset.id); };
+$("bNew").onclick = async () => {
+  const b = { id: "b" + Date.now(), cliente: "", titulo: "Bono de soporte técnico", referencia: "", inicio: hoy(), horas: 10, token: token(), compartido: true, entradas: [] };
+  store.unshift(b); await put(b); abrir(b.id);
+};
+$("ed").addEventListener("input", e => {
+  const p = e.target.dataset.p; if (!p || !cur) return;
+  cur[p] = e.target.type === "number" ? Number(e.target.value) : e.target.value;
+  save(); lista();
+});
+$("ed").addEventListener("change", e => { if (e.target.dataset.p === "horas") editor(); });
+$("ed").addEventListener("click", async e => {
+  if (!cur) return;
+  const id = e.target.id;
+  if (id === "bAdd") {
+    const tarea = $("nTarea").value.trim(), minutos = Number($("nH").value || 0) * 60 + Number($("nM").value || 0);
+    if (!tarea || !minutos) return toast("Pon la tarea y el tiempo", true);
+    (cur.entradas ||= []).push({ fecha: $("nFecha").value || hoy(), tarea, detalle: $("nDetalle").value.trim(), minutos });
+    await put(cur); toast(`Apuntado: ${hm(minutos)}`); lista(); editor(); return;
+  }
+  if (e.target.dataset.del != null) {
+    if (!confirm("¿Eliminar esta intervención?")) return;
+    cur.entradas.splice(+e.target.dataset.del, 1); await put(cur); lista(); editor(); return;
+  }
+  if (id === "bCopy") { await navigator.clipboard.writeText(enlace(cur)); toast("Enlace copiado"); return; }
+  if (id === "bToken") {
+    if (!confirm("Se creará un enlace nuevo y el anterior dejará de funcionar. ¿Continuar?")) return;
+    cur.token = token(); await put(cur); editor(); toast("Enlace cambiado"); return;
+  }
+  if (id === "compartido") { cur.compartido = e.target.checked; await put(cur); editor(); return; }
+  if (id === "bDel") {
+    if (!confirm(`¿Eliminar el bono de ${cur.cliente || "este cliente"} con todas sus intervenciones?`)) return;
+    await api(`docs/bonos/${cur.id}`, { method: "DELETE" });
+    store = store.filter(b => b.id !== cur.id); cur = null; lista(); $("ed").innerHTML = `<div class="empty">Selecciona un bono.</div>`;
+  }
+});
+
+lista();
+if (store.length === 1) abrir(store[0].id);
+</script>
+</body>
+</html>

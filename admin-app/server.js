@@ -2,6 +2,7 @@
 // sesiones en servidor y almacenamiento de presupuestos y facturas.
 import express from "express";
 import path from "node:path";
+import crypto from "node:crypto";
 import { fileURLToPath } from "node:url";
 import QRCode from "qrcode";
 import { db, audit } from "./lib/db.js";
@@ -197,6 +198,23 @@ app.post("/api/contacto", (req, res) => {
 app.get("/admin/login", (req, res) => loadSession(req) ? res.redirect(302, "/admin/") : res.sendFile(path.join(PUBLIC, "login.html")));
 app.get("/admin/panel.css", (req, res) => res.sendFile(path.join(PUBLIC, "panel.css")));
 
+/* ===== Bonos de horas: vista del cliente (pública, solo lectura, por enlace secreto) ===== */
+const bonoPorToken = token => {
+  if (!/^[A-Za-z0-9_-]{20,64}$/.test(token)) return null;
+  for (const r of db.prepare("SELECT data FROM docs WHERE kind = 'bonos'").all()) {
+    const b = JSON.parse(r.data);
+    if (b.token && b.compartido !== false && b.token.length === token.length && crypto.timingSafeEqual(Buffer.from(b.token), Buffer.from(token))) return b;
+  }
+  return null;
+};
+app.get("/admin/bono/:token", (req, res) => bonoPorToken(req.params.token) ? res.sendFile(path.join(PUBLIC, "bono.html")) : res.status(404).send("Enlace no válido"));
+app.get("/admin/bono/:token/datos", (req, res) => {
+  const b = bonoPorToken(req.params.token); if (!b) return res.status(404).json({ error: "Enlace no válido" });
+  // Solo lo que el cliente debe ver (sin precios internos ni notas privadas)
+  res.json({ cliente: b.cliente, titulo: b.titulo, referencia: b.referencia, inicio: b.inicio, horas: Number(b.horas) || 0,
+    entradas: (b.entradas || []).map(e => ({ fecha: e.fecha, tarea: e.tarea, detalle: e.detalle, minutos: Number(e.minutos) || 0 })) });
+});
+
 /* ===== A partir de aquí, todo requiere sesión ===== */
 app.use("/admin", requireAuth);
 
@@ -259,7 +277,7 @@ app.post("/admin/api/password", (req, res) => {
 });
 
 /* ===== Documentos: presupuestos y facturas ===== */
-const KINDS = new Set(["presupuestos", "facturas", "ajustes"]);
+const KINDS = new Set(["presupuestos", "facturas", "ajustes", "bonos"]);
 const ID = /^[\w-]{1,64}$/;
 app.param("kind", (req, res, next, kind) => KINDS.has(kind) ? next() : res.status(404).json({ error: "No existe" }));
 
@@ -333,7 +351,7 @@ app.post("/admin/api/servidores/copias", async (req, res) => {
 });
 
 /* ===== Páginas privadas ===== */
-const PAGES = { "": "index.html", presupuestos: "presupuestos.html", facturas: "facturas.html", correo: "correo.html", mensajes: "mensajes.html", seguridad: "seguridad.html", servidores: "servidores.html" };
+const PAGES = { "": "index.html", presupuestos: "presupuestos.html", facturas: "facturas.html", correo: "correo.html", mensajes: "mensajes.html", seguridad: "seguridad.html", servidores: "servidores.html", bonos: "bonos.html" };
 app.get("/admin/panel.js", (req, res) => res.sendFile(path.join(PUBLIC, "panel.js")));
 app.get(["/admin", "/admin/:page"], (req, res, next) => {
   const f = PAGES[(req.params.page || "").replace(/\.html$/, "")];
