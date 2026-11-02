@@ -64,7 +64,7 @@
     .pill.pendiente { background: #fff5d6; color: #8a6200; }
     .pill.pagada { background: #e6f3ea; color: #2f7d4f; }
     .pill.borrador { background: #eeede5; color: var(--muted); }
-    .pill.recibo { background: #e6eefa; color: #2a5db0; }
+    .pill.recibo { background: #f1f4c8; color: #5d6300; }
     button.pill { border: 1px solid transparent; font: inherit; font-size: 11.5px; font-weight: 700; cursor: pointer; }
     button.pill:hover { border-color: currentColor; }
     .del-row { border: 0; background: none; cursor: pointer; font-size: 14px; opacity: .35; padding: 2px 6px; border-radius: 6px; }
@@ -118,16 +118,8 @@
     .s-top { background: var(--ink); color: var(--cream); margin: -16mm -18mm 0; padding: 12mm 18mm 10mm; display: flex; justify-content: space-between; align-items: flex-start; position: relative; overflow: hidden; }
     .s-top::before { content: ""; position: absolute; width: 70mm; height: 70mm; border-radius: 50%; background: var(--lime); opacity: .14; filter: blur(30px); top: -35mm; right: -25mm; }
     .s-top > * { position: relative; }
-    /* Recibo: cabecera clara en azul y aviso fijo, para que nunca parezca una factura */
-    .sheet.recibo .s-top { background: #eaf1fb; color: var(--ink); }
-    .sheet.recibo .s-top::before { background: #2a5db0; opacity: .10; }
-    .sheet.recibo .s-top .me img { filter: none; }
-    .sheet.recibo .s-top .me h1 { color: #2a5db0; }
-    .sheet.recibo .s-top .meta { color: #5b6b82; }
-    .sheet.recibo .s-top .meta b { color: #2a5db0; }
-    .sheet.recibo .s-top .me .mark i { color: #2a5db0; }
-    .aviso-recibo { margin: 0 -18mm; padding: 2.4mm 18mm; background: #2a5db0; color: #fff; font-size: 8pt; font-weight: 700; letter-spacing: .04em; }
-    .sheet.recibo .items thead th { background: #2a5db0; }
+    /* Recibo: misma estética que la factura, con una franja que deja claro que no es una factura */
+    .aviso-recibo { margin: 0 -18mm; padding: 2.4mm 18mm; background: var(--lime); color: var(--ink); font-size: 8pt; font-weight: 800; letter-spacing: .04em; }
     .s-top .me .mark { display: flex; align-items: center; gap: 2mm; }
     .s-top .me img { height: 18px; filter: invert(1); }
     .s-top .me .mark span { font-size: 10.5pt; font-weight: 800; letter-spacing: -.03em; }
@@ -464,7 +456,11 @@ function sheet() {
       <thead><tr><th>#</th><th>Concepto</th></tr></thead>
       <tbody>${f.lineas.map((l, i) => `<tr><td class="n">${String(i + 1).padStart(2, "0")}</td><td><b>${esc(l.concepto)}</b>${l.detalle ? `<small>${esc(l.detalle)}</small>` : ""}</td></tr>`).join("")}</tbody>
     </table>
-    <div class="sum"><div></div><div class="totals"><div class="t"><span>Importe a pagar</span><span>${eur(t.total)}</span></div></div></div>` : `<table class="items">
+    <div class="sum"><div></div><div class="totals">
+      <div><span>Importe</span><span>${eur(t.base)}</span></div>
+      <div><span>IVA ${f.iva}%</span><span>+ ${eur(t.iva)}</span></div>
+      ${t.irpf ? `<div><span>Retención IRPF ${f.irpf ?? IRPF_DEFECTO}%</span><span>− ${eur(t.irpf)}</span></div>` : ""}
+      <div class="t"><span>Importe a pagar</span><span>${eur(t.total)}</span></div></div></div>` : `<table class="items">
       <thead><tr><th>#</th><th>Descripción</th><th class="r">Cant.</th><th class="r">Precio</th><th class="r">Importe</th></tr></thead>
       <tbody>${f.lineas.map((l, i) => `<tr><td class="n">${String(i + 1).padStart(2, "0")}</td><td><b>${esc(l.concepto)}</b>${l.detalle ? `<small>${esc(l.detalle)}</small>` : ""}${f.periodo.desde ? `<small>Del ${fecha(f.periodo.desde)} al ${fecha(f.periodo.hasta)}</small>` : ""}</td><td class="r">${l.cantidad}</td><td class="r">${eur(l.precio)}</td><td class="r"><b>${eur(l.cantidad * l.precio)}</b></td></tr>`).join("")}</tbody>
     </table>
