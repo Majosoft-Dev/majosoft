@@ -38,6 +38,8 @@ export async function web(url) {
   return { url, codigo, ms, ssl, error };
 }
 
+const RUIDO = /xmlrpc\.php|wp-config-sample\.php|wp-signup\.php|\/wp-admin\/includes\/|\/wp-includes\//i;
+
 // Errores 5xx de nginx en las últimas 24 h, agrupados por ruta
 function errores5xx() {
   const desde = Date.now() - 24 * 3600e3, rutas = new Map();
@@ -52,6 +54,7 @@ function errores5xx() {
       if (!(t >= desde)) continue;
       peticiones++;
       if (m[7][0] !== "5") continue;
+      if (RUIDO.test(m[6])) continue; // bots que piden ficheros internos de WordPress: no es un fallo real
       total++;
       const k = `${m[7]} ${m[5]} ${m[6]}`, v = rutas.get(k) || { ruta: k, veces: 0, ultima: 0 };
       v.veces++; v.ultima = Math.max(v.ultima, t); rutas.set(k, v);
