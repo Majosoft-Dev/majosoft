@@ -567,7 +567,6 @@ function paginar() {
         cont.querySelector(".mod-desc")?.remove();
         cont.querySelector(".mod-price")?.remove();
         cont.querySelector(".mod-n").textContent = "";
-        cont.querySelector("h3").insertAdjacentHTML("beforeend", ' <small style="font-weight:500;color:var(--muted)">(continuación)</small>');
         cont.classList.add("mod--cont");
         while (llena() && ul.children.length > 1) cul.prepend(ul.lastElementChild);
         // Si a la hoja siguiente solo pasaría el botón «+ Añadir punto», no se crea la continuación
