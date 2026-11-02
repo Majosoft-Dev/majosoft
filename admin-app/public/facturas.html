@@ -453,8 +453,8 @@ function sheet() {
         : `<div><small>Concepto</small><b>${esc(f.resumen)}</b></div>`}
     </div>
     ${rec ? `<table class="items">
-      <thead><tr><th>#</th><th>Concepto</th></tr></thead>
-      <tbody>${f.lineas.map((l, i) => `<tr><td class="n">${String(i + 1).padStart(2, "0")}</td><td><b>${esc(l.concepto)}</b>${l.detalle ? `<small>${esc(l.detalle)}</small>` : ""}</td></tr>`).join("")}</tbody>
+      <thead><tr><th>#</th><th>Concepto</th><th class="r">Importe</th></tr></thead>
+      <tbody>${f.lineas.map((l, i) => `<tr><td class="n">${String(i + 1).padStart(2, "0")}</td><td><b>${esc(l.concepto)}</b>${l.detalle ? `<small>${esc(l.detalle)}</small>` : ""}</td><td class="r"><b>${eur(l.cantidad * l.precio)}</b></td></tr>`).join("")}</tbody>
     </table>
     <div class="sum"><div></div><div class="totals">
       <div><span>Importe</span><span>${eur(t.base)}</span></div>
