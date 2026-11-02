@@ -446,10 +446,13 @@ function sheet() {
       <div class="meta"><b>Nº ${esc(f.numero)}</b>Fecha: ${edFecha("fecha")}${f.vencimiento ? `<br />Vencimiento: ${edFecha("vencimiento")}` : ""}</div>
     </div>
     ${rec ? `<div class="aviso-recibo">SOLICITUD DE PAGO · NO ES UNA FACTURA · La factura se emitirá al recibir el pago</div>` : ""}
-    <div class="parties">
+    ${rec ? `<div class="parties">
+      <div><span class="lbl">De</span><b>${ed("emisor.titular", "Nombre del emisor")}</b>${ed("emisor.email", "Email")} · ${ed("emisor.telefono", "Teléfono")}</div>
+      <div class="to">${c.logo ? `<img src="${c.logo}" alt="" />` : ""}<span class="lbl">Para</span><b>${ed("cliente.nombre", "Nombre del cliente")}</b></div>
+    </div>` : `<div class="parties">
       <div><span class="lbl">${rec ? "De" : "Emisor"}</span><b>${ed("emisor.titular", "Nombre del emisor")}</b>${ed("emisor.empresa", "Actividad o empresa")}<br />NIF: ${ed("emisor.nif", "NIF")}<br />${ed("emisor.direccion", "Calle y número")}<br />${ed("emisor.cpCiudad", "C.P. y ciudad")}<br />${ed("emisor.email", "Email")} · ${ed("emisor.telefono", "Teléfono")}</div>
       <div class="to">${c.logo ? `<img src="${c.logo}" alt="" />` : ""}<span class="lbl">${rec ? "Para" : "Facturar a"}</span><b>${ed("cliente.nombre", "Nombre del cliente")}</b>NIF/CIF: ${ed("cliente.nif", "NIF/CIF")}<br />${ed("cliente.direccion", "Calle y número")}<br />${ed("cliente.cpCiudad", "C.P. y ciudad")}<br />${ed("cliente.email", "Email")}</div>
-    </div>
+    </div>`}
     <div class="strip${f.vencimiento ? "" : " strip--2"}">
       <div><small>${rec ? "Fecha" : "Fecha de emisión"}</small><b>${edFecha("fecha")}</b></div>
       ${f.vencimiento ? `<div><small>Vencimiento</small><b>${edFecha("vencimiento")}</b></div>` : ""}
@@ -457,19 +460,23 @@ function sheet() {
         ? `<div><small>Periodo de servicio</small><b>${f.periodo.desde ? fecha(f.periodo.desde) + " – " + fecha(f.periodo.hasta) : "—"}</b></div>`
         : `<div><small>Concepto</small><b>${esc(f.resumen)}</b></div>`}
     </div>
-    <table class="items">
+    ${rec ? `<table class="items">
+      <thead><tr><th>#</th><th>Concepto</th></tr></thead>
+      <tbody>${f.lineas.map((l, i) => `<tr><td class="n">${String(i + 1).padStart(2, "0")}</td><td><b>${esc(l.concepto)}</b>${l.detalle ? `<small>${esc(l.detalle)}</small>` : ""}</td></tr>`).join("")}</tbody>
+    </table>
+    <div class="sum"><div></div><div class="totals"><div class="t"><span>Importe a pagar</span><span>${eur(t.total)}</span></div></div></div>` : `<table class="items">
       <thead><tr><th>#</th><th>Descripción</th><th class="r">Cant.</th><th class="r">Precio</th><th class="r">Importe</th></tr></thead>
       <tbody>${f.lineas.map((l, i) => `<tr><td class="n">${String(i + 1).padStart(2, "0")}</td><td><b>${esc(l.concepto)}</b>${l.detalle ? `<small>${esc(l.detalle)}</small>` : ""}${f.periodo.desde ? `<small>Del ${fecha(f.periodo.desde)} al ${fecha(f.periodo.hasta)}</small>` : ""}</td><td class="r">${l.cantidad}</td><td class="r">${eur(l.precio)}</td><td class="r"><b>${eur(l.cantidad * l.precio)}</b></td></tr>`).join("")}</tbody>
     </table>
     <div class="sum">
       <div></div>
       <div class="totals">
-        <div><span>${rec ? "Importe" : "Base imponible"}</span><span>${eur(t.base)}</span></div>
+        <div><span>Base imponible</span><span>${eur(t.base)}</span></div>
         <div><span>IVA ${f.iva}%</span><span>+ ${eur(t.iva)}</span></div>
         ${t.irpf ? `<div><span>Retención IRPF ${f.irpf ?? IRPF_DEFECTO}%</span><span>− ${eur(t.irpf)}</span></div>` : ""}
         <div class="t"><span>Total a pagar</span><span>${eur(t.total)}</span></div>
       </div>
-    </div>
+    </div>`}
     <div class="s-bottom">
       <div class="pay">
         ${!rec && (f.irpf ?? IRPF_DEFECTO) == 7 ? `<p class="legal">${NOTA_IRPF}</p>` : ""}
