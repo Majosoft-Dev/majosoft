@@ -123,6 +123,9 @@
     table.sum .r { text-align: right; white-space: nowrap; }
     table.sum tr.sub td { font-weight: 700; border-bottom: none; padding-top: 4mm; }
     table.sum tr.iva td { color: var(--muted); }
+    table.sum tr.desc td { color: #2f7d4f; font-weight: 700; background: #eef7f0; border-bottom: none; }
+    table.sum tr.desc td:first-child { border-radius: 2mm 0 0 2mm; } table.sum tr.desc td:last-child { border-radius: 0 2mm 2mm 0; }
+    table.sum tr.base td { font-weight: 700; }
     table.sum tr.tot td { background: var(--ink); color: var(--cream); font-weight: 800; font-size: 12pt; border: none; }
     table.sum tr.tot td:first-child { border-radius: 3mm 0 0 3mm; }
     table.sum tr.tot td:last-child { border-radius: 0 3mm 3mm 0; color: var(--lime); }
@@ -293,6 +296,7 @@ const VACIO = {
 
 let D = null;
 const migrar = d => {
+  d.descuento ??= { activo: false, porcentaje: 0, etiqueta: "" };
   d.cuota ??= { activo: false, precio: "", nota: "", etiqueta: "", detalle: "", texto: "" };
   d.textos ??= {};
   if (d.totalConIva == null) { d.auto = true; d.totalConIva = Number(d.totalRedondeado) || Math.round(d.modulos.reduce((s, m) => s + Number(m.precio || 0), 0) * (1 + d.iva / 100)); }
@@ -326,8 +330,11 @@ function calc() {
   if (D.auto) repartir();
   const subtotal = D.modulos.reduce((s, m) => s + Number(m.precio || 0), 0);
   const horas = D.modulos.reduce((s, m) => s + Number(m.horas || 0), 0);
-  const total = D.auto ? Number(D.totalConIva || 0) : Math.round(subtotal * (1 + D.iva / 100) * 100) / 100;
-  return { subtotal, horas, iva: Math.round((total - subtotal) * 100) / 100, total };
+  // Descuento sobre el precio de lista (p. ej. bono de bienvenida): el IVA se calcula sobre la base ya descontada
+  const pct = !D.auto && D.descuento?.activo ? Number(D.descuento.porcentaje || 0) : 0;
+  const descuento = Math.round(subtotal * pct) / 100, base = Math.round((subtotal - descuento) * 100) / 100;
+  const total = D.auto ? Number(D.totalConIva || 0) : Math.round(base * (1 + D.iva / 100) * 100) / 100;
+  return { subtotal, horas, pct, descuento, base, iva: Math.round((total - base) * 100) / 100, total };
 }
 
 /* ===== Edición directa sobre el documento =====
@@ -336,7 +343,7 @@ function calc() {
 const TEXTOS = {
   lblCliente: "Cliente", lblInversion: "Inversión", lblLanzamiento: "Lanzamiento objetivo",
   objetivoTitulo: "Objetivo del proyecto", resumenTitulo: "Resumen económico", pagoTitulo: "Condiciones de pago",
-  colModulo: "Módulo", colHoras: "Horas", colPrecio: "Precio", subtotal: "Subtotal (sin IVA)", ivaLabel: "IVA", totalLabel: "Total (IVA incluido)",
+  colModulo: "Módulo", colHoras: "Horas", colPrecio: "Precio", subtotal: "Subtotal (sin IVA)", baseLabel: "Base imponible", ivaLabel: "IVA", totalLabel: "Total (IVA incluido)",
   incluido: "Incluido", ivaIncluido: "IVA incluido", ivaIncl: "IVA incl.", horas: "horas", hastaEl: "hasta el",
   incluyeTitulo: "Qué incluye", noIncluyeTitulo: "Qué no incluye", requisitosTitulo: "Requisitos por parte del cliente",
   pie: "Majosoft · Estudio de desarrollo de software en Jaén · Presupuesto válido 30 días desde su emisión"
@@ -404,6 +411,8 @@ function render() {
       <tbody>
         ${D.modulos.map((m, i) => `<tr><td>${E(`modulos.${i}.titulo`, "Título del módulo")}${m.nuevo ? '<span class="badge">Nuevo</span>' : ""}</td><td class="r">${m.horas ? m.horas + "h" : "—"}</td><td class="r">${Number(m.precio) ? eur(m.precio) : T("incluido")}</td></tr>`).join("")}
         <tr class="sub"><td>${T("subtotal")}</td><td class="r">${c.horas}h</td><td class="r">${eur(c.subtotal)}</td></tr>
+        ${c.descuento ? `<tr class="desc"><td>${E("descuento.etiqueta", "Descuento", { def: "Descuento" })} (−${String(c.pct).replace(".", ",")} %)</td><td></td><td class="r">−${eur(c.descuento)}</td></tr>
+        <tr class="base"><td>${T("baseLabel")}</td><td></td><td class="r">${eur(c.base)}</td></tr>` : ""}
         <tr class="iva"><td>${T("ivaLabel")} (${D.iva}%)</td><td></td><td class="r">${eur(c.iva)}</td></tr>
         <tr class="tot"><td>${T("totalLabel")}</td><td class="r">${c.horas}h</td><td class="r">${eur(c.total)}</td></tr>
       </tbody>
@@ -501,8 +510,11 @@ function paginar() {
         cont.querySelector("h3").insertAdjacentHTML("beforeend", ' <small style="font-weight:500;color:var(--muted)">(continuación)</small>');
         cont.classList.add("mod--cont");
         while (llena() && ul.children.length > 1) cul.prepend(ul.lastElementChild);
-        if (!llena()) { bloques.splice(i + 1, 0, cont); continue; }
+        // Si a la hoja siguiente solo pasaría el botón «+ Añadir punto», no se crea la continuación
+        const soloBoton = [...cul.children].every(x => x.classList.contains("add-pt"));
+        if (!llena() && !soloBoton) { bloques.splice(i + 1, 0, cont); continue; }
         while (cul.firstElementChild) ul.appendChild(cul.firstElementChild);
+        if (!llena()) continue;
       }
     }
     const prev = b.previousElementSibling;
@@ -557,6 +569,8 @@ function buildEditor() {
       <div class="row">${txt("Precio final (€ IVA incluido)", "totalConIva", { type: "number" })}${txt("IVA (%)", "iva", { type: "number" })}</div>
       <div class="hint" id="calcHint"></div>
       ${txt("Forma de pago", "formaPago", { type: "area" })}
+      ${txt("Aplicar descuento en el resumen económico", "descuento.activo", { type: "check" })}
+      <div class="row">${txt("Descuento (%)", "descuento.porcentaje", { type: "number" })}${txt("Nombre del descuento", "descuento.etiqueta", { ph: "Bono de bienvenida" })}</div>
       ${txt("Incluir bono / descuento", "bono.activo", { type: "check" })}
       ${txt("Nombre del bono", "bono.titulo")}
       <div class="row">${txt("Precio final (€ IVA incl.)", "bono.precio", { type: "number" })}${txt("Fecha límite", "bono.fechaLimite", { type: "date" })}</div>
@@ -716,7 +730,9 @@ if (D) {
   document.fonts?.ready.then(render); // las medidas cambian al cargar Inter
 } else {
   document.getElementById("plist").hidden = false;
-  const totalP = p => p.auto ? Number(p.totalConIva || 0) : Math.round(p.modulos.reduce((s, m) => s + Number(m.precio || 0), 0) * (1 + p.iva / 100) * 100) / 100;
+  const totalP = p => { if (p.auto) return Number(p.totalConIva || 0);
+    const sub = p.modulos.reduce((s, m) => s + Number(m.precio || 0), 0), pct = p.descuento?.activo ? Number(p.descuento.porcentaje || 0) : 0;
+    return Math.round((sub - Math.round(sub * pct) / 100) * (1 + p.iva / 100) * 100) / 100; };
   document.getElementById("prows").innerHTML = lista.length ? lista.map(p => `<tr data-id="${esc(p.id)}">
     <td><b>${esc(p.titulo)}</b></td><td>${esc(p.cliente)}</td><td>${fecha(p.fecha)}</td><td class="r"><b>${eur(totalP(p))}</b></td>
     <td class="r"><button class="del" data-del="${esc(p.id)}" title="Eliminar">✕</button></td></tr>`).join("")
