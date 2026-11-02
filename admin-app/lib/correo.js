@@ -125,3 +125,12 @@ export async function marcar(uid, leido) {
     ? imap.messageFlagsAdd(String(uid), ["\\Seen"], { uid: true })
     : imap.messageFlagsRemove(String(uid), ["\\Seen"], { uid: true }));
 }
+
+// Envío de avisos desde el mismo buzón (SMTP de IONOS con las credenciales guardadas)
+export async function enviar({ asunto, texto, html, para }) {
+  const c = config();
+  if (!c) throw new Error("El buzón no está conectado: no se pueden enviar avisos");
+  const { createTransport } = await import("nodemailer");
+  const smtp = createTransport({ host: c.host.replace(/^imap\./, "smtp."), port: 465, secure: true, auth: { user: c.user, pass: c.password } });
+  await smtp.sendMail({ from: `Panel Majosoft <${c.user}>`, to: para || c.user, subject: asunto, text: texto, html });
+}

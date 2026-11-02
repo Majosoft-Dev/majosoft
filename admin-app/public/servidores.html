@@ -76,6 +76,11 @@
     .cod { font-weight: 800; font-variant-numeric: tabular-nums; }
     .cod.bad { color: var(--bad); } .cod.warn { color: #9a6a00; } .cod.ok { color: var(--ok); }
     .scroll-x { overflow-x: auto; }
+    .hist { list-style: none; padding: 0 !important; margin: 0 !important; }
+    .hist li { display: flex; gap: 10px; padding: 9px 0; border-bottom: 1px solid #eeede5; font-size: 13px; }
+    .hist li:last-child { border: 0; }
+    .hist .cuando { color: var(--muted); white-space: nowrap; min-width: 92px; font-size: 12px; padding-top: 1px; }
+    .hist .txt { white-space: pre-line; }
     .dot { width: 8px; height: 8px; border-radius: 50%; flex: none; }
     .dot.ok { background: var(--ok); } .dot.bad { background: var(--bad); } .dot.warn { background: var(--warn); } .dot.off { background: var(--line); }
     .ctrl { display: flex; justify-content: flex-end; }
@@ -110,6 +115,11 @@
       <div class="card wide">
         <div class="est-head"><div><h2>Estado en directo</h2><p class="sub" id="estSub">Comprobando las webs…</p></div><button class="btn-est" id="estRefresh">Comprobar ahora</button></div>
         <div id="estado"></div>
+      </div>
+
+      <div class="card wide">
+        <div class="est-head"><div><h2>Avisos por email</h2><p class="sub" id="vigSub">Cargando…</p></div><button class="btn-est" id="vigPrueba">Enviar email de prueba</button></div>
+        <div id="vigilancia"></div>
       </div>
 
       <div class="card wide">
@@ -253,7 +263,7 @@ function pintarEstado(d) {
   }
   const filas = [...d.webs].sort((a, b) => ({ bad: 0, warn: 1, ok: 2 }[estadoWeb(a)] - { bad: 0, warn: 1, ok: 2 }[estadoWeb(b)]) || a.servidor.localeCompare(b.servidor));
   document.getElementById("estado").innerHTML = `
-    <div class="alertas">${al.length ? al.sort((a, b) => (a[0] === "bad" ? 0 : 1) - (b[0] === "bad" ? 0 : 1)).map(([c, t]) => `<div class="alerta ${c}">${c === "bad" ? "⛔" : "⚠️"}<span>${t}</span></div>`).join("") : `<div class="alerta ok">✅<span>Todo funciona: las ${d.webs.length} webs responden bien.</span></div>`}</div>
+    <div class="alertas">${al.length ? al.sort((a, b) => (a[0] === "bad" ? 0 : 1) - (b[0] === "bad" ? 0 : 1)).map(([c, t]) => `<div class="alerta ${c}">${c === "bad" ? "⛔" : "⚠️"}<span>${t}</span></div>`).join("") : `<div class="alerta ok">✅<span>Todo funciona: ${d.webs.length === 1 ? "la web responde" : `las ${d.webs.length} webs responden`} bien.</span></div>`}</div>
     ${d.servidores.map(bloqueServidor).join("")}
     <h3>Webs</h3>
     <div class="scroll-x"><table class="tabla-est"><thead><tr><th>Web</th><th>Servidor</th><th class="r">Código</th><th class="r">Tiempo</th><th class="r">SSL</th></tr></thead><tbody>
@@ -273,6 +283,27 @@ async function comprobar() {
   finally { b.disabled = false; b.textContent = "Comprobar ahora"; }
 }
 document.getElementById("estRefresh").onclick = comprobar;
+
+/* ===== Avisos por email ===== */
+const durac = ms => ms < 3600e3 ? Math.max(1, Math.round(ms / 60e3)) + " min" : (ms / 3600e3).toFixed(1).replace(".", ",") + " h";
+async function vigilancia() {
+  const v = await api("servidores/vigilancia");
+  const activos = Object.values(v.activos || {});
+  document.getElementById("vigSub").textContent = (v.buzon?.configurado ? `Se envían a ${v.buzon.user}` : "El buzón no está conectado: conéctalo en Correo para recibir avisos")
+    + ` · Revisión automática cada ${v.cada / 60e3} min` + (v.ultima ? ` · Última: ${new Date(v.ultima).toLocaleTimeString("es-ES", { hour: "2-digit", minute: "2-digit" })}` : " · Primera revisión en curso");
+  document.getElementById("vigilancia").innerHTML = `
+    ${v.error ? `<div class="alertas"><div class="alerta bad">⛔<span>${esc(v.error)}</span></div></div>` : ""}
+    <div class="alertas">${activos.length ? activos.map(p => `<div class="alerta bad">⛔<span>${esc(p.texto)} <small>· desde hace ${durac(Date.now() - p.desde)}</small></span></div>`).join("") : `<div class="alerta ok">✅<span>Sin problemas abiertos. Te escribiré si una web da error, aparecen errores 5xx (en cualquier página o API) o algo del servidor falla, y otra vez cuando se arregle.</span></div>`}</div>
+    ${v.historial?.length ? `<h3>Historial</h3><ul class="hist">${v.historial.slice(0, 15).map(h => `<li><span class="cuando">${when(h.desde)}</span><span>${h.tipo === "ok" ? "✅" : h.tipo === "5xx" ? "⚠️" : "⛔"}</span><span class="txt">${esc(h.texto)}${h.tipo === "ok" ? ` <small style="color:var(--muted)">· arreglado tras ${durac(h.hasta - h.desde)}</small>` : ""}</span></li>`).join("")}</ul>` : ""}`;
+}
+document.getElementById("vigPrueba").onclick = async e => {
+  const b = e.target; b.disabled = true; b.textContent = "Enviando…";
+  try { await api("servidores/vigilancia/prueba", { method: "POST" }); toast("Email de prueba enviado"); }
+  catch (err) { toast(err.message, true); }
+  finally { b.disabled = false; b.textContent = "Enviar email de prueba"; }
+};
+vigilancia().catch(err => { document.getElementById("vigilancia").innerHTML = `<p class="bad">${esc(err.message)}</p>`; });
+setInterval(() => { if (!document.hidden) vigilancia().catch(() => {}); }, 60e3);
 comprobar();
 setInterval(() => { if (!document.hidden) comprobar(); }, 60e3);
 

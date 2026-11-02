@@ -9,6 +9,7 @@ import { db, audit } from "./lib/db.js";
 import * as correo from "./lib/correo.js";
 import * as copias from "./lib/copias.js";
 import * as salud from "./lib/salud.js";
+import * as vigilancia from "./lib/vigilancia.js";
 import {
   verifyPassword, hashPassword, DUMMY_HASH, passwordProblems,
   newTotpSecret, verifyTotp, totpUri, newToken, sha256,
@@ -353,6 +354,11 @@ app.get("/admin/api/servidores/estado", async (req, res) => {
   }));
   res.json({ comprobado: Date.now(), servidores, webs });
 });
+// Avisos por email: estado de la vigilancia y email de prueba
+app.get("/admin/api/servidores/vigilancia", (req, res) => res.json({ ...vigilancia.estado(), buzon: correo.estado() }));
+app.post("/admin/api/servidores/vigilancia/prueba", async (req, res) => {
+  try { await vigilancia.prueba(); res.json({ ok: true }); } catch (e) { res.status(502).json({ error: "No se pudo enviar: " + e.message }); }
+});
 app.post("/admin/api/servidores/copias", async (req, res) => {
   const { servidor, web, activa } = req.body || {};
   try { await copias.cambiar(String(servidor || ""), String(web || ""), !!activa); }
@@ -378,3 +384,4 @@ setInterval(() => {
 }, 10 * 60e3).unref();
 
 app.listen(PORT, "127.0.0.1", () => console.log(`Panel Majosoft escuchando en 127.0.0.1:${PORT}`));
+vigilancia.arrancar();
