@@ -20,6 +20,7 @@
     .btn { display: inline-flex; align-items: center; gap: 6px; padding: 9px 15px; border-radius: 10px; border: 1px solid var(--line); background: #fff; color: var(--ink); font: inherit; font-weight: 700; font-size: 13px; cursor: pointer; text-decoration: none; white-space: nowrap; }
     .btn:hover { border-color: var(--ink); }
     .btn--ink { background: var(--ink); color: var(--cream); border-color: var(--ink); }
+    .btn--lime { background: var(--lime); color: var(--ink); border-color: var(--lime); }
     .btn--ink:hover { background: #2a2b26; }
     .btn--danger:hover { border-color: #b42318; color: #b42318; }
 
@@ -63,6 +64,7 @@
     .pill.pendiente { background: #fff5d6; color: #8a6200; }
     .pill.pagada { background: #e6f3ea; color: #2f7d4f; }
     .pill.borrador { background: #eeede5; color: var(--muted); }
+    .pill.recibo { background: #e6eefa; color: #2a5db0; }
     button.pill { border: 1px solid transparent; font: inherit; font-size: 11.5px; font-weight: 700; cursor: pointer; }
     button.pill:hover { border-color: currentColor; }
     .del-row { border: 0; background: none; cursor: pointer; font-size: 14px; opacity: .35; padding: 2px 6px; border-radius: 6px; }
@@ -177,29 +179,31 @@
 <body>
   <header class="topbar" id="topbar" hidden>
     <button class="btn" id="toPanel">← Facturas</button>
-    <span class="doc-title"><small>Factura</small><span id="docTitle"></span></span>
+    <span class="doc-title"><small id="docTipo">Factura</small><span id="docTitle"></span></span>
     <span class="save-state" data-save-state></span>
     <span id="editBtns" hidden>
       <button class="btn btn--danger" id="bDel">Eliminar</button>
       <button class="btn" id="bDup">Duplicar</button>
+      <button class="btn btn--lime" id="bConvertir" hidden>Pagado: convertir en factura</button>
       <button class="btn btn--ink" id="bPrint">Descargar PDF</button>
     </span>
   </header>
 
   <section class="panel" id="panel">
     <div class="page-head">
-      <div><div class="crumbs">Comercial</div><h1>Facturas</h1><p>Emisión, numeración y seguimiento de cobros.</p></div>
+      <div><div class="crumbs">Comercial</div><h1>Facturas</h1><p>Primero el recibo para pedir el pago; al cobrar, se convierte en factura con su número correlativo.</p></div>
       <div class="actions">
         <button class="btn" id="bImport">Importar</button>
         <button class="btn" id="bExport">Exportar copia</button>
-        <button class="btn btn--ink" id="bNew">+ Nueva factura</button>
+        <button class="btn" id="bNew">+ Nueva factura</button>
+        <button class="btn btn--ink" id="bNewRecibo">+ Nuevo recibo</button>
         <input type="file" id="file" accept="application/json" hidden />
       </div>
     </div>
     <div class="kpis" id="kpis"></div>
     <div class="card">
       <div class="card-tools">
-        <div class="tabs" id="tabs"><button data-f="" class="on">Todas</button><button data-f="pendiente">Pendientes</button><button data-f="pagada">Pagadas</button><button data-f="borrador">Borradores</button></div>
+        <div class="tabs" id="tabs"><button data-f="" class="on">Todas</button><button data-f="pendiente">Pendientes</button><button data-f="pagada">Pagadas</button><button data-f="borrador">Borradores</button><button data-f="recibo">Recibos</button></div>
         <input class="search" id="q" placeholder="Buscar cliente, número o concepto" />
       </div>
       <div class="scroll"><table class="list">
@@ -271,10 +275,14 @@ const totales = f => {
   const irpf = r2(base * (f.irpf ?? IRPF_DEFECTO) / 100);
   return { base, iva, irpf, total: r2(base + iva - irpf) };
 };
-const siguienteNumero = () => {
-  // Numeración correlativa: 01, 02, 03…
-  const n = store.map(f => parseInt(String(f.numero).replace(/\D/g, ""), 10)).filter(Number.isFinite);
-  return String((n.length ? Math.max(...n) : 0) + 1).padStart(2, "0");
+// Recibo: documento para pedir el pago, sin efecto fiscal. Al cobrarlo se convierte en factura.
+const esRecibo = f => f.tipo === "recibo";
+const TIPO = f => esRecibo(f) ? "Recibo" : "Factura";
+const siguienteNumero = (recibo = false) => {
+  // Numeración correlativa: facturas 01, 02, 03…; recibos R-01, R-02… (series separadas)
+  const n = store.filter(f => esRecibo(f) === recibo).map(f => parseInt(String(f.numero).replace(/\D/g, ""), 10)).filter(Number.isFinite);
+  const sig = String((n.length ? Math.max(...n) : 0) + 1).padStart(2, "0");
+  return recibo ? "R-" + sig : sig;
 };
 
 /* ===== Panel ===== */
@@ -299,23 +307,25 @@ function panel() {
   document.getElementById("topbar").hidden = true;
   history.replaceState(null, "", "/admin/facturas");
   const q = document.getElementById("q").value.toLowerCase();
-  const lista = store.filter(f => (!filtro || f.estado === filtro) && (!q || [f.numero, f.cliente.nombre, ...f.lineas.map(l => l.concepto)].join(" ").toLowerCase().includes(q)))
+  const lista = store.filter(f => (!filtro || (filtro === "recibo" ? esRecibo(f) : !esRecibo(f) && f.estado === filtro)) && (!q || [f.numero, f.cliente.nombre, ...f.lineas.map(l => l.concepto)].join(" ").toLowerCase().includes(q)))
     .sort((a, b) => String(b.numero).localeCompare(String(a.numero), "es", { numeric: true }));
   const y = String(new Date().getFullYear());
   const sum = arr => arr.reduce((s, f) => s + totales(f).total, 0);
-  const año = store.filter(f => f.fecha.startsWith(y) && f.estado !== "borrador");
-  const pend = store.filter(f => f.estado === "pendiente"), pag = store.filter(f => f.estado === "pagada");
+  const facts = store.filter(f => !esRecibo(f)), recibos = store.filter(esRecibo);
+  const año = facts.filter(f => f.fecha.startsWith(y) && f.estado !== "borrador");
+  // Pendiente de cobro: recibos sin cobrar y facturas pendientes
+  const pend = [...recibos, ...facts.filter(f => f.estado === "pendiente")], pag = facts.filter(f => f.estado === "pagada");
   document.getElementById("kpis").innerHTML = `
     <div class="kpi dark"><small>Facturado ${y}</small><b>${eur(sum(año))}</b><span>IVA incluido</span></div>
-    <div class="kpi"><small>Pendiente de cobro</small><b>${eur(sum(pend))}</b><span>${pend.length} ${pend.length === 1 ? "factura" : "facturas"}</span></div>
+    <div class="kpi"><small>Pendiente de cobro</small><b>${eur(sum(pend))}</b><span>${recibos.length} ${recibos.length === 1 ? "recibo" : "recibos"} · ${pend.length - recibos.length} ${pend.length - recibos.length === 1 ? "factura" : "facturas"}</span></div>
     <div class="kpi"><small>Cobrado</small><b>${eur(sum(pag))}</b><span>${pag.length} ${pag.length === 1 ? "factura" : "facturas"}</span></div>
-    <div class="kpi"><small>Facturas emitidas</small><b>${store.filter(f => f.estado !== "borrador").length}</b><span>${store.filter(f => f.estado === "borrador").length} en borrador</span></div>`;
+    <div class="kpi"><small>Facturas emitidas</small><b>${facts.filter(f => f.estado !== "borrador").length}</b><span>${facts.filter(f => f.estado === "borrador").length} en borrador</span></div>`;
   const ini = n => String(n || "?").trim().split(/\s+/).slice(0, 2).map(w => w[0]).join("").toUpperCase();
   document.getElementById("rows").innerHTML = lista.length ? lista.map(f => `
     <tr data-id="${f.id}"><td class="num">${esc(f.numero)}</td>
     <td><span class="cli">${f.cliente.logo ? `<img src="${esc(f.cliente.logo)}" alt="" />` : `<i>${esc(ini(f.cliente.nombre))}</i>`}${esc(f.cliente.nombre)}</span></td>
     <td class="muted">${esc(f.resumen || f.lineas[0]?.concepto || "")}</td><td class="muted">${fecha(f.fecha)}</td>
-    <td>${f.estado === "borrador" ? `<span class="pill borrador">borrador</span>` : `<button class="pill ${f.estado}" data-toggle="${esc(f.id)}" title="Marcar como ${f.estado === "pagada" ? "pendiente" : "pagada"}">${f.estado}</button>`}</td><td class="r"><b>${eur(totales(f).total)}</b></td><td class="r"><button class="del-row" data-del-row="${esc(f.id)}" title="Eliminar factura">🗑</button></td></tr>`).join("")
+    <td>${esRecibo(f) ? `<span class="pill recibo">recibo</span>` : f.estado === "borrador" ? `<span class="pill borrador">borrador</span>` : `<button class="pill ${f.estado}" data-toggle="${esc(f.id)}" title="Marcar como ${f.estado === "pagada" ? "pendiente" : "pagada"}">${f.estado}</button>`}</td><td class="r"><b>${eur(totales(f).total)}</b></td><td class="r"><button class="del-row" data-del-row="${esc(f.id)}" title="Eliminar">🗑</button></td></tr>`).join("")
     : `<tr><td colspan="7" class="empty">${store.length ? "Ninguna factura coincide con el filtro." : "Aún no hay facturas. Crea la primera con «+ Nueva factura»."}</td></tr>`;
 }
 
@@ -345,14 +355,19 @@ function editar(id) {
   document.getElementById("editBtns").hidden = false;
   document.getElementById("topbar").hidden = false;
   document.getElementById("docTitle").textContent = `Nº ${cur.numero} · ${cur.cliente.nombre}`;
+  document.getElementById("docTipo").textContent = TIPO(cur);
+  document.getElementById("bConvertir").hidden = !esRecibo(cur);
   history.replaceState(null, "", "/admin/facturas#" + id);
   form(); sheet();
 }
 
 function form() {
   document.getElementById("form").innerHTML = `
-    <section class="sec"><h3>Factura</h3>
-      <div class="row"><label class="f">Número (automático)<input type="text" value="${esc(cur.numero)}" readonly tabindex="-1" class="ro" title="Se asigna solo al crear la factura" /></label><label class="f">Estado<select data-p="estado">${["borrador", "pendiente", "pagada"].map(e => `<option ${cur.estado === e ? "selected" : ""}>${e}</option>`).join("")}</select></label></div>
+    <section class="sec"><h3>${TIPO(cur)}</h3>
+      <div class="row"><label class="f">Número (automático)<input type="text" value="${esc(cur.numero)}" readonly tabindex="-1" class="ro" title="Se asigna solo al crear el documento" /></label>${esRecibo(cur)
+        ? `<label class="f">Estado<input type="text" value="Pendiente de cobro" readonly tabindex="-1" class="ro" /></label>`
+        : `<label class="f">Estado<select data-p="estado">${["borrador", "pendiente", "pagada"].map(e => `<option ${cur.estado === e ? "selected" : ""}>${e}</option>`).join("")}</select></label>`}</div>
+      ${esRecibo(cur) ? `<p class="hint-own">Sin efecto fiscal. Cuando te paguen, pulsa «Pagado: convertir en factura» y recibirá el siguiente número de factura con fecha de hoy.</p>` : cur.reciboOrigen ? `<p class="hint-own">Procede del recibo ${esc(cur.reciboOrigen)}.</p>` : ""}
       <div class="row">${fld("Fecha", "fecha", "date")}
         <label class="f"><span class="chk-venc"><input type="checkbox" id="conVenc" ${cur.vencimiento ? "checked" : ""} /> Vencimiento</span>
           <input type="date" data-p="vencimiento" value="${esc(cur.vencimiento || "")}" ${cur.vencimiento ? "" : "disabled"} /></label></div>
@@ -416,7 +431,7 @@ function sheet() {
   const f = cur, t = totales(f), e = f.emisor, c = f.cliente;
   document.getElementById("sheet").innerHTML = `
     <div class="s-top">
-      <div class="me"><div class="mark"><img src="/assets/logo.svg" alt="" /><span>majosoft<i>.</i></span></div><h1>Factura</h1></div>
+      <div class="me"><div class="mark"><img src="/assets/logo.svg" alt="" /><span>majosoft<i>.</i></span></div><h1>${TIPO(f)}</h1></div>
       <div class="meta"><b>Nº ${esc(f.numero)}</b>Fecha: ${edFecha("fecha")}${f.vencimiento ? `<br />Vencimiento: ${edFecha("vencimiento")}` : ""}</div>
     </div>
     <div class="parties">
@@ -448,13 +463,14 @@ function sheet() {
         ${(f.irpf ?? IRPF_DEFECTO) == 7 ? `<p class="legal">${NOTA_IRPF}</p>` : ""}
         <div><span class="lbl">Forma de pago</span><p>Transferencia bancaria${f.vencimiento ? ` antes del ${fecha(f.vencimiento)}` : ""}</p>
           ${e.iban ? `<p class="iban" style="margin-top:2mm">${esc(e.iban)}</p>` : `<p style="margin-top:2mm;color:var(--muted)">IBAN pendiente de indicar</p>`}
-          <p style="margin-top:2mm">Concepto: <b class="ed" contenteditable="plaintext-only" spellcheck="false" data-p="conceptoPago" data-ph="Factura ${esc(f.numero)}">${esc(f.conceptoPago || `Factura ${f.numero}`)}</b></p></div>
+          <p style="margin-top:2mm">Concepto: <b class="ed" contenteditable="plaintext-only" spellcheck="false" data-p="conceptoPago" data-ph="${TIPO(f)} ${esc(f.numero)}">${esc(f.conceptoPago || `${TIPO(f)} ${f.numero}`)}</b></p></div>
+        ${esRecibo(f) ? `<div><span class="lbl">Importante</span><p>Este recibo no es una factura. La factura se emitirá al recibir el pago.</p></div>` : ""}
         ${f.notas ? `<div><span class="lbl">Condiciones</span><p>${esc(f.notas)}</p></div>` : ""}
       </div>
       <div class="thanks"><b>Gracias por confiar en Majosoft<i>.</i></b></div>
-      <div class="s-foot"><span>Majosoft · Estudio de desarrollo de software · majosoft.es</span><span>Factura ${esc(f.numero)} · Página 1 de 1</span></div>
+      <div class="s-foot"><span>Majosoft · Estudio de desarrollo de software · majosoft.es</span><span>${TIPO(f)} ${esc(f.numero)} · Página 1 de 1</span></div>
     </div>`;
-  document.title = `Factura ${f.numero} · ${f.cliente.nombre}`;
+  document.title = `${TIPO(f)} ${f.numero} · ${f.cliente.nombre}`;
   ajustarVista();
 }
 
@@ -574,8 +590,8 @@ document.getElementById("rows").onclick = async ev => {
   if (del) {
     ev.stopPropagation();
     const f = store.find(x => x.id === del.dataset.delRow); if (!f) return;
-    if (!confirm(`¿Eliminar la factura ${f.numero || "sin número"} de ${f.cliente.nombre}?`)) return;
-    try { await api(`docs/facturas/${f.id}`, { method: "DELETE" }); store = store.filter(x => x.id !== f.id); toast("Factura eliminada"); }
+    if (!confirm(`¿Eliminar ${esRecibo(f) ? "el recibo" : "la factura"} ${f.numero || "sin número"} de ${f.cliente.nombre}?`)) return;
+    try { await api(`docs/facturas/${f.id}`, { method: "DELETE" }); store = store.filter(x => x.id !== f.id); toast(`${TIPO(f)} eliminado/a`); }
     catch (e) { toast(e.message, true); }
     panel(); return;
   }
@@ -599,22 +615,35 @@ document.getElementById("toPanel").onclick = async ev => {
 document.getElementById("bPrint").onclick = () => window.print();
 // Antes de numerar se recarga la lista del servidor, por si se creó otra factura en otro dispositivo
 const refrescar = async () => { store = await api("docs/facturas"); };
-document.getElementById("bNew").onclick = async () => {
+const nuevo = async recibo => {
   await refrescar();
-  const ult = store.at(-1);
   const hoy = isoLocal();
-  const f = { id: "f" + Date.now(), numero: siguienteNumero(), fecha: hoy, vencimiento: "", estado: "borrador",
+  const f = { id: "f" + Date.now(), tipo: recibo ? "recibo" : "factura", numero: siguienteNumero(recibo), fecha: hoy, vencimiento: "", estado: recibo ? "pendiente" : "borrador",
     cliente: { nombre: "Nuevo cliente", nif: "", direccion: "", cpCiudad: "", email: "", logo: "" }, periodo: { desde: "", hasta: "" },
     lineas: [{ concepto: "", detalle: "", cantidad: 1, precio: 0 }], iva: 21, notas: "", emisor: EMISOR_G };
   store.push(f); await put(f); editar(f.id);
 };
+document.getElementById("bNew").onclick = () => nuevo(false);
+document.getElementById("bNewRecibo").onclick = () => nuevo(true);
 document.getElementById("bDup").onclick = async () => {
   await refrescar();
-  const f = { ...structuredClone(cur), id: "f" + Date.now(), numero: siguienteNumero(), estado: "borrador", fecha: isoLocal() };
+  const f = { ...structuredClone(cur), id: "f" + Date.now(), numero: siguienteNumero(esRecibo(cur)), estado: esRecibo(cur) ? "pendiente" : "borrador", fecha: isoLocal() };
+  delete f.reciboOrigen;
   store.push(f); await put(f); editar(f.id);
 };
+// Recibo cobrado: pasa a ser factura pagada con el siguiente número y la fecha de hoy
+document.getElementById("bConvertir").onclick = async () => {
+  await saveCur.flush();
+  await refrescar();
+  const f = store.find(x => x.id === cur.id); if (!f || !esRecibo(f)) return;
+  const numero = siguienteNumero(false), hoy = isoLocal();
+  if (!confirm(`Se emitirá la factura nº ${numero} con fecha ${fecha(hoy)}, marcada como pagada. ¿Continuar?`)) return;
+  if (!f.conceptoPago || f.conceptoPago === `Recibo ${f.numero}`) delete f.conceptoPago;
+  Object.assign(f, { tipo: "factura", reciboOrigen: f.numero, numero, fecha: hoy, estado: "pagada" });
+  await put(f); toast(`Factura ${numero} emitida`); editar(f.id);
+};
 document.getElementById("bDel").onclick = async () => {
-  if (!confirm(`¿Eliminar la factura ${cur.numero}?`)) return;
+  if (!confirm(`¿Eliminar ${esRecibo(cur) ? "el recibo" : "la factura"} ${cur.numero}?`)) return;
   await api(`docs/facturas/${cur.id}`, { method: "DELETE" });
   store = store.filter(f => f.id !== cur.id); toast("Factura eliminada"); panel();
 };
@@ -631,7 +660,7 @@ file.onchange = async () => {
     if (!confirm(`Se importarán ${d.length} facturas (las que tengan el mismo identificador se sobrescriben). ¿Continuar?`)) return;
     // Las que llegan sin número reciben el siguiente correlativo
     await refrescar();
-    d.forEach(f => { if (!String(f.numero ?? "").trim()) { f.numero = siguienteNumero(); store.push(f); } });
+    d.forEach(f => { if (!String(f.numero ?? "").trim()) { f.numero = siguienteNumero(esRecibo(f)); store.push(f); } });
     await Promise.all(d.map(put)); store = await api("docs/facturas"); toast("Facturas importadas"); panel();
   } catch { toast("El archivo no es una copia válida", true); }
   file.value = "";
