@@ -179,6 +179,17 @@
     .req { display: grid; grid-template-columns: 1fr 1fr; gap: 2mm 6mm; }
     .req:has(> div:only-child) { grid-template-columns: 1fr; } /* un solo grupo: a todo el ancho */
     .req > div { break-inside: avoid; }
+    table.cmp { width: 100%; border-collapse: separate; border-spacing: 0; margin-top: 2mm; font-size: 9.5pt; break-inside: avoid; }
+    table.cmp th { font-size: 7pt; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); font-weight: 700; padding: 0 4mm 2mm; text-align: left; }
+    table.cmp td { padding: 2.6mm 4mm; border-bottom: 1px solid #eeede5; }
+    table.cmp tr:last-child td { border-bottom: none; }
+    table.cmp .r { text-align: right; white-space: nowrap; }
+    table.cmp td.hoy { color: #b42318; font-weight: 600; }
+    table.cmp .nueva { background: var(--ink); color: var(--lime); font-weight: 800; width: 34mm; }
+    table.cmp th.nueva { color: var(--cream); border-radius: 3mm 3mm 0 0; padding-top: 2.5mm; }
+    table.cmp tr:last-child td.nueva { border-radius: 0 0 3mm 3mm; }
+    table.cmp td.nueva { border-bottom-color: #2a2b26; }
+    .cmp-nota { font-size: 7.5pt; color: var(--muted); margin-top: 2mm; }
     .pags { display: grid; grid-template-columns: 1fr 1fr; gap: 3mm; margin-top: 2mm; }
     .pags > div { background: var(--cream, #f5f4ec); border-radius: 3mm; padding: 3.5mm 4.5mm; break-inside: avoid; }
     .pags h4 { display: flex; justify-content: space-between; align-items: baseline; gap: 3mm; margin: 0 0 1.5mm; font-size: 10pt; }
@@ -410,6 +421,11 @@ function render() {
   <div class="body">
     <h2 class="h2${D.objetivo ? "" : " solo-pantalla"}">${T("objetivoTitulo")}</h2>${P("objetivo", "Describe el objetivo del proyecto…")}
     ${D.porque.length ? `<h2 class="h2">${E("porqueTitulo", "Título", { def: "¿Por qué este enfoque?" })}</h2>${P("porqueIntro", "Introducción (opcional)")}<div class="why">${porque}</div>` : ""}
+
+    ${D.cifras?.filas?.length ? `<h2 class="h2">${E("cifras.titulo", "Título", { def: "El cambio en cifras" })}</h2>${P("cifras.intro", "Introducción (opcional)")}
+      <table class="cmp"><thead><tr><th></th><th class="r">${E("cifras.colHoy", "Hoy", { def: "Web actual" })}</th><th class="r nueva">${E("cifras.colNueva", "Nueva", { def: "Nueva web" })}</th></tr></thead>
+      <tbody>${D.cifras.filas.map((f, i) => `<tr><td>${E(`cifras.filas.${i}.0`, "Medida")}</td><td class="r hoy">${E(`cifras.filas.${i}.1`, "—")}</td><td class="r nueva">${E(`cifras.filas.${i}.2`, "—")}</td></tr>`).join("")}</tbody></table>
+      ${D.cifras.nota ? E("cifras.nota", "Nota", { tag: "p", cls: "cmp-nota", multi: true }) : ""}` : ""}
 
     <h2 class="h2">${E("modulosTitulo", "Título", { def: "Módulos del proyecto" })}</h2>
     ${D.modulos.map((m, i) => `
