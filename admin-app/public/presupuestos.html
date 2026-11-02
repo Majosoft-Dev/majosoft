@@ -101,12 +101,12 @@
     ul.b.neg li::before { background: #c9c8bc; }
 
     .why { display: grid; grid-template-columns: 1fr 1fr; gap: 3mm; margin-top: 4mm; }
-    .why > div:last-child:nth-child(odd), .pags > div:last-child:nth-child(odd) { grid-column: 1 / -1; } /* número impar: la última ocupa todo el ancho */
+    .why > div:last-child:nth-child(odd) { grid-column: 1 / -1; } /* número impar: la última ocupa todo el ancho */
     .why div { background: var(--cream); border-radius: 3mm; padding: 3.5mm 4mm; break-inside: avoid; }
     .why b { display: block; font-size: 10pt; margin-bottom: 1mm; }
     .why div > span { color: var(--ink2); font-size: 9pt; }
 
-    .mod { display: grid; grid-template-columns: 16mm 1fr; gap: 4mm; border: 1px solid var(--line); border-radius: 4mm; padding: 5mm; margin-bottom: 4mm; break-inside: avoid; }
+    .mod { display: grid; grid-template-columns: 16mm 1fr; gap: 4mm; border: 1px solid var(--line); border-radius: 4mm; padding: 4.5mm 5mm; margin-bottom: 3mm; break-inside: avoid; }
     .mod--cont .mod-n::after { display: none; }
     .mod-n { font-size: 20pt; font-weight: 900; letter-spacing: -.04em; color: var(--ink); line-height: 1; }
     .mod-n::after { content: ""; display: block; width: 8mm; height: 3px; background: var(--lime); margin-top: 2mm; }
@@ -198,8 +198,8 @@
     table.cmp tr:last-child td.nueva { border-radius: 0 0 3mm 3mm; }
     table.cmp td.nueva { border-bottom-color: #2a2b26; }
     .cmp-nota { font-size: 7.5pt; color: var(--muted); margin-top: 2mm; }
-    .pags { display: grid; grid-template-columns: 1fr 1fr; gap: 3mm; margin-top: 2mm; }
-    .pags > div { background: var(--cream, #f5f4ec); border-radius: 3mm; padding: 3.5mm 4.5mm; break-inside: avoid; }
+    .pags { column-count: 2; column-gap: 3mm; margin-top: 2mm; }
+    .pags > div { background: var(--cream, #f5f4ec); border-radius: 3mm; padding: 3.5mm 4.5mm; break-inside: avoid; display: inline-block; width: 100%; margin-bottom: 3mm; }
     .pags h4 { display: flex; justify-content: space-between; align-items: baseline; gap: 3mm; margin: 0 0 1.5mm; font-size: 10pt; }
     .pags .cifra { font-size: 7.5pt; font-weight: 800; background: var(--ink); color: var(--lime); padding: .4mm 2mm; border-radius: 99px; white-space: nowrap; }
     .pags ul.b { margin-top: 1mm; font-size: 8.8pt; }
@@ -550,7 +550,14 @@ function paginar() {
     if (!llena()) continue;
     if (body.children.length === 1) continue; // bloque más alto que una hoja: se queda
     // Rejillas (ventajas, requisitos): se parten por tarjetas entre hojas
-    if (b.matches(".why, .req, .pags") && b.children.length > 2) {
+    // Tarjetas de páginas: van en columnas, así que pasan de una en una
+    if (b.matches(".pags") && b.children.length > 1) {
+      const resto = b.cloneNode(false);
+      while (llena() && b.children.length > 1) resto.prepend(b.lastElementChild);
+      if (!llena()) { bloques.splice(i + 1, 0, resto); continue; }
+      while (resto.firstElementChild) b.appendChild(resto.firstElementChild);
+    }
+    if (b.matches(".why, .req") && b.children.length > 2) {
       const resto = b.cloneNode(false);
       while (llena() && b.children.length > 2) { resto.prepend(b.lastElementChild); if (b.children.length % 2) resto.prepend(b.lastElementChild); }
       if (!llena()) { bloques.splice(i + 1, 0, resto); continue; }
@@ -593,17 +600,6 @@ function paginar() {
     body.appendChild(b);
   }
   pages.forEach((pg, i) => pg.querySelector(".n").textContent = `Página ${i + 1} de ${pages.length}`);
-  // Sin huecos al final de las hojas: el espacio sobrante se reparte antes de cada bloque
-  // (nunca entre un título y lo que le sigue), con un máximo por hueco para que no se note
-  pages.slice(0, -1).forEach(pg => {
-    const b = pg.querySelector(".page-body"), hijos = [...b.children];
-    const pegado = el => { const p = el.previousElementSibling; return !p || p.classList.contains("h2") || (p.tagName === "P" && p.previousElementSibling?.classList.contains("h2")); };
-    const huecos = hijos.filter(el => !pegado(el));
-    if (!huecos.length) return;
-    const libre = b.getBoundingClientRect().bottom - hijos.at(-1).getBoundingClientRect().bottom - 4;
-    const extra = Math.min(libre / huecos.length, 45);
-    if (extra > 1) huecos.forEach(el => el.style.marginTop = `calc(${getComputedStyle(el).marginTop} + ${extra}px)`);
-  });
   ajustarVista();
   flow.remove();
 }
