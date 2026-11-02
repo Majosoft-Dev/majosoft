@@ -414,7 +414,7 @@ function render() {
     <p class="tag${D.tagline ? "" : " solo-pantalla"}">${E("tagline", "Frase destacada")}</p>
     <div class="cover-meta">
       <div><small>${T("lblCliente")}</small><b>${E("cliente", "Cliente")}</b></div>
-      <div><small>${T("lblInversion")}</small><b>${D.cuota?.activo ? `${E("cuota.precio", "75 €/mes")} ${E("cuota.nota", "IVA incluido")}` : c.descuento ? `<span class="antes"><s>${(Math.round(c.subtotal * (1 + D.iva / 100) * 100) / 100).toLocaleString("es-ES", { minimumFractionDigits: 2, maximumFractionDigits: 2, useGrouping: "always" })} €</s><span class="dto">−${String(c.pct).replace(".", ",")} %</span></span>${eur(c.total)}<i class="ivai">IVA incl.</i>` : `${eur(c.total)} ${T("ivaIncl")}`}</b></div>
+      <div><small>${T("lblInversion")}</small><b>${D.cuota?.activo ? `${E("cuota.precio", "75 €/mes")} ${E("cuota.nota", "IVA incluido")}` : c.descuento ? `<span class="antes"><s>${c.pagarLista.toLocaleString("es-ES", { minimumFractionDigits: 2, maximumFractionDigits: 2, useGrouping: "always" })} €</s><span class="dto">−${String(c.pct).replace(".", ",")} %</span></span>${eur(c.pagar)}<i class="ivai">${c.irpf ? "IVA incl. · IRPF desc." : "IVA incl."}</i>` : `${eur(c.pagar)} ${T("ivaIncl")}`}</b></div>
       <div><small>${T("lblLanzamiento")}</small><b>${E("lanzamiento", "Fecha prevista")}</b></div>
     </div>
   </section>
