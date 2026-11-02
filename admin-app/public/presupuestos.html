@@ -593,6 +593,17 @@ function paginar() {
     body.appendChild(b);
   }
   pages.forEach((pg, i) => pg.querySelector(".n").textContent = `Página ${i + 1} de ${pages.length}`);
+  // Sin huecos al final de las hojas: el espacio sobrante se reparte antes de cada bloque
+  // (nunca entre un título y lo que le sigue), con un máximo por hueco para que no se note
+  pages.slice(0, -1).forEach(pg => {
+    const b = pg.querySelector(".page-body"), hijos = [...b.children];
+    const pegado = el => { const p = el.previousElementSibling; return !p || p.classList.contains("h2") || (p.tagName === "P" && p.previousElementSibling?.classList.contains("h2")); };
+    const huecos = hijos.filter(el => !pegado(el));
+    if (!huecos.length) return;
+    const libre = b.getBoundingClientRect().bottom - hijos.at(-1).getBoundingClientRect().bottom - 4;
+    const extra = Math.min(libre / huecos.length, 45);
+    if (extra > 1) huecos.forEach(el => el.style.marginTop = `calc(${getComputedStyle(el).marginTop} + ${extra}px)`);
+  });
   ajustarVista();
   flow.remove();
 }
