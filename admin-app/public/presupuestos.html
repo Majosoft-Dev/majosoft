@@ -101,6 +101,7 @@
     ul.b.neg li::before { background: #c9c8bc; }
 
     .why { display: grid; grid-template-columns: 1fr 1fr; gap: 3mm; margin-top: 4mm; }
+    .why > div:last-child:nth-child(odd), .pags > div:last-child:nth-child(odd) { grid-column: 1 / -1; } /* número impar: la última ocupa todo el ancho */
     .why div { background: var(--cream); border-radius: 3mm; padding: 3.5mm 4mm; break-inside: avoid; }
     .why b { display: block; font-size: 10pt; margin-bottom: 1mm; }
     .why div > span { color: var(--ink2); font-size: 9pt; }
