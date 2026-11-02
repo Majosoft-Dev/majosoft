@@ -347,7 +347,11 @@ app.get("/admin/api/servidores", async (req, res) => res.json(await copias.estad
 app.get("/admin/api/servidores/estado", async (req, res) => {
   const srvs = await copias.estado();
   const webs = await Promise.all(srvs.flatMap(s => s.webs.filter(w => w.url).map(async w => ({ servidor: s.nombre, nombre: w.nombre, ...(await salud.web(w.url)) }))));
-  res.json({ comprobado: Date.now(), servidor: await salud.servidor(), webs });
+  const servidores = await Promise.all(copias.SERVIDORES.map(async s => {
+    try { return { id: s.id, nombre: s.nombre, ...(await copias.salud(s, salud.servidor)) }; }
+    catch (e) { return { id: s.id, nombre: s.nombre, error: "No se pudo consultar: " + e.message }; }
+  }));
+  res.json({ comprobado: Date.now(), servidores, webs });
 });
 app.post("/admin/api/servidores/copias", async (req, res) => {
   const { servidor, web, activa } = req.body || {};

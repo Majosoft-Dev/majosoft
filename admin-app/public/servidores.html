@@ -219,24 +219,10 @@ function estadoWeb(w) {
   if (w.codigo >= 400 || w.ms > 3000 || (w.ssl != null && w.ssl < 20)) return "warn";
   return "ok";
 }
-function pintarEstado(d) {
-  const s = d.servidor, al = [];
-  for (const w of d.webs) {
-    if (!w.codigo) al.push(["bad", `<b>${esc(w.nombre)}</b> no responde: ${esc(w.error)}`]);
-    else if (w.codigo >= 500) al.push(["bad", `<b>${esc(w.nombre)}</b> da error ${w.codigo}`]);
-    else if (w.codigo >= 400) al.push(["warn", `<b>${esc(w.nombre)}</b> responde ${w.codigo}`]);
-    if (w.ssl != null && w.ssl < 20) al.push([w.ssl < 7 ? "bad" : "warn", `El certificado SSL de <b>${esc(new URL(w.url).hostname)}</b> caduca en ${w.ssl} días`]);
-    if (w.codigo && w.ms > 3000) al.push(["warn", `<b>${esc(w.nombre)}</b> va lenta: ${(w.ms / 1000).toFixed(1).replace(".", ",")} s`]);
-  }
-  if (s.certbot.length) al.push(["bad", `Certbot no consigue renovar: <b>${s.certbot.map(esc).join(", ")}</b>`]);
-  for (const x of s.servicios) al.push(["bad", `Servicio caído en Majosoft: <b>${esc(x)}</b>`]);
-  if (s.nginx.total) al.push(["warn", `<b>${s.nginx.total}</b> errores 5xx en las últimas 24 h en el servidor de Majosoft`]);
+function bloqueServidor(s) {
+  if (s.error) return `<h3>${esc(s.nombre)}</h3><p class="sub">Sin datos del servidor todavía (${esc(s.error)}). Sus webs se comprueban igualmente abajo.</p>`;
   const pd = pct(s.disco.usado, s.disco.total), pm = pct(s.memoria.total - s.memoria.libre, s.memoria.total), pc = pct(s.carga[0], s.cpus);
-  if (pd >= 85) al.push(["bad", `Disco del servidor de Majosoft al ${pd} %`]);
-  const filas = [...d.webs].sort((a, b) => ({ bad: 0, warn: 1, ok: 2 }[estadoWeb(a)] - { bad: 0, warn: 1, ok: 2 }[estadoWeb(b)]) || a.servidor.localeCompare(b.servidor));
-  document.getElementById("estado").innerHTML = `
-    <div class="alertas">${al.length ? al.sort((a, b) => (a[0] === "bad" ? 0 : 1) - (b[0] === "bad" ? 0 : 1)).map(([c, t]) => `<div class="alerta ${c}">${c === "bad" ? "⛔" : "⚠️"}<span>${t}</span></div>`).join("") : `<div class="alerta ok">✅<span>Todo funciona: las ${d.webs.length} webs responden bien.</span></div>`}</div>
-    <h3>Servidor de Majosoft</h3>
+  return `<h3>${esc(s.nombre)}</h3>
     <div class="metricas">
       <div class="met"><small>Disco</small><b>${pd} %</b> <small>${GB(s.disco.usado)} de ${GB(s.disco.total)}</small><div class="barra"><i class="${nivel(pd, 75, 85)}" style="width:${pd}%"></i></div></div>
       <div class="met"><small>Memoria</small><b>${pm} %</b> <small>${GB(s.memoria.total - s.memoria.libre)} de ${GB(s.memoria.total)}</small><div class="barra"><i class="${nivel(pm, 80, 92)}" style="width:${pm}%"></i></div></div>
@@ -244,8 +230,31 @@ function pintarEstado(d) {
       <div class="met"><small>Peticiones 24 h</small><b>${s.nginx.peticiones.toLocaleString("es-ES")}</b> <small>${s.nginx.total} con error 5xx</small></div>
       <div class="met"><small>Encendido</small><b>${s.actividad} días</b> <small>sin reiniciar</small></div>
     </div>
-    ${s.nginx.rutas.length ? `<h3>Errores 5xx (últimas 24 h)</h3><div class="scroll-x"><table class="tabla-est"><thead><tr><th>Petición</th><th class="r">Veces</th><th class="r">Última</th></tr></thead><tbody>
-      ${s.nginx.rutas.map(r => `<tr><td><code>${esc(r.ruta)}</code></td><td class="r">${r.veces}</td><td class="r">${when(r.ultima)}</td></tr>`).join("")}</tbody></table></div>` : ""}
+    ${s.nginx.rutas.length ? `<div class="scroll-x"><table class="tabla-est"><thead><tr><th>Error 5xx (últimas 24 h)</th><th class="r">Veces</th><th class="r">Última</th></tr></thead><tbody>
+      ${s.nginx.rutas.map(r => `<tr><td><code>${esc(r.ruta)}</code></td><td class="r">${r.veces}</td><td class="r">${when(r.ultima)}</td></tr>`).join("")}</tbody></table></div>` : ""}`;
+}
+function pintarEstado(d) {
+  const al = [];
+  for (const w of d.webs) {
+    if (!w.codigo) al.push(["bad", `<b>${esc(w.nombre)}</b> no responde: ${esc(w.error)}`]);
+    else if (w.codigo >= 500) al.push(["bad", `<b>${esc(w.nombre)}</b> da error ${w.codigo}`]);
+    else if (w.codigo >= 400) al.push(["warn", `<b>${esc(w.nombre)}</b> responde ${w.codigo}`]);
+    if (w.ssl != null && w.ssl < 20) al.push([w.ssl < 7 ? "bad" : "warn", `El certificado SSL de <b>${esc(new URL(w.url).hostname)}</b> caduca en ${w.ssl} días`]);
+    if (w.codigo && w.ms > 3000) al.push(["warn", `<b>${esc(w.nombre)}</b> va lenta: ${(w.ms / 1000).toFixed(1).replace(".", ",")} s`]);
+  }
+  for (const s of d.servidores) {
+    if (s.error) continue;
+    const pd = pct(s.disco.usado, s.disco.total), pm = pct(s.memoria.total - s.memoria.libre, s.memoria.total);
+    if (s.certbot.length) al.push(["bad", `${esc(s.nombre)}: certbot no consigue renovar <b>${s.certbot.map(esc).join(", ")}</b>`]);
+    for (const x of s.servicios.filter(x => !(x === "certbot.service" && s.certbot.length))) al.push(["bad", `${esc(s.nombre)}: servicio caído <b>${esc(x)}</b>`]);
+    if (s.nginx.total) al.push([s.nginx.total >= 20 ? "bad" : "warn", `${esc(s.nombre)}: <b>${s.nginx.total}</b> ${s.nginx.total === 1 ? "error" : "errores"} 5xx en las últimas 24 h`]);
+    if (pd >= 85) al.push(["bad", `${esc(s.nombre)}: disco al ${pd} %`]);
+    if (pm >= 92) al.push(["warn", `${esc(s.nombre)}: memoria al ${pm} %`]);
+  }
+  const filas = [...d.webs].sort((a, b) => ({ bad: 0, warn: 1, ok: 2 }[estadoWeb(a)] - { bad: 0, warn: 1, ok: 2 }[estadoWeb(b)]) || a.servidor.localeCompare(b.servidor));
+  document.getElementById("estado").innerHTML = `
+    <div class="alertas">${al.length ? al.sort((a, b) => (a[0] === "bad" ? 0 : 1) - (b[0] === "bad" ? 0 : 1)).map(([c, t]) => `<div class="alerta ${c}">${c === "bad" ? "⛔" : "⚠️"}<span>${t}</span></div>`).join("") : `<div class="alerta ok">✅<span>Todo funciona: las ${d.webs.length} webs responden bien.</span></div>`}</div>
+    ${d.servidores.map(bloqueServidor).join("")}
     <h3>Webs</h3>
     <div class="scroll-x"><table class="tabla-est"><thead><tr><th>Web</th><th>Servidor</th><th class="r">Código</th><th class="r">Tiempo</th><th class="r">SSL</th></tr></thead><tbody>
       ${filas.map(w => { const e = estadoWeb(w); return `<tr>

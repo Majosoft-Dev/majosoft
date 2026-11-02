@@ -37,3 +37,9 @@ export async function cambiar(servidorId, web, activa) {
   if (!s || !/^[a-z0-9-]{1,64}$/.test(web)) throw new Error("Web desconocida");
   await lanzar(s, [activa ? "activar" : "desactivar", web]);
 }
+
+// Estado del servidor (disco, memoria, carga, servicios, certbot, 5xx). Local: directo; remotos: orden «salud».
+export async function salud(s, local) {
+  if (s.local) return local();
+  return JSON.parse(await lanzar(s, ["salud"]));
+}

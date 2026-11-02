@@ -1,10 +1,13 @@
 // Estado en directo de las webs y del servidor del panel («apartamentos»).
 // Las webs se comprueban desde aquí por HTTPS (código, tiempo y caducidad del certificado);
 // del servidor local se leen disco, memoria, carga, servicios caídos, renovaciones de certbot y errores 5xx de nginx.
+// En «guiadelbombero» y «objetivo» este mismo archivo está copiado como /usr/local/bin/salud-servidor.mjs y lo lanza
+// copias-web-remoto con la orden «salud» (solo lectura). Si se cambia, hay que volver a copiarlo allí.
 import { execFile } from "node:child_process";
 import fs from "node:fs";
 import os from "node:os";
 import tls from "node:tls";
+import { pathToFileURL } from "node:url";
 
 const sh = (cmd, args) => new Promise(resolve =>
   execFile(cmd, args, { timeout: 15e3 }, (err, stdout) => resolve(err && !stdout ? "" : String(stdout))));
@@ -68,7 +71,8 @@ export async function servidor() {
   const lineas = certbot.split("\n"), ini = lineas.findLastIndex(l => /^Starting certbot/.test(l));
   const fallos = lineas.slice(Math.max(0, ini)).filter(l => /Failed to renew certificate/.test(l)).map(l => l.match(/certificate (\S+)/)?.[1]).filter(Boolean);
   // Memoria disponible de verdad (la caché del sistema se puede liberar)
-  const disp = Number(fs.readFileSync("/proc/meminfo", "utf8").match(/MemAvailable:\s+(\d+)/)?.[1] || 0) * 1024;
+  let disp = 0;
+  try { disp = Number(fs.readFileSync("/proc/meminfo", "utf8").match(/MemAvailable:\s+(\d+)/)?.[1] || 0) * 1024; } catch {}
   return {
     actividad: Math.floor(os.uptime() / 86400),
     carga: os.loadavg().map(n => +n.toFixed(2)), cpus: os.cpus().length,
@@ -79,3 +83,6 @@ export async function servidor() {
     nginx: errores5xx(),
   };
 }
+
+// Uso desde la línea de órdenes (servidores remotos): node salud-servidor.mjs → JSON del servidor
+if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) console.log(JSON.stringify(await servidor()));
