@@ -52,6 +52,30 @@
     .links a:hover { color: var(--ink); text-decoration: underline; }
     .dato { font-size: 12.5px; }
     .dato small { display: block; color: var(--muted); font-size: 11.5px; }
+    .est-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; }
+    .btn-est { border: 1px solid var(--line); background: #fff; border-radius: 10px; padding: 8px 13px; font: inherit; font-weight: 700; font-size: 12.5px; cursor: pointer; }
+    .btn-est:hover { border-color: var(--ink); }
+    .alertas { display: grid; gap: 6px; margin-bottom: 14px; }
+    .alerta { display: flex; gap: 10px; align-items: flex-start; padding: 10px 13px; border-radius: 10px; font-size: 13px; line-height: 1.45; }
+    .alerta.bad { background: #fbe9e7; color: #8c1d18; } .alerta.warn { background: #fff5d6; color: #7a5600; } .alerta.ok { background: #e6f3ea; color: #2f7d4f; }
+    .alerta b { font-weight: 800; }
+    .metricas { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; margin-bottom: 16px; }
+    .met { background: var(--cream); border-radius: 12px; padding: 11px 13px; }
+    .met small { display: block; color: var(--muted); font-size: 11.5px; font-weight: 700; }
+    .met b { font-size: 18px; letter-spacing: -.02em; }
+    .met .barra { height: 5px; background: #e4e3d8; border-radius: 9px; margin-top: 7px; overflow: hidden; }
+    .met .barra i { display: block; height: 100%; background: var(--ink); }
+    .met .barra i.warn { background: var(--warn); } .met .barra i.bad { background: var(--bad); }
+    .tabla-est { width: 100%; border-collapse: collapse; font-size: 13px; }
+    .tabla-est th { text-align: left; font-size: 11px; text-transform: uppercase; letter-spacing: .05em; color: var(--muted); padding: 7px 8px; border-bottom: 1px solid var(--line); }
+    .tabla-est td { padding: 9px 8px; border-bottom: 1px solid #eeede5; vertical-align: middle; }
+    .tabla-est td.r, .tabla-est th.r { text-align: right; white-space: nowrap; }
+    .tabla-est .nom { display: flex; gap: 9px; align-items: center; }
+    .tabla-est small { color: var(--muted); display: block; }
+    .tabla-est small a { color: var(--muted); text-decoration: none; } .tabla-est small a:hover { color: var(--ink); text-decoration: underline; }
+    .cod { font-weight: 800; font-variant-numeric: tabular-nums; }
+    .cod.bad { color: var(--bad); } .cod.warn { color: #9a6a00; } .cod.ok { color: var(--ok); }
+    .scroll-x { overflow-x: auto; }
     .dot { width: 8px; height: 8px; border-radius: 50%; flex: none; }
     .dot.ok { background: var(--ok); } .dot.bad { background: var(--bad); } .dot.warn { background: var(--warn); } .dot.off { background: var(--line); }
     .ctrl { display: flex; justify-content: flex-end; }
@@ -80,8 +104,13 @@
 </head>
 <body>
   <main>
-    <div class="page-head"><div><div class="crumbs">Sistemas</div><h1>Servidores</h1><p>Qué hay en cada servidor y el estado de sus copias. Actualizado: 14-oct-2026.</p></div></div>
+    <div class="page-head"><div><div class="crumbs">Sistemas</div><h1>Servidores</h1><p>Si todo funciona, qué hay en cada servidor y el estado de sus copias. Actualizado: 14-oct-2026.</p></div></div>
     <div class="grid">
+
+      <div class="card wide">
+        <div class="est-head"><div><h2>Estado en directo</h2><p class="sub" id="estSub">Comprobando las webs…</p></div><button class="btn-est" id="estRefresh">Comprobar ahora</button></div>
+        <div id="estado"></div>
+      </div>
 
       <div class="card wide">
         <h2>Webs y copias automáticas</h2>
@@ -180,6 +209,63 @@ caja.addEventListener("change", async e => {
     el.disabled = false;
   }
 });
+
+/* ===== Estado en directo ===== */
+const GB = n => (n / 1024 ** 3).toFixed(1).replace(".", ",") + " GB";
+const pct = (a, b) => b ? Math.round(a / b * 100) : 0;
+const nivel = (p, w, b) => p >= b ? "bad" : p >= w ? "warn" : "";
+function estadoWeb(w) {
+  if (!w.codigo || w.codigo >= 500) return "bad";
+  if (w.codigo >= 400 || w.ms > 3000 || (w.ssl != null && w.ssl < 20)) return "warn";
+  return "ok";
+}
+function pintarEstado(d) {
+  const s = d.servidor, al = [];
+  for (const w of d.webs) {
+    if (!w.codigo) al.push(["bad", `<b>${esc(w.nombre)}</b> no responde: ${esc(w.error)}`]);
+    else if (w.codigo >= 500) al.push(["bad", `<b>${esc(w.nombre)}</b> da error ${w.codigo}`]);
+    else if (w.codigo >= 400) al.push(["warn", `<b>${esc(w.nombre)}</b> responde ${w.codigo}`]);
+    if (w.ssl != null && w.ssl < 20) al.push([w.ssl < 7 ? "bad" : "warn", `El certificado SSL de <b>${esc(new URL(w.url).hostname)}</b> caduca en ${w.ssl} días`]);
+    if (w.codigo && w.ms > 3000) al.push(["warn", `<b>${esc(w.nombre)}</b> va lenta: ${(w.ms / 1000).toFixed(1).replace(".", ",")} s`]);
+  }
+  if (s.certbot.length) al.push(["bad", `Certbot no consigue renovar: <b>${s.certbot.map(esc).join(", ")}</b>`]);
+  for (const x of s.servicios) al.push(["bad", `Servicio caído en Majosoft: <b>${esc(x)}</b>`]);
+  if (s.nginx.total) al.push(["warn", `<b>${s.nginx.total}</b> errores 5xx en las últimas 24 h en el servidor de Majosoft`]);
+  const pd = pct(s.disco.usado, s.disco.total), pm = pct(s.memoria.total - s.memoria.libre, s.memoria.total), pc = pct(s.carga[0], s.cpus);
+  if (pd >= 85) al.push(["bad", `Disco del servidor de Majosoft al ${pd} %`]);
+  const filas = [...d.webs].sort((a, b) => ({ bad: 0, warn: 1, ok: 2 }[estadoWeb(a)] - { bad: 0, warn: 1, ok: 2 }[estadoWeb(b)]) || a.servidor.localeCompare(b.servidor));
+  document.getElementById("estado").innerHTML = `
+    <div class="alertas">${al.length ? al.sort((a, b) => (a[0] === "bad" ? 0 : 1) - (b[0] === "bad" ? 0 : 1)).map(([c, t]) => `<div class="alerta ${c}">${c === "bad" ? "⛔" : "⚠️"}<span>${t}</span></div>`).join("") : `<div class="alerta ok">✅<span>Todo funciona: las ${d.webs.length} webs responden bien.</span></div>`}</div>
+    <h3>Servidor de Majosoft</h3>
+    <div class="metricas">
+      <div class="met"><small>Disco</small><b>${pd} %</b> <small>${GB(s.disco.usado)} de ${GB(s.disco.total)}</small><div class="barra"><i class="${nivel(pd, 75, 85)}" style="width:${pd}%"></i></div></div>
+      <div class="met"><small>Memoria</small><b>${pm} %</b> <small>${GB(s.memoria.total - s.memoria.libre)} de ${GB(s.memoria.total)}</small><div class="barra"><i class="${nivel(pm, 80, 92)}" style="width:${pm}%"></i></div></div>
+      <div class="met"><small>Carga (1 min)</small><b>${s.carga[0].toFixed(2).replace(".", ",")}</b> <small>${s.cpus} CPU · 15 min: ${s.carga[2].toFixed(2).replace(".", ",")}</small><div class="barra"><i class="${nivel(pc, 70, 100)}" style="width:${Math.min(100, pc)}%"></i></div></div>
+      <div class="met"><small>Peticiones 24 h</small><b>${s.nginx.peticiones.toLocaleString("es-ES")}</b> <small>${s.nginx.total} con error 5xx</small></div>
+      <div class="met"><small>Encendido</small><b>${s.actividad} días</b> <small>sin reiniciar</small></div>
+    </div>
+    ${s.nginx.rutas.length ? `<h3>Errores 5xx (últimas 24 h)</h3><div class="scroll-x"><table class="tabla-est"><thead><tr><th>Petición</th><th class="r">Veces</th><th class="r">Última</th></tr></thead><tbody>
+      ${s.nginx.rutas.map(r => `<tr><td><code>${esc(r.ruta)}</code></td><td class="r">${r.veces}</td><td class="r">${when(r.ultima)}</td></tr>`).join("")}</tbody></table></div>` : ""}
+    <h3>Webs</h3>
+    <div class="scroll-x"><table class="tabla-est"><thead><tr><th>Web</th><th>Servidor</th><th class="r">Código</th><th class="r">Tiempo</th><th class="r">SSL</th></tr></thead><tbody>
+      ${filas.map(w => { const e = estadoWeb(w); return `<tr>
+        <td><div class="nom"><span class="dot ${e}"></span><div>${esc(w.nombre)}<small><a href="${esc(w.url)}" target="_blank" rel="noopener">${esc(w.url.replace("https://", ""))}</a></small></div></div></td>
+        <td>${esc(w.servidor)}</td>
+        <td class="r"><span class="cod ${!w.codigo || w.codigo >= 500 ? "bad" : w.codigo >= 400 ? "warn" : "ok"}" title="${esc(w.error)}">${w.codigo || "—"}</span></td>
+        <td class="r">${w.codigo ? (w.ms < 1000 ? w.ms + " ms" : (w.ms / 1000).toFixed(1).replace(".", ",") + " s") : "—"}</td>
+        <td class="r">${w.ssl == null ? "—" : `<span class="cod ${w.ssl < 7 ? "bad" : w.ssl < 20 ? "warn" : ""}">${w.ssl} días</span>`}</td></tr>`; }).join("")}
+    </tbody></table></div>`;
+  document.getElementById("estSub").textContent = `Comprobado a las ${new Date(d.comprobado).toLocaleTimeString("es-ES", { hour: "2-digit", minute: "2-digit", second: "2-digit" })}. Se actualiza solo cada minuto.`;
+}
+async function comprobar() {
+  const b = document.getElementById("estRefresh"); b.disabled = true; b.textContent = "Comprobando…";
+  try { pintarEstado(await api("servidores/estado")); }
+  catch (err) { document.getElementById("estado").innerHTML = `<p class="bad">${esc(err.message)}</p>`; }
+  finally { b.disabled = false; b.textContent = "Comprobar ahora"; }
+}
+document.getElementById("estRefresh").onclick = comprobar;
+comprobar();
+setInterval(() => { if (!document.hidden) comprobar(); }, 60e3);
 
 try { pintar(await api("servidores")); }
 catch (err) { caja.innerHTML = `<p class="bad">${esc(err.message)}</p>`; }

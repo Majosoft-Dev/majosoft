@@ -8,6 +8,7 @@ import QRCode from "qrcode";
 import { db, audit } from "./lib/db.js";
 import * as correo from "./lib/correo.js";
 import * as copias from "./lib/copias.js";
+import * as salud from "./lib/salud.js";
 import {
   verifyPassword, hashPassword, DUMMY_HASH, passwordProblems,
   newTotpSecret, verifyTotp, totpUri, newToken, sha256,
@@ -342,6 +343,12 @@ app.get("/admin/api/correo/mensajes/:uid/adjuntos/:i", wrap(async (req, res) => 
 
 /* ===== Servidores: webs y copias automáticas ===== */
 app.get("/admin/api/servidores", async (req, res) => res.json(await copias.estado()));
+// Estado en directo: cada web (HTTP, tiempo, SSL) y el servidor del panel
+app.get("/admin/api/servidores/estado", async (req, res) => {
+  const srvs = await copias.estado();
+  const webs = await Promise.all(srvs.flatMap(s => s.webs.filter(w => w.url).map(async w => ({ servidor: s.nombre, nombre: w.nombre, ...(await salud.web(w.url)) }))));
+  res.json({ comprobado: Date.now(), servidor: await salud.servidor(), webs });
+});
 app.post("/admin/api/servidores/copias", async (req, res) => {
   const { servidor, web, activa } = req.body || {};
   try { await copias.cambiar(String(servidor || ""), String(web || ""), !!activa); }
