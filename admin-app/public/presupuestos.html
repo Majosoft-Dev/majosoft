@@ -304,6 +304,7 @@ const VACIO = {
 
 let D = null;
 const migrar = d => {
+  d.irpf ??= 0;
   d.descuento ??= { activo: false, porcentaje: 0, etiqueta: "" };
   d.cuota ??= { activo: false, precio: "", nota: "", etiqueta: "", detalle: "", texto: "" };
   d.textos ??= {};
@@ -313,7 +314,7 @@ const migrar = d => {
 
 /* ===== Utilidades ===== */
 const esc = s => String(s ?? "").replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
-const eur = n => Number(n || 0).toLocaleString("es-ES", { minimumFractionDigits: 0, maximumFractionDigits: 2, useGrouping: "always" }) + " €";
+const eur = n => { const v = Number(n || 0); return v.toLocaleString("es-ES", { minimumFractionDigits: Number.isInteger(v) ? 0 : 2, maximumFractionDigits: 2, useGrouping: "always" }) + " €"; };
 const fecha = s => s ? new Date(s + "T00:00").toLocaleDateString("es-ES", { day: "numeric", month: "long", year: "numeric" }) : "";
 const paras = s => String(s || "").split(/\n\s*\n/).filter(x => x.trim()).map(x => `<p>${esc(x)}</p>`).join("");
 const list = (arr, cls = "b") => arr?.length ? `<ul class="${cls}">${arr.map(i => `<li>${esc(i)}</li>`).join("")}</ul>` : "";
@@ -342,7 +343,10 @@ function calc() {
   const pct = !D.auto && D.descuento?.activo ? Number(D.descuento.porcentaje || 0) : 0;
   const descuento = Math.round(subtotal * pct) / 100, base = Math.round((subtotal - descuento) * 100) / 100;
   const total = D.auto ? Number(D.totalConIva || 0) : Math.round(base * (1 + D.iva / 100) * 100) / 100;
-  return { subtotal, horas, pct, descuento, base, iva: Math.round((total - base) * 100) / 100, total };
+  // Retención de IRPF (si el cliente es empresa): se resta sobre la base y deja el total a pagar
+  const irpf = Math.round(base * Number(D.irpf || 0)) / 100, pagar = Math.round((total - irpf) * 100) / 100;
+  const pagarLista = Math.round((subtotal * (1 + D.iva / 100) - subtotal * Number(D.irpf || 0) / 100) * 100) / 100;
+  return { subtotal, horas, pct, descuento, base, iva: Math.round((total - base) * 100) / 100, total, irpf, pagar, pagarLista };
 }
 
 /* ===== Edición directa sobre el documento =====
@@ -351,7 +355,7 @@ function calc() {
 const TEXTOS = {
   lblCliente: "Cliente", lblInversion: "Inversión", lblLanzamiento: "Lanzamiento objetivo",
   objetivoTitulo: "Objetivo del proyecto", resumenTitulo: "Resumen económico", pagoTitulo: "Condiciones de pago",
-  colModulo: "Módulo", colHoras: "Horas", colPrecio: "Precio", subtotal: "Subtotal (sin IVA)", baseLabel: "Base imponible", ivaLabel: "IVA", totalLabel: "Total (IVA incluido)",
+  colModulo: "Módulo", colHoras: "Horas", colPrecio: "Precio", subtotal: "Subtotal (sin IVA)", baseLabel: "Base imponible", ivaLabel: "IVA", totalLabel: "Total (IVA incluido)", totalPagar: "Total a pagar", irpfLabel: "Retención IRPF", aPagar: "a pagar",
   incluido: "Incluido", ivaIncluido: "IVA incluido", ivaIncl: "IVA incl.", horas: "horas", hastaEl: "hasta el",
   incluyeTitulo: "Qué incluye", noIncluyeTitulo: "Qué no incluye", requisitosTitulo: "Requisitos por parte del cliente",
   pie: "Majosoft · Estudio de desarrollo de software en Jaén · Presupuesto válido 30 días desde su emisión"
@@ -388,7 +392,7 @@ function render() {
     <p class="tag${D.tagline ? "" : " solo-pantalla"}">${E("tagline", "Frase destacada")}</p>
     <div class="cover-meta">
       <div><small>${T("lblCliente")}</small><b>${E("cliente", "Cliente")}</b></div>
-      <div><small>${T("lblInversion")}</small><b>${D.cuota?.activo ? `${E("cuota.precio", "75 €/mes")} ${E("cuota.nota", "IVA incluido")}` : c.descuento ? `<span class="antes"><s>${(Math.round(c.subtotal * (1 + D.iva / 100) * 100) / 100).toLocaleString("es-ES", { minimumFractionDigits: 2, maximumFractionDigits: 2, useGrouping: "always" })} €</s><span class="dto">−${String(c.pct).replace(".", ",")} %</span></span>${eur(c.total)} ${T("ivaIncl")}` : `${eur(c.total)} ${T("ivaIncl")}`}</b></div>
+      <div><small>${T("lblInversion")}</small><b>${D.cuota?.activo ? `${E("cuota.precio", "75 €/mes")} ${E("cuota.nota", "IVA incluido")}` : c.descuento ? `<span class="antes"><s>${c.pagarLista.toLocaleString("es-ES", { minimumFractionDigits: 2, maximumFractionDigits: 2, useGrouping: "always" })} €</s><span class="dto">−${String(c.pct).replace(".", ",")} %</span></span>${eur(c.pagar)} ${c.irpf ? T("aPagar") : T("ivaIncl")}` : `${eur(c.pagar)} ${c.irpf ? T("aPagar") : T("ivaIncl")}`}</b></div>
       <div><small>${T("lblLanzamiento")}</small><b>${E("lanzamiento", "Fecha prevista")}</b></div>
     </div>
   </section>
@@ -425,9 +429,10 @@ function render() {
         <div><span>${c.descuento ? "Precio del proyecto" : T("subtotal")}</span><b>${eur(c.subtotal)}</b></div>
         ${c.descuento ? `<div class="dto-l"><span>${E("descuento.etiqueta", "Descuento", { def: "Descuento" })} <i>−${String(c.pct).replace(".", ",")} %</i></span><b>−${eur(c.descuento)}</b></div>
         <div><span>${T("baseLabel")}</span><b>${eur(c.base)}</b></div>` : ""}
-        <div><span>${T("ivaLabel")} (${D.iva}%)</span><b>${eur(c.iva)}</b></div>
+        <div><span>${T("ivaLabel")} (${D.iva}%)</span><b>+${eur(c.iva)}</b></div>
+        ${c.irpf ? `<div><span>${T("irpfLabel")} (${String(D.irpf).replace(".", ",")}%)</span><b>−${eur(c.irpf)}</b></div>` : ""}
       </div>
-      <div class="final"><small>${T("totalLabel")}</small><b>${eur(c.total)}</b><span>${c.horas} horas de trabajo</span></div>
+      <div class="final"><small>${c.irpf ? T("totalPagar") : T("totalLabel")}</small><b>${eur(c.pagar)}</b><span>${c.horas} horas de trabajo</span></div>
     </div>`}
 
     <h2 class="h2">${T("pagoTitulo")}</h2>
@@ -594,6 +599,7 @@ function buildEditor() {
       <div class="row">${txt("Precio final (€ IVA incluido)", "totalConIva", { type: "number" })}${txt("IVA (%)", "iva", { type: "number" })}</div>
       <div class="hint" id="calcHint"></div>
       ${txt("Forma de pago", "formaPago", { type: "area" })}
+      ${txt("Retención de IRPF (%) · 0 si el cliente es particular", "irpf", { type: "number" })}
       ${txt("Aplicar descuento en el resumen económico", "descuento.activo", { type: "check" })}
       <div class="row">${txt("Descuento (%)", "descuento.porcentaje", { type: "number" })}${txt("Nombre del descuento", "descuento.etiqueta", { ph: "Bono de bienvenida" })}</div>
       ${txt("Incluir bono / descuento", "bono.activo", { type: "check" })}
@@ -757,7 +763,8 @@ if (D) {
   document.getElementById("plist").hidden = false;
   const totalP = p => { if (p.auto) return Number(p.totalConIva || 0);
     const sub = p.modulos.reduce((s, m) => s + Number(m.precio || 0), 0), pct = p.descuento?.activo ? Number(p.descuento.porcentaje || 0) : 0;
-    return Math.round((sub - Math.round(sub * pct) / 100) * (1 + p.iva / 100) * 100) / 100; };
+    const base = sub - Math.round(sub * pct) / 100;
+    return Math.round((base * (1 + p.iva / 100) - base * Number(p.irpf || 0) / 100) * 100) / 100; };
   document.getElementById("prows").innerHTML = lista.length ? lista.map(p => `<tr data-id="${esc(p.id)}">
     <td><b>${esc(p.titulo)}</b></td><td>${esc(p.cliente)}</td><td>${fecha(p.fecha)}</td><td class="r"><b>${eur(totalP(p))}</b></td>
     <td class="r"><button class="del" data-del="${esc(p.id)}" title="Eliminar">✕</button></td></tr>`).join("")
