@@ -175,6 +175,12 @@
     .req { display: grid; grid-template-columns: 1fr 1fr; gap: 2mm 6mm; }
     .req:has(> div:only-child) { grid-template-columns: 1fr; } /* un solo grupo: a todo el ancho */
     .req > div { break-inside: avoid; }
+    .pags { display: grid; grid-template-columns: 1fr 1fr; gap: 3mm; margin-top: 2mm; }
+    .pags > div { background: var(--cream, #f5f4ec); border-radius: 3mm; padding: 3.5mm 4.5mm; break-inside: avoid; }
+    .pags h4 { display: flex; justify-content: space-between; align-items: baseline; gap: 3mm; margin: 0 0 1.5mm; font-size: 10pt; }
+    .pags .cifra { font-size: 7.5pt; font-weight: 800; background: var(--ink); color: var(--lime); padding: .4mm 2mm; border-radius: 99px; white-space: nowrap; }
+    .pags ul.b { margin-top: 1mm; font-size: 8.8pt; }
+    .pags ul.b li { margin-bottom: 1mm; }
 
     .contact { margin-top: 10mm; background: var(--ink); color: var(--cream); border-radius: 4mm; padding: 6mm; display: flex; justify-content: space-between; align-items: center; break-inside: avoid; }
     .contact b { font-size: 12pt; display: block; }
@@ -412,6 +418,9 @@ function render() {
         </div>
       </div>`).join("")}
 
+    ${D.paginas?.grupos?.length ? `<h2 class="h2">${E("paginas.titulo", "Título", { def: "Páginas de la nueva web" })}</h2>${P("paginas.intro", "Introducción (opcional)")}
+      <div class="pags">${D.paginas.grupos.map((g, i) => `<div><h4>${E(`paginas.grupos.${i}.titulo`, "Grupo")}${g.cifra ? `<span class="cifra">${E(`paginas.grupos.${i}.cifra`, "nº")}</span>` : ""}</h4>${L(`paginas.grupos.${i}.items`)}</div>`).join("")}</div>` : ""}
+
     <h2 class="h2">${T("resumenTitulo")}</h2>
     ${D.cuota?.activo ? `
     <div class="cuota">
@@ -510,7 +519,7 @@ function paginar() {
     if (!llena()) continue;
     if (body.children.length === 1) continue; // bloque más alto que una hoja: se queda
     // Rejillas (ventajas, requisitos): se parten por tarjetas entre hojas
-    if (b.matches(".why, .req") && b.children.length > 2) {
+    if (b.matches(".why, .req, .pags") && b.children.length > 2) {
       const resto = b.cloneNode(false);
       while (llena() && b.children.length > 2) { resto.prepend(b.lastElementChild); if (b.children.length % 2) resto.prepend(b.lastElementChild); }
       if (!llena()) { bloques.splice(i + 1, 0, resto); continue; }
@@ -675,7 +684,7 @@ ed.addEventListener("click", e => {
 const docEl = document.getElementById("doc");
 const txtDe = x => x.innerText.replace(/\u00a0/g, " ").replace(/\n+$/, "");
 // Puntos vacíos de las listas: se quitan al terminar de editar
-const LISTAS = () => ["porque", "garantia", "mant.incluye", "mant.noIncluye", ...D.modulos.map((_, i) => `modulos.${i}.items`), ...D.requisitos.map((_, i) => `requisitos.${i}.items`)];
+const LISTAS = () => ["porque", "garantia", "mant.incluye", "mant.noIncluye", ...(D.paginas?.grupos || []).map((_, i) => `paginas.grupos.${i}.items`), ...D.modulos.map((_, i) => `modulos.${i}.items`), ...D.requisitos.map((_, i) => `requisitos.${i}.items`)];
 const limpiar = () => LISTAS().forEach(p => { const a = get(p); if (Array.isArray(a)) set(p, a.filter(x => String(x).trim() && String(x).trim() !== ":")); });
 docEl.addEventListener("keydown", e => {
   const el = e.target.closest(".ed"); if (!el) return;
