@@ -117,6 +117,9 @@
     .mod-price b { display: block; font-size: 13pt; }
     .mod-price small { color: var(--muted); }
     .mod-desc { color: var(--ink2); margin: 2mm 0 0; }
+    /* Textos justificados: todas las líneas acaban a la misma altura (guiones automáticos para evitar huecos) */
+    .page-body p, .why div > span, .mod-desc, .callout, ul.b li { text-align: justify; hyphens: auto; -webkit-hyphens: auto; }
+    .why div > span { display: block; }
 
     table.sum { width: 100%; border-collapse: collapse; margin-top: 2mm; }
     table.sum th { text-align: left; font-size: 7pt; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); padding: 0 3mm 2mm; border-bottom: 1px solid var(--line); font-weight: 700; }
