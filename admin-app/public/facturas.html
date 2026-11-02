@@ -118,6 +118,16 @@
     .s-top { background: var(--ink); color: var(--cream); margin: -16mm -18mm 0; padding: 12mm 18mm 10mm; display: flex; justify-content: space-between; align-items: flex-start; position: relative; overflow: hidden; }
     .s-top::before { content: ""; position: absolute; width: 70mm; height: 70mm; border-radius: 50%; background: var(--lime); opacity: .14; filter: blur(30px); top: -35mm; right: -25mm; }
     .s-top > * { position: relative; }
+    /* Recibo: cabecera clara en azul y aviso fijo, para que nunca parezca una factura */
+    .sheet.recibo .s-top { background: #eaf1fb; color: var(--ink); }
+    .sheet.recibo .s-top::before { background: #2a5db0; opacity: .10; }
+    .sheet.recibo .s-top .me img { filter: none; }
+    .sheet.recibo .s-top .me h1 { color: #2a5db0; }
+    .sheet.recibo .s-top .meta { color: #5b6b82; }
+    .sheet.recibo .s-top .meta b { color: #2a5db0; }
+    .sheet.recibo .s-top .me .mark i { color: #2a5db0; }
+    .aviso-recibo { margin: 0 -18mm; padding: 2.4mm 18mm; background: #2a5db0; color: #fff; font-size: 8pt; font-weight: 700; letter-spacing: .04em; }
+    .sheet.recibo .items thead th { background: #2a5db0; }
     .s-top .me .mark { display: flex; align-items: center; gap: 2mm; }
     .s-top .me img { height: 18px; filter: invert(1); }
     .s-top .me .mark span { font-size: 10.5pt; font-weight: 800; letter-spacing: -.03em; }
@@ -428,18 +438,20 @@ const ed = (p, ph, multi) => `<span class="ed" contenteditable="plaintext-only" 
 const edFecha = p => `<span class="ed" contenteditable="plaintext-only" spellcheck="false" data-p="${p}" data-t="fecha" data-ph="dd/mm/aaaa">${val(p) ? fecha(val(p)) : ""}</span>`;
 
 function sheet() {
-  const f = cur, t = totales(f), e = f.emisor, c = f.cliente;
+  const f = cur, t = totales(f), e = f.emisor, c = f.cliente, rec = esRecibo(f);
+  document.getElementById("sheet").classList.toggle("recibo", rec);
   document.getElementById("sheet").innerHTML = `
     <div class="s-top">
-      <div class="me"><div class="mark"><img src="/assets/logo.svg" alt="" /><span>majosoft<i>.</i></span></div><h1>${TIPO(f)}</h1></div>
+      <div class="me"><div class="mark"><img src="/assets/logo.svg" alt="" /><span>majosoft<i>.</i></span></div><h1>${rec ? "Recibo de pago" : "Factura"}</h1></div>
       <div class="meta"><b>Nº ${esc(f.numero)}</b>Fecha: ${edFecha("fecha")}${f.vencimiento ? `<br />Vencimiento: ${edFecha("vencimiento")}` : ""}</div>
     </div>
+    ${rec ? `<div class="aviso-recibo">SOLICITUD DE PAGO · NO ES UNA FACTURA · La factura se emitirá al recibir el pago</div>` : ""}
     <div class="parties">
-      <div><span class="lbl">Emisor</span><b>${ed("emisor.titular", "Nombre del emisor")}</b>${ed("emisor.empresa", "Actividad o empresa")}<br />NIF: ${ed("emisor.nif", "NIF")}<br />${ed("emisor.direccion", "Calle y número")}<br />${ed("emisor.cpCiudad", "C.P. y ciudad")}<br />${ed("emisor.email", "Email")} · ${ed("emisor.telefono", "Teléfono")}</div>
-      <div class="to">${c.logo ? `<img src="${c.logo}" alt="" />` : ""}<span class="lbl">Facturar a</span><b>${ed("cliente.nombre", "Nombre del cliente")}</b>NIF/CIF: ${ed("cliente.nif", "NIF/CIF")}<br />${ed("cliente.direccion", "Calle y número")}<br />${ed("cliente.cpCiudad", "C.P. y ciudad")}<br />${ed("cliente.email", "Email")}</div>
+      <div><span class="lbl">${rec ? "De" : "Emisor"}</span><b>${ed("emisor.titular", "Nombre del emisor")}</b>${ed("emisor.empresa", "Actividad o empresa")}<br />NIF: ${ed("emisor.nif", "NIF")}<br />${ed("emisor.direccion", "Calle y número")}<br />${ed("emisor.cpCiudad", "C.P. y ciudad")}<br />${ed("emisor.email", "Email")} · ${ed("emisor.telefono", "Teléfono")}</div>
+      <div class="to">${c.logo ? `<img src="${c.logo}" alt="" />` : ""}<span class="lbl">${rec ? "Para" : "Facturar a"}</span><b>${ed("cliente.nombre", "Nombre del cliente")}</b>NIF/CIF: ${ed("cliente.nif", "NIF/CIF")}<br />${ed("cliente.direccion", "Calle y número")}<br />${ed("cliente.cpCiudad", "C.P. y ciudad")}<br />${ed("cliente.email", "Email")}</div>
     </div>
     <div class="strip${f.vencimiento ? "" : " strip--2"}">
-      <div><small>Fecha de emisión</small><b>${edFecha("fecha")}</b></div>
+      <div><small>${rec ? "Fecha" : "Fecha de emisión"}</small><b>${edFecha("fecha")}</b></div>
       ${f.vencimiento ? `<div><small>Vencimiento</small><b>${edFecha("vencimiento")}</b></div>` : ""}
       ${f.periodo.desde || !f.resumen
         ? `<div><small>Periodo de servicio</small><b>${f.periodo.desde ? fecha(f.periodo.desde) + " – " + fecha(f.periodo.hasta) : "—"}</b></div>`
@@ -452,7 +464,7 @@ function sheet() {
     <div class="sum">
       <div></div>
       <div class="totals">
-        <div><span>Base imponible</span><span>${eur(t.base)}</span></div>
+        <div><span>${rec ? "Importe" : "Base imponible"}</span><span>${eur(t.base)}</span></div>
         <div><span>IVA ${f.iva}%</span><span>+ ${eur(t.iva)}</span></div>
         ${t.irpf ? `<div><span>Retención IRPF ${f.irpf ?? IRPF_DEFECTO}%</span><span>− ${eur(t.irpf)}</span></div>` : ""}
         <div class="t"><span>Total a pagar</span><span>${eur(t.total)}</span></div>
@@ -460,11 +472,11 @@ function sheet() {
     </div>
     <div class="s-bottom">
       <div class="pay">
-        ${(f.irpf ?? IRPF_DEFECTO) == 7 ? `<p class="legal">${NOTA_IRPF}</p>` : ""}
+        ${!rec && (f.irpf ?? IRPF_DEFECTO) == 7 ? `<p class="legal">${NOTA_IRPF}</p>` : ""}
         <div><span class="lbl">Forma de pago</span><p>Transferencia bancaria${f.vencimiento ? ` antes del ${fecha(f.vencimiento)}` : ""}</p>
           ${e.iban ? `<p class="iban" style="margin-top:2mm">${esc(e.iban)}</p>` : `<p style="margin-top:2mm;color:var(--muted)">IBAN pendiente de indicar</p>`}
           <p style="margin-top:2mm">Concepto: <b class="ed" contenteditable="plaintext-only" spellcheck="false" data-p="conceptoPago" data-ph="${TIPO(f)} ${esc(f.numero)}">${esc(f.conceptoPago || `${TIPO(f)} ${f.numero}`)}</b></p></div>
-        ${esRecibo(f) ? `<div><span class="lbl">Importante</span><p>Este recibo no es una factura. La factura se emitirá al recibir el pago.</p></div>` : ""}
+
         ${f.notas ? `<div><span class="lbl">Condiciones</span><p>${esc(f.notas)}</p></div>` : ""}
       </div>
       <div class="thanks"><b>Gracias por confiar en Majosoft<i>.</i></b></div>
