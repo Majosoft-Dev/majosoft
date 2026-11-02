@@ -142,9 +142,9 @@
     .ed:empty::before { content: attr(data-ph); color: #b9b8ad; }
     .cover .ed:hover { outline-color: #55564f; }
     li.ed { display: list-item; }
-    .cover-meta s.antes { color: #8a8a80; font-weight: 600; font-size: .8em; margin-right: 1.5mm; text-decoration-thickness: 1.5px; }
-    .cover-meta .dto { display: inline-block; background: var(--lime); color: var(--ink); font-size: .62em; font-weight: 800; padding: .6mm 1.8mm; border-radius: 99px; vertical-align: middle; margin-left: 1mm; }
-    .cover-meta small.ivai { display: block; font-size: 7.5pt; font-weight: 500; color: #a9a99c; margin-top: .5mm; letter-spacing: 0; text-transform: none; }
+    .cover-meta .antes { display: flex; align-items: center; gap: 2mm; margin-bottom: .8mm; }
+    .cover-meta .antes s { color: #8a8a80; font-weight: 500; font-size: 8pt; text-decoration-thickness: 1px; }
+    .cover-meta .dto { background: var(--lime); color: var(--ink); font-size: 6.5pt; font-weight: 800; padding: .3mm 1.6mm; border-radius: 99px; letter-spacing: .02em; }
     ul.b li.add-pt { color: #9a998e; font-size: .9em; cursor: pointer; user-select: none; }
     ul.b li.add-pt::before { background: none; border: 1px dashed #c9c8bc; }
     ul.b li.add-pt:hover { color: var(--ink, #222); }
@@ -383,7 +383,7 @@ function render() {
     <p class="tag${D.tagline ? "" : " solo-pantalla"}">${E("tagline", "Frase destacada")}</p>
     <div class="cover-meta">
       <div><small>${T("lblCliente")}</small><b>${E("cliente", "Cliente")}</b></div>
-      <div><small>${T("lblInversion")}</small><b>${D.cuota?.activo ? `${E("cuota.precio", "75 €/mes")} ${E("cuota.nota", "IVA incluido")}` : c.descuento ? `<s class="antes">${(Math.round(c.subtotal * (1 + D.iva / 100) * 100) / 100).toLocaleString("es-ES", { minimumFractionDigits: 2, maximumFractionDigits: 2, useGrouping: "always" })} €</s> ${eur(c.total)} <span class="dto">−${String(c.pct).replace(".", ",")} %</span><small class="ivai">${T("ivaIncl")}</small>` : `${eur(c.total)} ${T("ivaIncl")}`}</b></div>
+      <div><small>${T("lblInversion")}</small><b>${D.cuota?.activo ? `${E("cuota.precio", "75 €/mes")} ${E("cuota.nota", "IVA incluido")}` : c.descuento ? `<span class="antes"><s>${(Math.round(c.subtotal * (1 + D.iva / 100) * 100) / 100).toLocaleString("es-ES", { minimumFractionDigits: 2, maximumFractionDigits: 2, useGrouping: "always" })} €</s><span class="dto">−${String(c.pct).replace(".", ",")} %</span></span>${eur(c.total)} ${T("ivaIncl")}` : `${eur(c.total)} ${T("ivaIncl")}`}</b></div>
       <div><small>${T("lblLanzamiento")}</small><b>${E("lanzamiento", "Fecha prevista")}</b></div>
     </div>
   </section>
