@@ -146,6 +146,7 @@
     .ed:empty::before { content: attr(data-ph); color: #b9b8ad; }
     .cover .ed:hover { outline-color: #55564f; }
     li.ed { display: list-item; }
+    .cover-meta i.ivai { font-style: normal; font-weight: 500; font-size: 7.5pt; color: #a9a99c; margin-left: 1.5mm; }
     .cover-meta .antes { display: flex; align-items: center; gap: 2mm; margin-bottom: .8mm; }
     .cover-meta .antes s { color: #8a8a80; font-weight: 500; font-size: 8pt; text-decoration-thickness: 1px; }
     .cover-meta .dto { background: var(--lime); color: var(--ink); font-size: 6.5pt; font-weight: 800; padding: .3mm 1.6mm; border-radius: 99px; letter-spacing: .02em; }
@@ -392,7 +393,7 @@ function render() {
     <p class="tag${D.tagline ? "" : " solo-pantalla"}">${E("tagline", "Frase destacada")}</p>
     <div class="cover-meta">
       <div><small>${T("lblCliente")}</small><b>${E("cliente", "Cliente")}</b></div>
-      <div><small>${T("lblInversion")}</small><b>${D.cuota?.activo ? `${E("cuota.precio", "75 €/mes")} ${E("cuota.nota", "IVA incluido")}` : c.descuento ? `<span class="antes"><s>${c.pagarLista.toLocaleString("es-ES", { minimumFractionDigits: 2, maximumFractionDigits: 2, useGrouping: "always" })} €</s><span class="dto">−${String(c.pct).replace(".", ",")} %</span></span>${eur(c.pagar)} ${c.irpf ? T("aPagar") : T("ivaIncl")}` : `${eur(c.pagar)} ${c.irpf ? T("aPagar") : T("ivaIncl")}`}</b></div>
+      <div><small>${T("lblInversion")}</small><b>${D.cuota?.activo ? `${E("cuota.precio", "75 €/mes")} ${E("cuota.nota", "IVA incluido")}` : c.descuento ? `<span class="antes"><s>${(Math.round(c.subtotal * (1 + D.iva / 100) * 100) / 100).toLocaleString("es-ES", { minimumFractionDigits: 2, maximumFractionDigits: 2, useGrouping: "always" })} €</s><span class="dto">−${String(c.pct).replace(".", ",")} %</span></span>${eur(c.total)}<i class="ivai">IVA incl.</i>` : `${eur(c.total)} ${T("ivaIncl")}`}</b></div>
       <div><small>${T("lblLanzamiento")}</small><b>${E("lanzamiento", "Fecha prevista")}</b></div>
     </div>
   </section>
