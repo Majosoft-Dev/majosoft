@@ -117,18 +117,22 @@
     .mod-price small { color: var(--muted); }
     .mod-desc { color: var(--ink2); margin: 2mm 0 0; }
 
-    table.sum { width: 100%; border-collapse: collapse; margin-top: 2mm; break-inside: avoid; }
-    table.sum th { text-align: left; font-size: 7.5pt; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); padding: 2mm 3mm; border-bottom: 2px solid var(--ink); }
-    table.sum td { padding: 2.3mm 3mm; border-bottom: 1px solid var(--line); }
+    table.sum { width: 100%; border-collapse: collapse; margin-top: 2mm; }
+    table.sum th { text-align: left; font-size: 7pt; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); padding: 0 3mm 2mm; border-bottom: 1px solid var(--line); font-weight: 700; }
+    table.sum td { padding: 2.4mm 3mm; border-bottom: 1px solid #eeede5; }
+    table.sum tr:last-child td { border-bottom: none; }
+    table.sum td:nth-child(2) { color: var(--muted); }
     table.sum .r { text-align: right; white-space: nowrap; }
-    table.sum tr.sub td { font-weight: 700; border-bottom: none; padding-top: 4mm; }
-    table.sum tr.iva td { color: var(--muted); }
-    table.sum tr.desc td { color: #2f7d4f; font-weight: 700; background: #eef7f0; border-bottom: none; }
-    table.sum tr.desc td:first-child { border-radius: 2mm 0 0 2mm; } table.sum tr.desc td:last-child { border-radius: 0 2mm 2mm 0; }
-    table.sum tr.base td { font-weight: 700; }
-    table.sum tr.tot td { background: var(--ink); color: var(--cream); font-weight: 800; font-size: 12pt; border: none; }
-    table.sum tr.tot td:first-child { border-radius: 3mm 0 0 3mm; }
-    table.sum tr.tot td:last-child { border-radius: 0 3mm 3mm 0; color: var(--lime); }
+    .totales { display: grid; grid-template-columns: 1fr 62mm; gap: 0; margin-top: 4mm; background: var(--ink); color: var(--cream); border-radius: 4mm; overflow: hidden; break-inside: avoid; }
+    .totales .desglose { padding: 5mm 6mm; display: grid; gap: 2.2mm; font-size: 9.5pt; }
+    .totales .desglose div { display: flex; justify-content: space-between; gap: 4mm; color: #cfcfc4; }
+    .totales .desglose b { color: var(--cream); font-weight: 700; }
+    .totales .dto-l span, .totales .dto-l b { color: var(--lime) !important; font-weight: 700; }
+    .totales .dto-l i { font-style: normal; background: var(--lime); color: var(--ink); font-size: 7pt; font-weight: 800; padding: .3mm 1.6mm; border-radius: 99px; margin-left: 1mm; }
+    .totales .final { background: #23241f; padding: 5mm 6mm; display: flex; flex-direction: column; justify-content: center; align-items: flex-end; text-align: right; }
+    .totales .final small { font-size: 7pt; letter-spacing: .12em; text-transform: uppercase; color: #a9a99c; font-weight: 700; }
+    .totales .final b { font-size: 20pt; font-weight: 900; letter-spacing: -.03em; color: var(--lime); line-height: 1.15; margin-top: 1mm; }
+    .totales .final span { font-size: 8pt; color: #a9a99c; margin-top: 1mm; }
 
     .cuota { display: grid; grid-template-columns: 1fr auto; gap: 8mm; align-items: center; background: var(--ink); color: var(--cream); border-radius: 4mm; padding: 7mm; margin: 2mm 0 4mm; break-inside: avoid; }
     .cuota small { font-weight: 800; letter-spacing: .12em; text-transform: uppercase; font-size: 7.5pt; color: var(--lime); }
@@ -168,6 +172,7 @@
     .cols { display: grid; grid-template-columns: 1fr 1fr; gap: 6mm; }
     .cols h4, .req h4 { margin: 3mm 0 1mm; font-size: 10pt; }
     .req { display: grid; grid-template-columns: 1fr 1fr; gap: 2mm 6mm; }
+    .req:has(> div:only-child) { grid-template-columns: 1fr; } /* un solo grupo: a todo el ancho */
     .req > div { break-inside: avoid; }
 
     .contact { margin-top: 10mm; background: var(--ink); color: var(--cream); border-radius: 4mm; padding: 6mm; display: flex; justify-content: space-between; align-items: center; break-inside: avoid; }
@@ -413,13 +418,17 @@ function render() {
       <thead><tr><th>${T("colModulo")}</th><th class="r">${T("colHoras")}</th><th class="r">${T("colPrecio")}</th></tr></thead>
       <tbody>
         ${D.modulos.map((m, i) => `<tr><td>${E(`modulos.${i}.titulo`, "Título del módulo")}${m.nuevo ? '<span class="badge">Nuevo</span>' : ""}</td><td class="r">${m.horas ? m.horas + "h" : "—"}</td><td class="r">${Number(m.precio) ? eur(m.precio) : T("incluido")}</td></tr>`).join("")}
-        <tr class="sub"><td>${T("subtotal")}</td><td class="r">${c.horas}h</td><td class="r">${eur(c.subtotal)}</td></tr>
-        ${c.descuento ? `<tr class="desc"><td>${E("descuento.etiqueta", "Descuento", { def: "Descuento" })} (−${String(c.pct).replace(".", ",")} %)</td><td></td><td class="r">−${eur(c.descuento)}</td></tr>
-        <tr class="base"><td>${T("baseLabel")}</td><td></td><td class="r">${eur(c.base)}</td></tr>` : ""}
-        <tr class="iva"><td>${T("ivaLabel")} (${D.iva}%)</td><td></td><td class="r">${eur(c.iva)}</td></tr>
-        <tr class="tot"><td>${T("totalLabel")}</td><td class="r">${c.horas}h</td><td class="r">${eur(c.total)}</td></tr>
       </tbody>
-    </table>`}
+    </table>
+    <div class="totales">
+      <div class="desglose">
+        <div><span>${c.descuento ? "Precio del proyecto" : T("subtotal")}</span><b>${eur(c.subtotal)}</b></div>
+        ${c.descuento ? `<div class="dto-l"><span>${E("descuento.etiqueta", "Descuento", { def: "Descuento" })} <i>−${String(c.pct).replace(".", ",")} %</i></span><b>−${eur(c.descuento)}</b></div>
+        <div><span>${T("baseLabel")}</span><b>${eur(c.base)}</b></div>` : ""}
+        <div><span>${T("ivaLabel")} (${D.iva}%)</span><b>${eur(c.iva)}</b></div>
+      </div>
+      <div class="final"><small>${T("totalLabel")}</small><b>${eur(c.total)}</b><span>${c.horas} horas de trabajo</span></div>
+    </div>`}
 
     <h2 class="h2">${T("pagoTitulo")}</h2>
     ${E("formaPago", "Forma de pago", { tag: "div", cls: "callout", multi: true })}
@@ -500,6 +509,19 @@ function paginar() {
       while (llena() && b.children.length > 2) { resto.prepend(b.lastElementChild); if (b.children.length % 2) resto.prepend(b.lastElementChild); }
       if (!llena()) { bloques.splice(i + 1, 0, resto); continue; }
       while (resto.firstElementChild) b.appendChild(resto.firstElementChild);
+    }
+    // Tabla de módulos y listas de puntos sueltas: siguen en la hoja siguiente (la tabla repite su cabecera)
+    if (b.matches("table.sum, ul.b")) {
+      const filas = b.matches("table") ? b.tBodies[0] : b;
+      const real = () => [...filas.children].filter(x => !x.classList.contains("add-pt"));
+      if (real().length > 1) {
+        const resto = b.cloneNode(true), rf = resto.matches("table") ? resto.tBodies[0] : resto;
+        rf.innerHTML = "";
+        while (llena() && real().length > 1) rf.prepend(filas.lastElementChild);
+        if (!llena() && [...rf.children].some(x => !x.classList.contains("add-pt"))) { bloques.splice(i + 1, 0, resto); continue; }
+        while (rf.firstElementChild) filas.appendChild(rf.firstElementChild);
+        if (!llena()) continue;
+      }
     }
     // Módulos: si no caben, sus puntos continúan en la hoja siguiente
     if (b.matches(".mod")) {
