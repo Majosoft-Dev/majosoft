@@ -14,6 +14,29 @@ const leer = () => JSON.parse(db.prepare("SELECT value FROM settings WHERE key =
 const guardar = st => db.prepare("INSERT INTO settings (key, value) VALUES ('vigilancia', ?) ON CONFLICT(key) DO UPDATE SET value = excluded.value").run(JSON.stringify(st));
 export const estado = () => ({ ...leer(), cada: CADA });
 
+/* ===== Email con la estética de Majosoft (estilos en línea: los clientes de correo ignoran <style>) ===== */
+const esc = t => String(t ?? "").replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+const TONO = { bad: ["#fbe9e7", "#b42318", "Problema"], warn: ["#fff5d6", "#a86b00", "Aviso"], ok: ["#e6f3ea", "#2f7d4f", "Arreglado"] };
+function plantilla({ titulo, resumen, secciones }) {
+  const filas = secciones.map(({ tono, titulo, items }) => { const [fondo, color, etiqueta] = TONO[tono]; return `
+    <tr><td style="padding:0 32px 18px">
+      <div style="font:700 11px/1 Inter,Arial,sans-serif;letter-spacing:.12em;text-transform:uppercase;color:${color};margin:0 0 8px">${esc(etiqueta)} · ${esc(titulo)}</div>
+      ${items.map(i => `<div style="background:${fondo};border-left:3px solid ${color};border-radius:8px;padding:12px 14px;margin:0 0 8px;font:500 14px/1.45 Inter,Arial,sans-serif;color:#15161a">${esc(i.texto)}${i.nota ? `<div style="font-size:12px;color:#6b6b62;margin-top:3px">${esc(i.nota)}</div>` : ""}</div>`).join("")}
+    </td></tr>`; }).join("");
+  return `<!doctype html><html><body style="margin:0;background:#f5f4ec;padding:24px 12px">
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:560px;margin:0 auto;background:#fff;border-radius:16px;overflow:hidden;border:1px solid #dcdbd0">
+    <tr><td style="background:#15161a;padding:26px 32px">
+      <div style="font:800 15px/1 Inter,Arial,sans-serif;color:#fff;letter-spacing:-.02em">majosoft<span style="color:#d6e022">.</span></div>
+      <div style="font:800 22px/1.25 Inter,Arial,sans-serif;color:#fff;letter-spacing:-.02em;margin-top:18px">${esc(titulo)}</div>
+      <div style="font:500 13px/1.5 Inter,Arial,sans-serif;color:#a9a99c;margin-top:6px">${esc(resumen)}</div>
+    </td></tr>
+    <tr><td style="height:24px"></td></tr>
+    ${filas}
+    <tr><td style="padding:6px 32px 28px"><a href="https://majosoft.es/admin/servidores" style="display:inline-block;background:#d6e022;color:#15161a;font:800 14px/1 Inter,Arial,sans-serif;text-decoration:none;padding:13px 20px;border-radius:10px">Ver estado en directo →</a></td></tr>
+    <tr><td style="border-top:1px solid #eeede5;padding:16px 32px;font:500 11.5px/1.5 Inter,Arial,sans-serif;color:#8a8a80">Vigilancia del panel Majosoft · Revisa las webs, los errores 5xx y los servidores cada 5 minutos. Te escribe cuando algo falla y cuando se arregla.</td></tr>
+  </table></body></html>`;
+}
+
 const espera = ms => new Promise(r => setTimeout(r, ms));
 const host = url => new URL(url).hostname;
 
@@ -55,18 +78,22 @@ async function revisar() {
   for (const texto of sucesos) st.historial.unshift({ tipo: "5xx", texto, desde: ahora });
   st.historial = st.historial.slice(0, 100);
   st.ultima = ahora;
+  st.error = ""; // si el envío de abajo falla, se vuelve a anotar
 
   if (nuevos.length || resueltos.length || sucesos.length) {
-    const dur = ms => ms < 3600e3 ? Math.round(ms / 60e3) + " min" : (ms / 3600e3).toFixed(1).replace(".", ",") + " h";
-    const partes = [
-      nuevos.length && "⛔ NUEVOS PROBLEMAS\n" + nuevos.map(([, t]) => "  · " + t).join("\n"),
-      sucesos.length && "⚠️ " + sucesos.join("\n\n⚠️ "),
-      resueltos.length && "✅ ARREGLADO\n" + resueltos.map(([, p]) => `  · ${p.texto} (duró ${dur(ahora - p.desde)})`).join("\n"),
+    const dur = ms => ms < 3600e3 ? Math.max(1, Math.round(ms / 60e3)) + " min" : (ms / 3600e3).toFixed(1).replace(".", ",") + " h";
+    const secciones = [
+      nuevos.length && { tono: "bad", titulo: nuevos.length === 1 ? "algo ha dejado de funcionar" : `${nuevos.length} cosas han dejado de funcionar`, items: nuevos.map(([, texto]) => ({ texto })) },
+      sucesos.length && { tono: "warn", titulo: "errores 5xx nuevos", items: sucesos.map(t => { const [cab, ...rs] = t.split("\n"); return { texto: cab.replace(/:$/, ""), nota: rs.map(x => x.trim().replace(/^· /, "")).join(" · ") }; }) },
+      resueltos.length && { tono: "ok", titulo: "vuelve a funcionar", items: resueltos.map(([, p]) => ({ texto: p.texto, nota: `Duró ${dur(ahora - p.desde)}` })) },
     ].filter(Boolean);
     const asunto = nuevos.length ? `⛔ ${nuevos[0][1]}${nuevos.length > 1 ? ` (+${nuevos.length - 1})` : ""}`
       : sucesos.length ? "⚠️ Errores 5xx nuevos en los servidores" : `✅ Arreglado: ${resueltos[0][1].texto}`;
+    const titulo = nuevos.length ? "Algo no va bien" : sucesos.length ? "Ha habido errores" : "Todo vuelve a funcionar";
+    const resumen = new Date(ahora).toLocaleString("es-ES", { timeZone: "Europe/Madrid", weekday: "long", day: "numeric", month: "long", hour: "2-digit", minute: "2-digit" });
+    const texto = secciones.map(x => `${TONO[x.tono][2].toUpperCase()} · ${x.titulo}\n` + x.items.map(i => `  · ${i.texto}${i.nota ? ` (${i.nota})` : ""}`).join("\n")).join("\n\n") + "\n\nEstado en directo: https://majosoft.es/admin/servidores";
     try {
-      await correo.enviar({ asunto, texto: partes.join("\n\n") + "\n\nEstado en directo: https://majosoft.es/admin/servidores\n— Vigilancia del panel Majosoft (revisa cada 5 minutos)" });
+      await correo.enviar({ asunto, texto, html: plantilla({ titulo, resumen, secciones }) });
       st.error = "";
     } catch (e) { st.error = "No se pudo enviar el aviso: " + e.message; }
   }
@@ -74,7 +101,9 @@ async function revisar() {
 }
 
 export async function prueba() {
-  await correo.enviar({ asunto: "✅ Prueba de avisos del panel Majosoft", texto: "Los avisos funcionan. Te escribiré aquí cuando una web dé error, aparezcan errores 5xx o algo del servidor falle, y otra vez cuando se arregle.\n\nhttps://majosoft.es/admin/servidores" });
+  const texto = "Los avisos funcionan. Te escribiré aquí cuando una web dé error, aparezcan errores 5xx o algo del servidor falle, y otra vez cuando se arregle.";
+  await correo.enviar({ asunto: "✅ Prueba de avisos del panel Majosoft", texto: texto + "\n\nhttps://majosoft.es/admin/servidores",
+    html: plantilla({ titulo: "Los avisos funcionan", resumen: "Email de prueba de la vigilancia del panel", secciones: [{ tono: "ok", titulo: "todo listo", items: [{ texto }] }] }) });
 }
 
 let enMarcha = false;
