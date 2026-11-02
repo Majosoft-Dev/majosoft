@@ -179,6 +179,14 @@
     .req { display: grid; grid-template-columns: 1fr 1fr; gap: 2mm 6mm; }
     .req:has(> div:only-child) { grid-template-columns: 1fr; } /* un solo grupo: a todo el ancho */
     .req > div { break-inside: avoid; }
+    .pagos { display: grid; grid-template-columns: 1fr 1fr; gap: 3mm; margin-top: 2mm; break-inside: avoid; }
+    .pago { border: 1px solid var(--line); border-radius: 3.5mm; padding: 4.5mm 5mm; display: flex; flex-direction: column; gap: 1.2mm; }
+    .pago .p-t { font-size: 7pt; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); font-weight: 700; }
+    .pago .p-i { font-size: 18pt; font-weight: 900; letter-spacing: -.03em; line-height: 1.15; color: var(--ink); }
+    .pago .p-d { font-size: 9pt; color: var(--ink2); }
+    .pago.dest { background: var(--ink); border-color: var(--ink); }
+    .pago.dest .p-t { color: #a9a99c; } .pago.dest .p-i { color: var(--lime); } .pago.dest .p-d { color: #cfcfc4; }
+    .pagos-nota { font-size: 8pt; color: var(--muted); margin-top: 2.5mm; }
     table.cmp { width: 100%; border-collapse: separate; border-spacing: 0; margin-top: 2mm; font-size: 9.5pt; break-inside: avoid; }
     table.cmp th { font-size: 7pt; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); font-weight: 700; padding: 0 4mm 2mm; text-align: left; }
     table.cmp td { padding: 2.6mm 4mm; border-bottom: 1px solid #eeede5; }
@@ -466,7 +474,10 @@ function render() {
     </div>`}
 
     <h2 class="h2">${T("pagoTitulo")}</h2>
-    ${E("formaPago", "Forma de pago", { tag: "div", cls: "callout", multi: true })}
+    ${D.pagos?.opciones?.length ? `${D.pagos.intro ? E("pagos.intro", "Introducción", { tag: "p" }) : ""}
+      <div class="pagos">${D.pagos.opciones.map((o, i) => `<div class="pago${i === 0 ? " dest" : ""}"><div class="p-t">${E(`pagos.opciones.${i}.titulo`, "Opción")}</div><div class="p-i">${E(`pagos.opciones.${i}.importe`, "Importe")}</div><div class="p-d">${E(`pagos.opciones.${i}.detalle`, "Cuándo se paga", { multi: true })}</div></div>`).join("")}</div>
+      ${D.pagos.nota ? E("pagos.nota", "Nota", { tag: "p", cls: "pagos-nota", multi: true }) : ""}`
+      : E("formaPago", "Forma de pago", { tag: "div", cls: "callout", multi: true })}
     ${D.bono.activo ? `
       <div class="bono">
         <div><small>${E("bono.titulo", "Nombre del bono")}${D.bono.fechaLimite ? ` · ${T("hastaEl")} ` + fecha(D.bono.fechaLimite) : ""}</small><p style="margin:2mm 0 0">${E("bono.texto", "Texto del bono", { multi: true })}</p></div>
