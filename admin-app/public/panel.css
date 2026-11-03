@@ -113,3 +113,29 @@ body label.f input::placeholder, body label.f textarea::placeholder { font-weigh
 @media (pointer: coarse) {
   body label.f input, body label.f select, body label.f textarea, body .search { font-size: 16px; }
 }
+
+/* ===== Desplegables con el estilo del panel ===== */
+body select {
+  -webkit-appearance: none; appearance: none; cursor: pointer;
+  padding-right: 36px !important;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2315161a' stroke-width='2.6' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E") !important;
+  background-repeat: no-repeat !important; background-position: right 13px center !important; background-size: 12px !important;
+  transition: border-color .15s, box-shadow .15s, background-color .15s;
+}
+body select:hover { border-color: var(--ink2); }
+body select:focus { outline: none; border-color: var(--ink); box-shadow: 0 0 0 3px rgba(214, 224, 34, .45); background-color: #fff; }
+/* Chrome 135+: también la lista que se abre (en otros navegadores queda la del sistema) */
+@supports (appearance: base-select) {
+  body select, body select::picker(select) { appearance: base-select; }
+  body select { background-image: none !important; display: flex; align-items: center; }
+  body select::picker-icon { content: ""; width: 12px; height: 12px; margin-left: auto; transition: transform .2s;
+    background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2315161a' stroke-width='2.6' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E") center / 12px no-repeat; }
+  body select:open::picker-icon { transform: rotate(180deg); }
+  body select { padding-right: 13px !important; }
+  body select::picker(select) { border: 1px solid var(--line); border-radius: 12px; padding: 5px; background: #fff; margin-top: 4px;
+    box-shadow: 0 14px 40px rgba(21, 22, 26, .16); font-family: Inter, system-ui, sans-serif; }
+  body select option { padding: 8px 10px; border-radius: 8px; font-size: 14px; font-weight: 500; color: var(--ink); cursor: pointer; }
+  body select option:hover, body select option:focus-visible { background: var(--cream); outline: none; }
+  body select option:checked { background: #f3f4dc; font-weight: 700; }
+  body select option::checkmark { content: "✓"; color: var(--ink); font-weight: 800; order: 1; margin-left: auto; }
+}
