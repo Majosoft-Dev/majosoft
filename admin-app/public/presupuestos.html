@@ -187,6 +187,24 @@
     .pago.dest { background: var(--ink); border-color: var(--ink); }
     .pago.dest .p-t { color: #a9a99c; } .pago.dest .p-i { color: var(--lime); } .pago.dest .p-d { color: #cfcfc4; }
     .pagos-nota { font-size: 8pt; color: var(--muted); margin-top: 2.5mm; }
+    .redes { display: flex; flex-wrap: wrap; gap: 2.5mm; margin: 1mm 0 5mm; break-inside: avoid; }
+    .red { display: inline-flex; align-items: center; gap: 2mm; padding: 2mm 3.6mm 2mm 2.4mm; border-radius: 99px; background: var(--cream); font-size: 9pt; font-weight: 700; }
+    .red svg { width: 5.2mm; height: 5.2mm; padding: 1mm; border-radius: 50%; background: var(--ink); color: var(--lime); }
+    .redes-nota { font-size: 8.5pt; color: var(--muted); margin: -2mm 0 5mm; }
+    table.tar { width: 100%; border-collapse: separate; border-spacing: 0; margin: 2mm 0 3mm; font-size: 9.5pt; break-inside: avoid; }
+    table.tar th { font-size: 7pt; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); font-weight: 700; padding: 0 4mm 2mm; text-align: right; }
+    table.tar th:first-child { text-align: left; }
+    table.tar td { padding: 3mm 4mm; border-bottom: 1px solid #eeede5; text-align: right; white-space: nowrap; }
+    table.tar td:first-child { text-align: left; font-weight: 700; white-space: normal; }
+    table.tar td b { display: block; font-size: 11pt; }
+    table.tar td small { display: block; color: var(--muted); font-size: 8pt; font-weight: 500; }
+    table.tar td.dest { background: var(--ink); color: var(--cream); }
+    table.tar td.dest b { color: var(--lime); }
+    table.tar td.dest small { color: #c9c9bd; }
+    table.tar tr:first-child td.dest { border-radius: 3mm 3mm 0 0; }
+    table.tar tr:last-child td.dest { border-radius: 0 0 3mm 3mm; }
+    table.tar tr:last-child td { border-bottom: none; }
+    table.tar .ahorro { display: inline-block; margin-top: 1mm; font-size: 7.5pt; font-weight: 800; color: var(--ink); background: var(--lime); border-radius: 99px; padding: .6mm 2.2mm; }
     table.cmp { width: 100%; border-collapse: separate; border-spacing: 0; margin-top: 2mm; font-size: 9.5pt; break-inside: avoid; }
     table.cmp th { font-size: 7pt; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); font-weight: 700; padding: 0 4mm 2mm; text-align: left; }
     table.cmp td { padding: 2.6mm 4mm; border-bottom: 1px solid #eeede5; }
@@ -338,6 +356,7 @@ const migrar = d => {
   d.descuento ??= { activo: false, porcentaje: 0, etiqueta: "" };
   d.cuota ??= { activo: false, precio: "", nota: "", etiqueta: "", detalle: "", texto: "" };
   d.textos ??= {};
+  d.redes ??= { titulo: "", items: [], nota: "" };
   d.renov ??= { tipo: "", persona: "", inicio: "", hasta: "", nota: "" };
   if (d.totalConIva == null) { d.auto ??= true; d.totalConIva = Number(d.totalRedondeado) || Math.round(d.modulos.reduce((s, m) => s + Number(m.precio || 0), 0) * (1 + d.iva / 100)); }
   delete d.totalRedondeado; return d;
@@ -351,6 +370,20 @@ const paras = s => String(s || "").split(/\n\s*\n/).filter(x => x.trim()).map(x 
 const list = (arr, cls = "b") => arr?.length ? `<ul class="${cls}">${arr.map(i => `<li>${esc(i)}</li>`).join("")}</ul>` : "";
 const get = (path) => path.split(".").reduce((o, k) => o?.[k], D);
 const set = (path, v) => { const ks = path.split("."); const last = ks.pop(); ks.reduce((o, k) => o[k], D)[last] = v; };
+
+/* Iconos de redes sociales (bloque «redes» del presupuesto) */
+const REDES = {
+  instagram: ["Instagram", '<rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor"/>'],
+  facebook: ["Facebook", '<path d="M14 8h3V4h-3a4 4 0 0 0-4 4v3H7v4h3v6h4v-6h3l1-4h-4V8z"/>'],
+  tiktok: ["TikTok", '<path d="M14 3v11.5a3.5 3.5 0 1 1-3.5-3.5"/><path d="M14 3c.5 3 2.5 5 5.5 5"/>'],
+  youtube: ["YouTube", '<rect x="2.5" y="5.5" width="19" height="13" rx="4"/><path d="M10 9.5v5l4.5-2.5z" fill="currentColor"/>'],
+  x: ["X", '<path d="M4 4l16 16M20 4L4 20"/>'],
+  linkedin: ["LinkedIn", '<rect x="3" y="3" width="18" height="18" rx="3"/><path d="M8 10v7M8 7v.01M12 17v-4a2 2 0 0 1 4 0v4M12 10v7"/>'],
+  whatsapp: ["WhatsApp", '<path d="M4 20l1.3-4A8 8 0 1 1 8 18.7z"/><path d="M9 9.5c.3 2 2.5 4.2 4.5 4.5l1-1.2 2 .9c-.3 1.2-1.3 1.8-2.5 1.8-3 0-6.5-3.5-6.5-6.5 0-1.2.6-2.2 1.8-2.5l.9 2z"/>'],
+  telegram: ["Telegram", '<path d="M21 4L3 11l6 2 2 6 3-4 5 4z"/><path d="M9 13l8-6"/>'],
+  web: ["Web y blog", '<circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c3 3 3 15 0 18M12 3c-3 3-3 15 0 18"/>'],
+};
+const redIcono = k => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${REDES[k]?.[1] || REDES.web[1]}</svg>`;
 
 /* ===== Vista previa ===== */
 /* Modo automático: se parte del precio final con IVA, se quita el IVA
@@ -436,6 +469,10 @@ function render() {
       <tbody>${D.cifras.filas.map((f, i) => `<tr><td>${E(`cifras.filas.${i}.0`, "Medida")}</td><td class="r hoy">${E(`cifras.filas.${i}.1`, "—")}</td><td class="r nueva">${E(`cifras.filas.${i}.2`, "—")}</td></tr>`).join("")}</tbody></table>
       ${D.cifras.nota ? E("cifras.nota", "Nota", { tag: "p", cls: "cmp-nota", multi: true }) : ""}` : ""}
 
+    ${D.redes?.items?.length ? `<h2 class="h2">${E("redes.titulo", "Título", { def: "Redes que gestionamos" })}</h2>
+      <div class="redes">${D.redes.items.map(k => `<span class="red">${redIcono(k)}${esc(REDES[k]?.[0] || k)}</span>`).join("")}</div>
+      ${D.redes.nota ? E("redes.nota", "Nota", { tag: "p", cls: "redes-nota", multi: true }) : ""}` : ""}
+
     <h2 class="h2">${E("modulosTitulo", "Título", { def: "Módulos del proyecto" })}</h2>
     ${D.modulos.map((m, i) => `
       <div class="mod">
@@ -456,6 +493,8 @@ function render() {
       <div><small>${E("cuota.etiqueta", "Cuota mensual", { def: "" })}</small><p>${E("cuota.detalle", "Detalle")}</p></div>
       <div class="price">${E("cuota.precio", "75 €/mes")}<span class="pn">${E("cuota.nota", "IVA incluido")}</span></div>
     </div>
+    ${D.tarifas?.filas?.length ? `<table class="tar"><thead><tr>${D.tarifas.cols.map(c => `<th>${esc(c)}</th>`).join("")}</tr></thead>
+      <tbody>${D.tarifas.filas.map(f => `<tr>${f.map((c, j) => j === 0 ? `<td>${esc(c)}</td>` : `<td class="${c.dest ? "dest" : ""}"><b>${esc(c.precio)}</b><small>${esc(c.iva || "")}</small>${c.ahorro ? `<span class="ahorro">${esc(c.ahorro)}</span>` : ""}</td>`).join("")}</tr>`).join("")}</tbody></table>` : ""}
     ${P("cuota.texto", "Texto bajo la cuota (opcional)")}` : `
     <table class="sum">
       <thead><tr><th>${T("colModulo")}</th><th class="r">${T("colHoras")}</th><th class="r">${T("colPrecio")}</th></tr></thead>
@@ -631,7 +670,9 @@ function buildEditor() {
     sec("Objetivo y enfoque", `
       ${txt("Objetivo del proyecto", "objetivo", { type: "area" })}<div class="hint">Separa párrafos con una línea en blanco</div>
       ${txt("Título del bloque de ventajas", "porqueTitulo")}${txt("Introducción", "porqueIntro", { type: "area" })}
-      ${txt("Ventajas", "porque", { type: "lines", h: 160 })}<div class="hint">Usa «Título: explicación» para destacar el título</div>`, o("Objetivo y enfoque")) +
+      ${txt("Ventajas", "porque", { type: "lines", h: 160 })}
+      ${txt("Redes sociales (iconos)", "redes.items", { type: "lines", h: 90 })}<div class="hint">Una por línea: ${Object.keys(REDES).join(", ")}</div>
+      ${txt("Nota bajo las redes", "redes.nota")}<div class="hint">Usa «Título: explicación» para destacar el título</div>`, o("Objetivo y enfoque")) +
     sec("Módulos", D.modulos.map((m, i) => `<div class="item">${head("Módulo " + String(i + 1).padStart(2, "0"), "modulos", i)}
       ${txt("Título", `modulos.${i}.titulo`)}
       <div class="row">${txt("Horas", `modulos.${i}.horas`, { type: "number" })}${txt(D.auto ? "Precio (automático)" : "Precio (€ sin IVA, 0 = incluido)", `modulos.${i}.precio`, { type: "number" })}</div>
