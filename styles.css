@@ -547,3 +547,27 @@ body { overflow-x: hidden; cursor: none; background: #f5f4ec; }
 @media (min-width: 1920px) { html { font-size: 18px; } }
 @media (min-width: 2400px) { html { font-size: 21px; } }
 @media (min-width: 3000px) { html { font-size: 25px; } }
+
+/* ===== Animaciones finas ===== */
+/* FAQ en dos filas: la línea separadora empieza de nuevo en cada fila */
+@media (min-width: 768px) {
+  .band-dark__item:nth-child(3n+1) { padding-left: 0; border-left: none; }
+}
+/* Títulos: cada palabra sube desde detrás de una máscara */
+.tw { display: inline-block; overflow: hidden; vertical-align: top; padding-bottom: .08em; margin-bottom: -.08em; }
+.tw > span { display: inline-block; will-change: transform; }
+/* Flecha de los enlaces de proyecto: se desliza al pasar */
+.project__link { transition: transform .45s var(--ease-smooth); }
+.project:hover .project__link { transform: translateX(6px); }
+/* Iconos de servicios: giro suave al pasar */
+.svc__icon svg { transition: transform .6s var(--ease-smooth); }
+.svc:hover .svc__icon svg { transform: rotate(-8deg) scale(1.08); }
+/* Servicios: al pasar, una franja lima barre la fila de izquierda a derecha */
+.svc { position: relative; isolation: isolate; }
+.svc::before {
+  content: ""; position: absolute; inset: 0; z-index: -1; background: #d6e022;
+  transform: scaleX(0); transform-origin: left; transition: transform .6s var(--ease-smooth);
+}
+.svc:hover::before { transform: scaleX(1); }
+.svc:hover .svc__text, .svc:hover .svc__idx { color: #15161a; }
+.svc:hover .svc__tags span { background: #fbfbf6; border-color: #15161a; }

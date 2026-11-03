@@ -57,9 +57,9 @@ window.addEventListener('DOMContentLoaded', () => {
     });
 
     /* Reveal por scroll genérico */
-    const grupos = '.svc, .project, .band-dark__item';
+    const grupos = '.svc, .band-dark__item';
     gsap.utils.toArray('.reveal').forEach((el) => {
-      if (el.closest('#inicio') || el.matches(grupos)) return;
+      if (el.closest('#inicio') || el.matches(grupos) || el.matches('.project')) return;
       gsap.to(el, { opacity: 1, y: 0, duration: 0.9, ease: 'power3.out',
         scrollTrigger: { trigger: el, start: 'top 88%' } });
     });
@@ -76,6 +76,69 @@ window.addEventListener('DOMContentLoaded', () => {
         }),
       });
     });
+
+    /* Títulos de sección: palabra a palabra, saliendo de una máscara */
+    gsap.utils.toArray('.section-title, .band-dark__title').forEach((t) => {
+      if (t.querySelector('.tw')) return;
+      const palabras = t.textContent.trim().split(/\s+/);
+      t.innerHTML = palabras.map((w) => `<span class="tw"><span>${w}</span></span>`).join(' ');
+      gsap.from(t.querySelectorAll('.tw > span'), {
+        yPercent: 105, duration: 0.85, ease: 'power3.out', stagger: 0.07,
+        scrollTrigger: { trigger: t, start: 'top 88%' },
+      });
+    });
+
+    /* Iconos de servicios: el trazo se dibuja al aparecer */
+    gsap.utils.toArray('.svc').forEach((svc) => {
+      const trazos = svc.querySelectorAll('.svc__icon path, .svc__icon polyline, .svc__icon rect, .svc__icon line, .svc__icon circle');
+      trazos.forEach((el) => {
+        const len = el.getTotalLength ? el.getTotalLength() : 0;
+        if (len) gsap.set(el, { strokeDasharray: len, strokeDashoffset: len });
+      });
+      gsap.to(trazos, { strokeDashoffset: 0, duration: 1.2, ease: 'power2.inOut', stagger: 0.08,
+        scrollTrigger: { trigger: svc, start: 'top 85%' } });
+    });
+
+    /* Etiquetas de servicio: entran una tras otra */
+    gsap.utils.toArray('.svc__tags').forEach((tags) => {
+      gsap.from(tags.children, { opacity: 0, y: 8, duration: 0.5, ease: 'power2.out', stagger: 0.06,
+        scrollTrigger: { trigger: tags, start: 'top 92%' } });
+    });
+
+    /* Distintivo de Patán: aparece con un pequeño rebote */
+    gsap.from('.patan-badge', { scale: 0, rotate: -20, duration: 0.9, ease: 'back.out(2.2)',
+      scrollTrigger: { trigger: '.patan-stage', start: 'top 75%' } });
+
+    /* Trabajos: cada tarjeta se "levanta" ligada al scroll (se nota al bajar y al subir) */
+    gsap.utils.toArray('.project').forEach((card, i) => {
+      gsap.fromTo(card,
+        { opacity: 0, y: 140, scale: 0.86, rotateX: 14, rotate: i % 2 ? 2 : -2, transformPerspective: 1000, transformOrigin: '50% 100%' },
+        { opacity: 1, y: 0, scale: 1, rotateX: 0, rotate: 0, ease: 'power2.out',
+          scrollTrigger: { trigger: card, start: 'top 98%', end: 'top 62%', scrub: 0.6 } });
+    });
+
+    /* Banda de tecnologías: acelera y cambia de sentido según el scroll */
+    const pista = document.querySelector('.marquee__track');
+    if (pista) {
+      pista.style.animation = 'none';
+      let x = 0, dir = -1, extra = 0;
+      const base = 0.6;
+      ScrollTrigger.create({
+        trigger: 'body', start: 'top top', end: 'bottom bottom',
+        onUpdate: (self) => {
+          dir = self.direction === 1 ? -1 : 1;
+          extra = Math.min(Math.abs(self.getVelocity()) / 120, 14);
+        },
+      });
+      gsap.ticker.add(() => {
+        const mitad = pista.scrollWidth / 2;
+        x += dir * (base + extra);
+        extra *= 0.92;
+        if (x <= -mitad) x += mitad;
+        if (x > 0) x -= mitad;
+        gsap.set(pista, { x, skewX: -dir * Math.min(extra * 0.8, 10) });
+      });
+    }
 
     /* Subrayado dibujado a mano del hero */
     const underline = document.querySelector('.hand-underline path');
