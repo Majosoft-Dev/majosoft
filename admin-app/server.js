@@ -226,6 +226,17 @@ app.get("/admin/calendario/:token.ics", (req, res) => {
   res.set({ "Content-Type": "text/calendar; charset=utf-8", "Cache-Control": "private, max-age=300" }).send(calendario.ics(persona));
 });
 
+/* ===== Publicaciones de redes de UMME (las manda el Mac de María con la clave UMME_CLAVE) ===== */
+app.put("/admin/umme/publicaciones", (req, res) => {
+  if (!calendario.claveUmmeValida(String(req.get("authorization") || "").replace(/^Bearer /, ""))) {
+    audit("umme_key_fail", { ip: req.ip });
+    return res.status(404).send("No existe");
+  }
+  const n = calendario.guardarPublicaciones(req.body?.lista);
+  if (n === false) return res.status(400).json({ error: "Datos no válidos" });
+  res.json({ ok: true, publicaciones: n });
+});
+
 app.use("/admin", requireAuth);
 
 app.get("/admin/api/me", (req, res) => {
@@ -287,7 +298,7 @@ app.post("/admin/api/password", (req, res) => {
 });
 
 /* ===== Documentos: presupuestos y facturas ===== */
-const KINDS = new Set(["presupuestos", "facturas", "ajustes", "bonos", "tareas", "renovaciones"]);
+const KINDS = new Set(["presupuestos", "facturas", "ajustes", "bonos", "tareas", "renovaciones", "publicaciones"]);
 const ID = /^[\w-]{1,64}$/;
 app.param("kind", (req, res, next, kind) => KINDS.has(kind) ? next() : res.status(404).json({ error: "No existe" }));
 

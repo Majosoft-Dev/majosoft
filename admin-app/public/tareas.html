@@ -149,7 +149,8 @@
     .renovs td small { display: block; color: var(--muted); }
     @media (max-width: 900px) { .dia { min-height: 70px; } .ev { font-size: 10px; } .renovs .opc { display: none; } }
     @media (max-width: 900px) { main { padding: 24px 16px 40px; } .mes-head { flex-wrap: wrap; } }
-  </style>
+      .ev.umme { background: #fde8f1; color: #8a1c4a; } .leyenda i.umme, .tip .k.umme i { background: #e0559a; }
+</style>
 </head>
 <body>
   <main>
@@ -179,6 +180,8 @@ const yo = /jos[eé]/i.test(`${me?.name} ${me?.email}`) ? "jose" : "maria"; // p
 
 let tareas = await api("docs/tareas");
 let fichas = await api("docs/renovaciones");
+// Publicaciones de redes de UMME (las manda el Mac de María cada lunes): solo el título en su día
+const umme = ((await api("docs/publicaciones").catch(() => [])).find(d => d.id === "umme")?.lista || []).filter(p => p.estado !== "pendiente");
 const presupuestos = await api("docs/presupuestos");
 let [facturas, bonos] = await Promise.all([api("docs/facturas"), api("docs/bonos")]).catch(() => [[], []]);
 // Clientes conocidos: facturas, presupuestos, bonos, renovaciones y los ya usados en tareas
@@ -311,11 +314,13 @@ function pintarMes() {
     add(t.fecha, `<div class="ev ${persona(t.persona)} ${t.estado === "hecha" ? "hecha" : t.fecha < hoy() ? "tarde" : ""}" data-id="${t.id}">${t.hora ? `<time>${t.hora}</time>` : ""}<span>${esc(t.titulo)}</span>${(p => p ? `<time>${p.hechas}/${p.total}</time>` : "")(progreso(t))}</div>`);
   for (const r of fuentes().filter(r => visible(r.persona))) for (const f of ocurrencias(r, desde, hasta))
     add(f, `<div class="ev renov" ${r.ficha ? `data-ren="${r.ficha.id}"` : `data-pre="${r.presupuesto.id}"`} data-f="${f}"><span>🔁 ${esc(r.titulo)}</span></div>`);
+  if (visible("maria")) for (const p of umme) if (p.fecha >= desde && p.fecha <= hasta)
+    add(p.fecha, `<div class="ev umme" data-umme="${esc(p.id)}"><span>${esc(p.titulo)}</span></div>`);
   const MAX = 3;
   const celda = f => { const l = por[f] || []; return l.length > MAX + 1 ? l.slice(0, MAX).join("") + `<button class="otros" data-otros>+${l.length - MAX} más</button><div hidden>${l.slice(MAX).join("")}</div>` : l.join(""); };
   $("mes").innerHTML = `<div class="mes-head"><h2>${(m => m[0].toUpperCase() + m.slice(1))(mesVisto.toLocaleDateString("es-ES", { month: "long", year: "numeric" }))}</h2>
       <div class="filtro">${[["majosoft", "Majosoft"], ["jose", "Jose"], ["maria", "María"]].map(([k, l]) => `<button data-filtro="${k}" class="${filtro === k ? "on" : ""}"><i class="${k}"></i>${l}</button>`).join("")}</div>
-      <div class="leyenda"><span><i class="renov"></i>Renovación</span></div>
+      <div class="leyenda"><span><i class="renov"></i>Renovación</span><span><i class="umme"></i>Redes UMME</span></div>
       <button class="btn" data-mes="-1">‹</button><button class="btn" data-mes="0">Hoy</button><button class="btn" data-mes="1">›</button></div>
     <div class="mes">${["lun", "mar", "mié", "jue", "vie", "sáb", "dom"].map(d => `<div class="dsem">${d}</div>`).join("")}
     ${dias.map(d => { const f = iso(d); return `<div class="dia ${d.getMonth() !== m ? "fuera" : ""} ${f === hoy() ? "hoy" : ""} ${d.getDay() % 6 === 0 ? "finde" : ""}" data-dia="${f}"><div class="n">${d.getDate()}</div><button class="mas" title="Nueva tarea este día">+</button>${celda(f)}</div>`; }).join("")}</div>`;
@@ -346,6 +351,9 @@ $("mes").addEventListener("mouseover", e => {
     h = `<div class="k ${persona(t.persona)}"><i></i>${PERSONAS[persona(t.persona)]} · ${ESTADOS[t.estado || "pendiente"]}${t.cliente ? " · " + esc(t.cliente) : ""}</div>${t.bono ? `<div class="m">⏱ ${esc(nombreBono(bonos.find(b => b.id === t.bono) || {}))}${t.minutos ? " · " + hm(t.minutos) : ""}${t.apuntado ? " · apuntado" : ""}</div>` : ""}<b>${esc(t.titulo)}</b>
       <div class="m">${fLarga(t.fecha)}${t.hora ? " · " + t.hora : ""}</div>${t.detalle ? `<p>${esc(t.detalle)}</p>` : ""}
       ${t.sub?.length ? `<ul>${t.sub.slice(0, 8).map(x => `<li class="${x.hecha ? "ok" : ""}">${x.hecha ? "☑" : "☐"} ${esc(x.texto)}</li>`).join("")}${t.sub.length > 8 ? `<li>… y ${t.sub.length - 8} más</li>` : ""}</ul>` : ""}`;
+  } else if (ev.dataset.umme) {
+    const p = umme.find(x => x.id === ev.dataset.umme); if (!p) return;
+    h = `<b>${esc(p.titulo)}</b><div class="m">${fLarga(p.fecha)}</div>${p.detalle ? `<p>${esc(p.detalle)}</p>` : ""}`;
   } else {
     const r = fuentes().find(x => ev.dataset.ren ? x.ficha?.id === ev.dataset.ren : x.presupuesto?.id === ev.dataset.pre); if (!r) return;
     h = `<div class="k renov"><i></i>Renovación ${r.tipo} · ${PERSONAS[persona(r.persona)]}</div><b>${esc(r.titulo)}</b>

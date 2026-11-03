@@ -15,6 +15,34 @@ export function tokenValido(token) {
   return !!t && /^[A-Za-z0-9_-]{20,64}$/.test(token) && t.length === token.length && crypto.timingSafeEqual(Buffer.from(t), Buffer.from(token));
 }
 
+// ===== Publicaciones de redes de UMME =====
+// Las manda el Mac de María (rrss-ro/herramientas/calendario/calendario.py majosoft) con la clave UMME_CLAVE
+export function claveUmmeValida(clave) {
+  const c = process.env.UMME_CLAVE || "";
+  return c.length >= 32 && typeof clave === "string" && clave.length === c.length && crypto.timingSafeEqual(Buffer.from(c), Buffer.from(clave));
+}
+
+export const publicaciones = () =>
+  JSON.parse(db.prepare("SELECT data FROM docs WHERE kind = 'publicaciones' AND id = 'umme'").get()?.data || '{"lista":[]}');
+
+export function guardarPublicaciones(lista) {
+  if (!Array.isArray(lista) || lista.length > 2000) return false;
+  const limpia = [];
+  for (const p of lista) {
+    if (!p || !FECHA.test(p.fecha || "") || !/^[\w|,.-]{1,120}$/.test(p.id || "")) continue;
+    limpia.push({
+      id: p.id, fecha: p.fecha, hora: /^\d{2}:\d{2}$/.test(p.hora || "") ? p.hora : "",
+      estado: ["publicado", "programado", "pendiente"].includes(p.estado) ? p.estado : "pendiente",
+      titulo: String(p.titulo || "Publicación").slice(0, 200), cuenta: String(p.cuenta || "").slice(0, 60),
+      detalle: String(p.detalle || "").slice(0, 2000),
+    });
+  }
+  db.prepare(`INSERT INTO docs (kind, id, data, updated_at, updated_by) VALUES ('publicaciones', 'umme', ?, ?, NULL)
+    ON CONFLICT(kind, id) DO UPDATE SET data = excluded.data, updated_at = excluded.updated_at`)
+    .run(JSON.stringify({ lista: limpia, recibido: new Date().toISOString() }), Date.now());
+  return limpia.length;
+}
+
 // Primera renovación: inicio + un periodo (si el día no existe en el mes, el último día del mes)
 export function sumarPeriodo(fecha, tipo, n = 1) {
   const [y, m, d] = fecha.split("-").map(Number);
@@ -103,21 +131,9 @@ export function ics(persona) {
       descripcion: x.nota,
     }));
   }
-  // Publicaciones de redes de UMME (las manda cada semana el Mac de María): son de María
-  if (de("maria")) {
-    const ahora = new Intl.DateTimeFormat("sv-SE", { timeZone: "Europe/Madrid", dateStyle: "short", timeStyle: "short" }).format(new Date());
-    for (const p of publicaciones().lista) {
-      // Lo programado, pasada su hora, ya está publicado (sin esperar a la siguiente actualización)
-      const pasada = `${p.fecha} ${p.hora || "23:59"}` <= ahora;
-      const estado = p.estado === "programado" && pasada ? "publicado" : p.estado;
-      const icono = { publicado: "✅ Publicado", programado: "📅 Programado" }[estado] || "📲 Por publicar";
-      ev.push(...evento({
-        uid: "umme-" + p.id, fecha: p.fecha, hora: p.hora, sello,
-        titulo: `${icono}: ${p.titulo}`,
-        descripcion: [p.cuenta && "Cuenta: " + p.cuenta, p.detalle].filter(Boolean).join("\n\n"),
-      }));
-    }
-  }
+  // Publicaciones de redes de UMME (las manda cada semana el Mac de María): solo el título, en su día
+  if (de("maria")) for (const p of publicaciones().lista.filter(p => p.estado !== "pendiente"))
+    ev.push(...evento({ uid: "umme-" + p.id, fecha: p.fecha, sello, titulo: p.titulo }));
   const nombre = persona ? `Majosoft · ${PERSONAS[persona]}` : "Majosoft · Tareas";
   return ["BEGIN:VCALENDAR", "VERSION:2.0", "PRODID:-//Majosoft//Panel//ES", "CALSCALE:GREGORIAN", "METHOD:PUBLISH",
     `X-WR-CALNAME:${nombre}`, "X-WR-TIMEZONE:Europe/Madrid", "REFRESH-INTERVAL;VALUE=DURATION:PT1H", "X-PUBLISHED-TTL:PT1H",
