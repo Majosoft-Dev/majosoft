@@ -187,10 +187,11 @@
     .pago.dest { background: var(--ink); border-color: var(--ink); }
     .pago.dest .p-t { color: #a9a99c; } .pago.dest .p-i { color: var(--lime); } .pago.dest .p-d { color: #cfcfc4; }
     .pagos-nota { font-size: 8pt; color: var(--muted); margin-top: 2.5mm; }
-    .redes { display: flex; flex-wrap: wrap; gap: 2.5mm; margin: 1mm 0 5mm; break-inside: avoid; }
-    .red { display: inline-flex; align-items: center; gap: 2mm; padding: 2mm 3.6mm 2mm 2.4mm; border-radius: 99px; background: var(--cream); font-size: 9pt; font-weight: 700; }
+    .redes { display: grid; grid-template-columns: repeat(var(--n, 5), minmax(0, 1fr)); gap: 2mm; margin: 1mm 0 5mm; break-inside: avoid; }
+    .red { display: flex; flex-direction: column; align-items: flex-start; gap: 1.8mm; padding: 3mm 3.2mm; border-radius: 3mm; background: var(--cream); font-size: 9.5pt; font-weight: 700; min-width: 0; }
+    .red > span { min-width: 0; }
     .red small { display: block; font-size: 7.5pt; font-weight: 500; color: var(--muted); margin-top: .3mm; }
-    .red svg { flex: none; width: 5.2mm; height: 5.2mm; padding: 1mm; border-radius: 50%; background: var(--ink); color: var(--lime); }
+    .red svg { flex: none; width: 6.4mm; height: 6.4mm; padding: 1.3mm; border-radius: 50%; background: var(--ink); color: var(--lime); }
     .redes-nota { font-size: 8.5pt; color: var(--muted); margin: -2mm 0 5mm; }
     table.tar { width: 100%; border-collapse: separate; border-spacing: 0; margin: 2mm 0 3mm; font-size: 9.5pt; break-inside: avoid; }
     table.tar th { font-size: 7pt; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); font-weight: 700; padding: 0 4mm 2mm; text-align: right; }
@@ -472,7 +473,7 @@ function render() {
       ${D.cifras.nota ? E("cifras.nota", "Nota", { tag: "p", cls: "cmp-nota", multi: true }) : ""}` : ""}
 
     ${D.redes?.items?.length ? `<h2 class="h2">${E("redes.titulo", "Título", { def: "Redes que gestionamos" })}</h2>
-      <div class="redes">${D.redes.items.map(it => { const [k, que] = String(it).split("|").map(x => x.trim()); return `<span class="red">${redIcono(k)}<span>${esc(REDES[k]?.[0] || k)}${que ? `<small>${esc(que)}</small>` : ""}</span></span>`; }).join("")}</div>
+      <div class="redes" style="--n:${Math.min(5, D.redes.items.length)}">${D.redes.items.map(it => { const [k, que] = String(it).split("|").map(x => x.trim()); return `<span class="red">${redIcono(k)}<span>${esc(REDES[k]?.[0] || k)}${que ? `<small>${esc(que)}</small>` : ""}</span></span>`; }).join("")}</div>
       ${D.redes.nota ? E("redes.nota", "Nota", { tag: "p", cls: "redes-nota", multi: true }) : ""}` : ""}
 
     <h2 class="h2">${E("modulosTitulo", "Título", { def: "Módulos del proyecto" })}</h2>
