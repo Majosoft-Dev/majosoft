@@ -69,7 +69,7 @@
     .leyenda i { display: inline-block; width: 9px; height: 9px; border-radius: 3px; margin-right: 4px; }
     .mes { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); }
     .mes .dsem { font-size: 11px; font-weight: 700; color: var(--muted); text-transform: uppercase; padding: 8px; border-bottom: 1px solid var(--line); }
-    .dia { min-height: 104px; border-right: 1px solid #eeede5; border-bottom: 1px solid #eeede5; padding: 6px; cursor: pointer; }
+    .dia { min-height: 118px; border-right: 1px solid #eeede5; border-bottom: 1px solid #eeede5; padding: 6px; cursor: pointer; }
     .dia:nth-child(7n) { border-right: 0; }
     .dia:hover { background: #fafaf5; }
     .dia.fuera { background: #fbfbf7; color: #b3b2a8; }
@@ -99,15 +99,15 @@
       <div class="tools"><button class="btn" id="bCal">📅 Google Calendar</button><button class="btn btn--ink" id="bNew">+ Nueva tarea</button></div>
     </div>
     <div class="card cal" id="cal" hidden></div>
-    <div class="vista"><button data-v="tablero" class="on">Tablero</button><button data-v="calendario">Calendario</button></div>
-    <div class="cols" id="cols"></div>
-    <div class="card" id="mes" hidden></div>
+    <div class="vista"><button data-v="calendario" class="on">📅 Calendario</button><button data-v="tablero">Tablero</button></div>
+    <div class="card" id="mes"></div>
+    <div class="cols" id="cols" hidden></div>
     <div class="card renovs" id="renovs"></div>
   </main>
   <dialog id="dlg"><form method="dialog" id="frm"></form></dialog>
 <script type="module">
 import { mountShell, api, toast } from "/admin/panel.js";
-const me = await mountShell("tareas");
+const me = await mountShell(new URLSearchParams(location.search).get("vista") === "tablero" ? "tareas" : "calendario");
 const $ = id => document.getElementById(id);
 const esc = s => String(s ?? "").replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
 const iso = d => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
@@ -208,11 +208,14 @@ $("mes").addEventListener("click", e => {
   const dia = e.target.closest("[data-dia]");
   if (dia) editar(null, dia.dataset.dia);
 });
-document.querySelector(".vista").addEventListener("click", e => {
-  const v = e.target.dataset.v; if (!v) return;
+function verVista(v) {
   document.querySelectorAll(".vista button").forEach(b => b.classList.toggle("on", b.dataset.v === v));
   $("cols").hidden = v !== "tablero"; $("mes").hidden = v !== "calendario";
-});
+  try { localStorage.setItem("mj-tareas-vista", v); } catch {}
+}
+document.querySelector(".vista").addEventListener("click", e => e.target.dataset.v && verVista(e.target.dataset.v));
+const pedida = new URLSearchParams(location.search).get("vista");
+verVista(["calendario", "tablero"].includes(pedida) ? pedida : (() => { try { return localStorage.getItem("mj-tareas-vista"); } catch {} })() === "tablero" ? "tablero" : "calendario");
 
 /* ===== Renovaciones de clientes ===== */
 function pintarRenovs() {
