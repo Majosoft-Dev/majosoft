@@ -446,7 +446,7 @@ function render() {
   // Ventajas «Título: explicación»: las dos partes se editan por separado
   const porque = D.porque.map((t, i) => { const [a, ...b] = t.split(":"); const pth = `porque.${i}`;
     const part = (k, v, ph) => `<span class="ed" contenteditable="plaintext-only" spellcheck="false" data-p="${pth}" data-part="${k}" data-ph="${ph}">${esc(v)}</span>`;
-    return b.length ? `<div><b>${part("a", a.trim(), "Título")}</b>${part("b", b.join(":").trim(), "Explicación")}</div>` : `<div>${part("a", t, "Ventaja")}</div>`; }).join("");
+    return b.length ? `<div><b>${part("a", a.trim(), "Título")}</b>${part("b", (x => x.charAt(0).toUpperCase() + x.slice(1))(b.join(":").trim()), "Explicación")}</div>` : `<div>${part("a", t, "Ventaja")}</div>`; }).join("");
   const mantTitulo = D.mant.titulo || "Mantenimiento";
 
   document.getElementById("doc").innerHTML = `
