@@ -89,8 +89,8 @@ export function ics(persona) {
     const hecha = t.estado === "hecha";
     ev.push(...evento({
       uid: "tarea-" + t.id, fecha: t.fecha, hora: t.hora, sello,
-      titulo: `${hecha ? "✓ " : ""}[${PERSONAS[t.persona] || "Majosoft"}] ${t.titulo || "Tarea"}`,
-      descripcion: [t.detalle, t.estado === "curso" ? "Estado: en curso" : hecha ? "Estado: hecha" : "Estado: pendiente"].filter(Boolean).join("\n\n"),
+      titulo: `${hecha ? "✓ " : ""}[${PERSONAS[t.persona] || "Majosoft"}] ${t.titulo || "Tarea"}${t.cliente ? " · " + t.cliente : ""}`,
+      descripcion: [t.detalle, Array.isArray(t.sub) && t.sub.length && t.sub.map(x => `${x.hecha ? "☑" : "☐"} ${x.texto}`).join("\n"), t.estado === "curso" ? "Estado: en curso" : hecha ? "Estado: hecha" : "Estado: pendiente"].filter(Boolean).join("\n\n"),
     }));
   }
   for (const x of fuentes()) {
@@ -102,6 +102,21 @@ export function ics(persona) {
       titulo: `${quien}Renovar ${x.tipo}: ${x.titulo}`,
       descripcion: x.nota,
     }));
+  }
+  // Publicaciones de redes de UMME (las manda cada semana el Mac de María): son de María
+  if (de("maria")) {
+    const ahora = new Intl.DateTimeFormat("sv-SE", { timeZone: "Europe/Madrid", dateStyle: "short", timeStyle: "short" }).format(new Date());
+    for (const p of publicaciones().lista) {
+      // Lo programado, pasada su hora, ya está publicado (sin esperar a la siguiente actualización)
+      const pasada = `${p.fecha} ${p.hora || "23:59"}` <= ahora;
+      const estado = p.estado === "programado" && pasada ? "publicado" : p.estado;
+      const icono = { publicado: "✅ Publicado", programado: "📅 Programado" }[estado] || "📲 Por publicar";
+      ev.push(...evento({
+        uid: "umme-" + p.id, fecha: p.fecha, hora: p.hora, sello,
+        titulo: `${icono}: ${p.titulo}`,
+        descripcion: [p.cuenta && "Cuenta: " + p.cuenta, p.detalle].filter(Boolean).join("\n\n"),
+      }));
+    }
   }
   const nombre = persona ? `Majosoft · ${PERSONAS[persona]}` : "Majosoft · Tareas";
   return ["BEGIN:VCALENDAR", "VERSION:2.0", "PRODID:-//Majosoft//Panel//ES", "CALSCALE:GREGORIAN", "METHOD:PUBLISH",
