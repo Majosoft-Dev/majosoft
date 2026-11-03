@@ -193,11 +193,17 @@
     .red small { display: block; font-size: 7.5pt; font-weight: 500; color: var(--muted); margin-top: .3mm; }
     .red svg { flex: none; width: 6.4mm; height: 6.4mm; padding: 1.3mm; border-radius: 50%; background: var(--ink); color: var(--lime); }
     .redes-nota { font-size: 8.5pt; color: var(--muted); margin: -2mm 0 5mm; }
-    .oferta { display: grid; grid-template-columns: 11mm 1fr; gap: 4mm; align-items: start; border: 2px solid var(--ink); border-radius: 4mm; padding: 5mm 6mm; margin: 4mm 0; background: #fbfcef; break-inside: avoid; }
-    .oferta .ic { width: 11mm; height: 11mm; border-radius: 3mm; background: var(--lime); display: grid; place-items: center; font-size: 15pt; }
-    .oferta small { font-weight: 800; letter-spacing: .12em; text-transform: uppercase; font-size: 7.5pt; color: var(--ink2); }
-    .oferta b { display: block; font-size: 12pt; margin: 1mm 0 1.5mm; }
-    .oferta p { margin: 0; font-size: 9.5pt; color: var(--ink2); line-height: 1.5; }
+    .oferta { position: relative; overflow: hidden; background: var(--ink); color: var(--cream); border-radius: 5mm; padding: 7mm 7mm 6mm; margin: 5mm 0; break-inside: avoid; }
+    .oferta::before { content: ""; position: absolute; right: -14mm; top: -14mm; width: 52mm; height: 52mm; border-radius: 50%; background: var(--lime); opacity: .16; }
+    .oferta::after { content: ""; position: absolute; right: 14mm; bottom: -20mm; width: 34mm; height: 34mm; border-radius: 50%; border: 2px solid var(--lime); opacity: .35; }
+    .oferta .top { position: relative; display: flex; align-items: center; gap: 3mm; margin-bottom: 3.5mm; }
+    .oferta .regalo { display: inline-flex; align-items: center; gap: 1.6mm; background: var(--lime); color: var(--ink); font-weight: 900; font-size: 8pt; letter-spacing: .14em; text-transform: uppercase; padding: 1.4mm 3.2mm; border-radius: 99px; }
+    .oferta small { font-weight: 700; letter-spacing: .12em; text-transform: uppercase; font-size: 7.5pt; color: #c9c9bd; }
+    .oferta b { position: relative; display: block; font-size: 19pt; line-height: 1.12; letter-spacing: -.02em; color: var(--lime); margin: 0 0 3mm; max-width: 140mm; }
+    .oferta p { position: relative; margin: 0; font-size: 10pt; color: #e4e3d8; line-height: 1.55; max-width: 150mm; }
+    .oferta .ventajas { position: relative; display: flex; flex-wrap: wrap; gap: 2mm; margin-top: 4.5mm; }
+    .oferta .ventajas > span { font-size: 8.5pt; font-weight: 700; padding: 1.6mm 3mm; border-radius: 99px; border: 1px solid rgba(214, 224, 34, .55); color: var(--cream); }
+    .oferta .ventajas > span::before { content: "✓ "; color: var(--lime); font-weight: 900; }
     table.tar { width: 100%; border-collapse: separate; border-spacing: 0; margin: 2mm 0 3mm; font-size: 9.5pt; break-inside: avoid; }
     table.tar th { font-size: 7pt; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); font-weight: 700; padding: 0 4mm 2mm; text-align: right; }
     table.tar th:first-child { text-align: left; }
@@ -504,7 +510,9 @@ function render() {
     ${D.tarifas?.filas?.length ? `<table class="tar"><thead><tr>${D.tarifas.cols.map(c => `<th>${esc(c)}</th>`).join("")}</tr></thead>
       <tbody>${D.tarifas.filas.map(f => `<tr>${f.map((c, j) => j === 0 ? `<td>${esc(c)}</td>` : `<td class="${c.dest ? "dest" : ""}"><b>${esc(c.precio)}</b><small>${esc(c.iva || "")}</small>${c.ahorro ? `<span class="ahorro">${esc(c.ahorro)}</span>` : ""}</td>`).join("")}</tr>`).join("")}</tbody></table>` : ""}
     ${P("cuota.texto", "Texto bajo la cuota (opcional)")}
-    ${D.oferta?.titulo ? `<div class="oferta"><div class="ic">🎁</div><div><small>${E("oferta.etiqueta", "Etiqueta", { def: "Oferta" })}</small>${E("oferta.titulo", "Título", { tag: "b" })}${E("oferta.texto", "Texto de la oferta", { tag: "p", multi: true })}</div></div>` : ""}` : `
+    ${D.oferta?.titulo ? `<div class="oferta"><div class="top"><span class="regalo">🎁 ${E("oferta.sello", "Sello", { def: "Regalo" })}</span>${E("oferta.etiqueta", "Etiqueta", { tag: "small" })}</div>
+      ${E("oferta.titulo", "Título", { tag: "b" })}${E("oferta.texto", "Texto de la oferta", { tag: "p", multi: true })}
+      ${D.oferta.ventajas?.length ? `<div class="ventajas">${D.oferta.ventajas.map((v, i) => `<span>${E(`oferta.ventajas.${i}`, "Ventaja")}</span>`).join("")}</div>` : ""}</div>` : ""}` : `
     <table class="sum">
       <thead><tr><th>${T("colModulo")}</th><th class="r">${T("colHoras")}</th><th class="r">${T("colPrecio")}</th></tr></thead>
       <tbody>
