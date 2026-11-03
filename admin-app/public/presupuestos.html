@@ -196,10 +196,13 @@
     .oferta { position: relative; overflow: hidden; background: var(--ink); color: var(--cream); border-radius: 4mm; padding: 4.5mm 5.5mm 4mm; margin: 3mm 0; break-inside: avoid; }
     .oferta::before { content: ""; position: absolute; right: -14mm; top: -14mm; width: 52mm; height: 52mm; border-radius: 50%; background: var(--lime); opacity: .16; }
     .oferta::after { content: ""; position: absolute; right: 14mm; bottom: -20mm; width: 34mm; height: 34mm; border-radius: 50%; border: 2px solid var(--lime); opacity: .35; }
-    .oferta.estirada { display: flex; flex-direction: column; justify-content: center; padding: 7mm 7mm; margin-bottom: 0; }
-    .oferta.estirada b { font-size: 17pt; margin-bottom: 2.5mm; }
-    .oferta.estirada p { font-size: 9.8pt; }
-    .oferta.estirada .ventajas { margin-top: 4.5mm; }
+    .oferta.estirada { display: flex; flex-direction: column; justify-content: space-evenly; gap: 4mm; padding: 8mm 8mm; margin-bottom: 0; }
+    .oferta.estirada .top, .oferta.estirada b, .oferta.estirada p, .oferta.estirada .ventajas { margin: 0; }
+    .oferta.estirada b { font-size: 18pt; line-height: 1.12; }
+    .oferta.estirada p { font-size: 10pt; line-height: 1.55; }
+    .oferta.estirada .ventajas { gap: 2.2mm; }
+    .oferta.estirada .ventajas > span { font-size: 8.6pt; padding: 1.8mm 3.4mm; }
+    .oferta.estirada .regalo { font-size: 8.6pt; padding: 1.8mm 3.6mm; }
     .oferta .top { position: relative; display: flex; align-items: center; gap: 3mm; margin-bottom: 2mm; }
     .oferta .regalo { display: inline-flex; align-items: center; gap: 1.6mm; background: var(--lime); color: var(--ink); font-weight: 900; font-size: 8pt; letter-spacing: .14em; text-transform: uppercase; padding: 1.4mm 3.2mm; border-radius: 99px; }
     .oferta small { font-weight: 700; letter-spacing: .12em; text-transform: uppercase; font-size: 7.5pt; color: #c9c9bd; }
@@ -668,8 +671,12 @@ function paginar() {
   pages.forEach(pg => {
     const b = pg.querySelector(".page-body"), of = b?.lastElementChild;
     if (!of?.classList.contains("oferta")) return;
-    const libre = b.getBoundingClientRect().bottom - of.getBoundingClientRect().bottom - parseFloat(getComputedStyle(b).paddingBottom || 0);
-    if (libre > 8) { of.style.minHeight = of.offsetHeight + libre - 2 + "px"; of.classList.add("estirada"); }
+    const hueco = () => b.getBoundingClientRect().bottom - of.getBoundingClientRect().bottom - parseFloat(getComputedStyle(b).paddingBottom || 0);
+    if (hueco() <= 8) return;
+    of.classList.add("estirada"); // texto más grande; si así no cabe, se queda como estaba
+    const libre = hueco();
+    if (libre < 0) return of.classList.remove("estirada");
+    of.style.minHeight = of.offsetHeight + libre - 2 + "px";
   });
   ajustarVista();
   flow.remove();
