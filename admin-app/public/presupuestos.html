@@ -204,7 +204,7 @@
     table.tar tr:first-child td.dest { border-radius: 3mm 3mm 0 0; }
     table.tar tr:last-child td.dest { border-radius: 0 0 3mm 3mm; }
     table.tar tr:last-child td { border-bottom: none; }
-    table.tar .ahorro { display: inline-block; margin-top: 1mm; font-size: 7.5pt; font-weight: 800; color: var(--ink); background: var(--lime); border-radius: 99px; padding: .6mm 2.2mm; }
+    table.tar .ahorro { display: inline-block; margin-top: 1mm; font-size: 7.5pt; font-weight: 700; color: var(--ink2); background: var(--cream); border-radius: 99px; padding: .6mm 2.2mm; }
     table.cmp { width: 100%; border-collapse: separate; border-spacing: 0; margin-top: 2mm; font-size: 9.5pt; break-inside: avoid; }
     table.cmp th { font-size: 7pt; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); font-weight: 700; padding: 0 4mm 2mm; text-align: left; }
     table.cmp td { padding: 2.6mm 4mm; border-bottom: 1px solid #eeede5; }
@@ -489,10 +489,10 @@ function render() {
 
     <h2 class="h2">${T("resumenTitulo")}</h2>
     ${D.cuota?.activo ? `
-    <div class="cuota">
+    ${D.tarifas?.filas?.length ? "" : /* con tabla de tarifas no se destaca un precio: eligen en la tabla */ `<div class="cuota">
       <div><small>${E("cuota.etiqueta", "Cuota mensual", { def: "" })}</small><p>${E("cuota.detalle", "Detalle")}</p></div>
       <div class="price">${E("cuota.precio", "75 €/mes")}<span class="pn">${E("cuota.nota", "IVA incluido")}</span></div>
-    </div>
+    </div>`}
     ${D.tarifas?.filas?.length ? `<table class="tar"><thead><tr>${D.tarifas.cols.map(c => `<th>${esc(c)}</th>`).join("")}</tr></thead>
       <tbody>${D.tarifas.filas.map(f => `<tr>${f.map((c, j) => j === 0 ? `<td>${esc(c)}</td>` : `<td class="${c.dest ? "dest" : ""}"><b>${esc(c.precio)}</b><small>${esc(c.iva || "")}</small>${c.ahorro ? `<span class="ahorro">${esc(c.ahorro)}</span>` : ""}</td>`).join("")}</tr>`).join("")}</tbody></table>` : ""}
     ${P("cuota.texto", "Texto bajo la cuota (opcional)")}` : `
@@ -515,7 +515,7 @@ function render() {
 
     <h2 class="h2">${T("pagoTitulo")}</h2>
     ${D.pagos?.opciones?.length ? `${D.pagos.intro ? E("pagos.intro", "Introducción", { tag: "p" }) : ""}
-      <div class="pagos">${D.pagos.opciones.map((o, i) => `<div class="pago${i === 0 ? " dest" : ""}"><div class="p-t">${E(`pagos.opciones.${i}.titulo`, "Opción")}</div><div class="p-i">${E(`pagos.opciones.${i}.importe`, "Importe")}</div><div class="p-d">${E(`pagos.opciones.${i}.detalle`, "Cuándo se paga", { multi: true })}</div></div>`).join("")}</div>
+      <div class="pagos">${D.pagos.opciones.map((o, i) => `<div class="pago${(o.destacar ?? i === 0) ? " dest" : ""}"><div class="p-t">${E(`pagos.opciones.${i}.titulo`, "Opción")}</div><div class="p-i">${E(`pagos.opciones.${i}.importe`, "Importe")}</div><div class="p-d">${E(`pagos.opciones.${i}.detalle`, "Cuándo se paga", { multi: true })}</div></div>`).join("")}</div>
       ${D.pagos.nota ? E("pagos.nota", "Nota", { tag: "p", cls: "pagos-nota", multi: true }) : ""}`
       : E("formaPago", "Forma de pago", { tag: "div", cls: "callout", multi: true })}
     ${D.bono.activo ? `
