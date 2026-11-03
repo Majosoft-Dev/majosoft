@@ -196,6 +196,10 @@
     .oferta { position: relative; overflow: hidden; background: var(--ink); color: var(--cream); border-radius: 4mm; padding: 4.5mm 5.5mm 4mm; margin: 3mm 0; break-inside: avoid; }
     .oferta::before { content: ""; position: absolute; right: -14mm; top: -14mm; width: 52mm; height: 52mm; border-radius: 50%; background: var(--lime); opacity: .16; }
     .oferta::after { content: ""; position: absolute; right: 14mm; bottom: -20mm; width: 34mm; height: 34mm; border-radius: 50%; border: 2px solid var(--lime); opacity: .35; }
+    .oferta.estirada { display: flex; flex-direction: column; justify-content: center; padding: 7mm 7mm; margin-bottom: 0; }
+    .oferta.estirada b { font-size: 17pt; margin-bottom: 2.5mm; }
+    .oferta.estirada p { font-size: 9.8pt; }
+    .oferta.estirada .ventajas { margin-top: 4.5mm; }
     .oferta .top { position: relative; display: flex; align-items: center; gap: 3mm; margin-bottom: 2mm; }
     .oferta .regalo { display: inline-flex; align-items: center; gap: 1.6mm; background: var(--lime); color: var(--ink); font-weight: 900; font-size: 8pt; letter-spacing: .14em; text-transform: uppercase; padding: 1.4mm 3.2mm; border-radius: 99px; }
     .oferta small { font-weight: 700; letter-spacing: .12em; text-transform: uppercase; font-size: 7.5pt; color: #c9c9bd; }
@@ -660,6 +664,13 @@ function paginar() {
     body.appendChild(b);
   }
   pages.forEach((pg, i) => pg.querySelector(".n").textContent = `Página ${i + 1} de ${pages.length}`);
+  // La oferta, si es lo último de su hoja, se estira hasta el final para no dejar hueco
+  pages.forEach(pg => {
+    const b = pg.querySelector(".page-body"), of = b?.lastElementChild;
+    if (!of?.classList.contains("oferta")) return;
+    const libre = b.getBoundingClientRect().bottom - of.getBoundingClientRect().bottom - parseFloat(getComputedStyle(b).paddingBottom || 0);
+    if (libre > 8) { of.style.minHeight = of.offsetHeight + libre - 2 + "px"; of.classList.add("estirada"); }
+  });
   ajustarVista();
   flow.remove();
 }
