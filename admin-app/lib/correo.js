@@ -42,7 +42,10 @@ export const estado = () => { const c = config(); return c ? { configurado: true
 
 function client(c = config()) {
   if (!c) throw Object.assign(new Error("El buzón no está conectado"), { status: 409 });
-  return new ImapFlow({ host: c.host, port: c.port, secure: true, auth: { user: c.user, pass: c.password }, logger: false, socketTimeout: 30000 });
+  const imap = new ImapFlow({ host: c.host, port: c.port, secure: true, auth: { user: c.user, pass: c.password }, logger: false, socketTimeout: 30000 });
+  // Sin este oyente, un timeout del socket es un 'error' sin capturar y tumba todo el panel
+  imap.on("error", e => console.error("correo (imap):", e.code || "", e.message));
+  return imap;
 }
 
 async function withBox(fn, c) {
