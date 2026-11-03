@@ -70,7 +70,7 @@ export async function mountShell(active) {
     <button class="side-toggle" aria-label="Menú">☰</button>
     <div class="side-body">
       <div class="side-sec">General</div>
-      <nav>${link("/admin/", "home", "Resumen", "home")}${link("/admin/tareas?vista=calendario", "calendario", "Calendario", "cal")}${link("/admin/tareas?vista=tablero", "tareas", "Tareas", "check")}</nav>
+      <nav>${link("/admin/", "home", "Resumen", "home")}${link("/admin/tareas", "calendario", "Calendario", "cal")}</nav>
       <div class="side-sec">Comercial</div>
       <nav>${link("/admin/presupuestos", "presupuestos", "Presupuestos", "doc")}${link("/admin/facturas", "facturas", "Facturas", "invoice")}${link("/admin/bonos", "bonos", "Bonos de horas", "clock")}</nav>
       <div class="side-sec">Comunicación</div>

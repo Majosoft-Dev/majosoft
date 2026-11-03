@@ -2,7 +2,7 @@
 import crypto from "node:crypto";
 import { db } from "./db.js";
 
-export const PERSONAS = { jose: "Jose", maria: "María" };
+export const PERSONAS = { jose: "Jose", maria: "María", majosoft: "Majosoft" };
 const FECHA = /^\d{4}-\d{2}-\d{2}$/;
 export const PERIODOS = { mensual: 1, trimestral: 3, semestral: 6, anual: 12 };
 
@@ -50,11 +50,15 @@ const plegar = linea => {
   return out.join("\r\n ");
 };
 
-function evento({ uid, fecha, titulo, descripcion, sello }) {
+function evento({ uid, fecha, hora, titulo, descripcion, sello }) {
   const fin = new Date(fecha + "T12:00Z"); fin.setUTCDate(fin.getUTCDate() + 1);
+  // Con hora: evento de 1 h en hora de Madrid; sin hora: de día completo
+  const h = /^\d{2}:\d{2}$/.test(hora || "") ? hora.replace(":", "") : "";
+  const hFin = h && String(Math.min(23, +h.slice(0, 2) + 1)).padStart(2, "0") + (+h.slice(0, 2) >= 23 ? "59" : h.slice(2));
   return [
     "BEGIN:VEVENT", `UID:${uid}@majosoft.es`, `DTSTAMP:${sello}`,
-    `DTSTART;VALUE=DATE:${dia(fecha)}`, `DTEND;VALUE=DATE:${dia(fin.toISOString().slice(0, 10))}`,
+    ...(h ? [`DTSTART;TZID=Europe/Madrid:${dia(fecha)}T${h}00`, `DTEND;TZID=Europe/Madrid:${dia(fecha)}T${hFin}00`]
+      : [`DTSTART;VALUE=DATE:${dia(fecha)}`, `DTEND;VALUE=DATE:${dia(fin.toISOString().slice(0, 10))}`]),
     `SUMMARY:${esc(titulo)}`, ...(descripcion ? [`DESCRIPTION:${esc(descripcion)}`] : []),
     "TRANSP:TRANSPARENT", "END:VEVENT",
   ];
@@ -77,14 +81,15 @@ export function fuentes() {
 // persona: "jose", "maria" o vacío para todas
 export function ics(persona) {
   const sello = new Date().toISOString().replace(/[-:]/g, "").replace(/\.\d+/, "");
-  const de = p => !persona || p === persona;
+  // El enlace de Jose o María incluye también lo de los dos (Majosoft o sin asignar)
+  const de = p => !persona || persona === "majosoft" || p === persona || !PERSONAS[p] || p === "majosoft";
   const ev = [];
   for (const t of docs("tareas")) {
     if (!FECHA.test(t.fecha || "") || !de(t.persona)) continue;
     const hecha = t.estado === "hecha";
     ev.push(...evento({
-      uid: "tarea-" + t.id, fecha: t.fecha, sello,
-      titulo: `${hecha ? "✓ " : ""}[${PERSONAS[t.persona] || "Sin asignar"}] ${t.titulo || "Tarea"}`,
+      uid: "tarea-" + t.id, fecha: t.fecha, hora: t.hora, sello,
+      titulo: `${hecha ? "✓ " : ""}[${PERSONAS[t.persona] || "Majosoft"}] ${t.titulo || "Tarea"}`,
       descripcion: [t.detalle, t.estado === "curso" ? "Estado: en curso" : hecha ? "Estado: hecha" : "Estado: pendiente"].filter(Boolean).join("\n\n"),
     }));
   }
