@@ -862,7 +862,7 @@ if (D) {
     const base = sub - Math.round(sub * pct) / 100;
     return Math.round((base * (1 + p.iva / 100) - base * Number(p.irpf || 0) / 100) * 100) / 100; };
   document.getElementById("prows").innerHTML = lista.length ? lista.map(p => `<tr data-id="${esc(p.id)}">
-    <td><b>${esc(p.titulo)}</b></td><td>${esc(p.cliente)}</td><td>${fecha(p.fecha)}</td><td class="r"><b>${eur(totalP(p))}</b></td>
+    <td><b>${esc(p.titulo)}</b></td><td>${esc(p.cliente)}</td><td>${fecha(p.fecha)}</td><td class="r"><b>${p.cuota?.activo && p.cuota.precio ? esc(p.cuota.precio) + (p.cuota.nota ? ` <small style="font-weight:500;color:var(--muted)">${esc(p.cuota.nota)}</small>` : "") : eur(totalP(p))}</b></td>
     <td class="r"><button class="del" data-del="${esc(p.id)}" title="Eliminar">✕</button></td></tr>`).join("")
     : `<tr><td colspan="5" class="empty">Aún no hay presupuestos. Crea uno nuevo o parte del ejemplo.</td></tr>`;
   document.getElementById("prows").onclick = async e => {
