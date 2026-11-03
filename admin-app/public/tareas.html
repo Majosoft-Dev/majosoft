@@ -58,6 +58,11 @@
     label.f { display: flex; flex-direction: column; gap: 5px; font-size: 12px; font-weight: 700; color: var(--muted); }
     label.f input, label.f textarea, label.f select { font: inherit; font-size: 14px; color: var(--ink); padding: 9px 11px; border: 1px solid var(--line); border-radius: 10px; background: #fcfcf8; font-weight: 500; }
     label.f textarea { min-height: 80px; resize: vertical; }
+    .imp-lista { max-height: 260px; overflow: auto; border: 1px solid var(--line); border-radius: 10px; }
+    .imp-lista label { display: grid; grid-template-columns: 18px 92px 1fr; gap: 8px; align-items: start; padding: 7px 10px; border-bottom: 1px solid #eeede5; font-size: 13px; cursor: pointer; }
+    .imp-lista label:last-child { border-bottom: 0; }
+    .imp-lista small { color: var(--muted); }
+    .hint { font-size: 12px; color: var(--muted); margin: 0; }
     .acts { display: flex; gap: 8px; justify-content: flex-end; margin-top: 4px; }
     .acts .btn--danger { margin-right: auto; }
     .vista { display: inline-flex; background: #fff; border: 1px solid var(--line); border-radius: 10px; padding: 3px; margin-bottom: 14px; }
@@ -96,7 +101,7 @@
   <main>
     <div class="page-head">
       <div><div class="crumbs">General</div><h1>Tareas</h1><p>Lo que tenemos pendiente y en curso, repartido entre Jose y María, con las renovaciones de los clientes.</p></div>
-      <div class="tools"><button class="btn" id="bCal">📅 Google Calendar</button><button class="btn btn--ink" id="bNew">+ Nueva tarea</button></div>
+      <div class="tools"><button class="btn" id="bImp">⬆ Importar eventos</button><button class="btn" id="bCal">📅 Google Calendar</button><button class="btn btn--ink" id="bNew">+ Nueva tarea</button></div>
     </div>
     <div class="card cal" id="cal" hidden></div>
     <div class="vista"><button data-v="calendario" class="on">📅 Calendario</button><button data-v="tablero">Tablero</button></div>
@@ -307,6 +312,81 @@ $("cols").addEventListener("click", async e => {
   const fila = e.target.closest(".t[data-id]");
   if (fila) editar(tareas.find(x => x.id === fila.dataset.id));
 });
+
+/* ===== Importar eventos de un calendario (.ics) ===== */
+// Lee los VEVENT de un .ics (Google Calendar, Outlook, Apple): título, fecha, hora y descripción
+function leerIcs(txt) {
+  const lineas = txt.replace(/\r?\n[ \t]/g, "").split(/\r?\n/), evs = [];
+  const des = v => v.replace(/\\n/gi, "\n").replace(/\\([,;\\])/g, "$1");
+  let ev = null;
+  for (const l of lineas) {
+    if (l === "BEGIN:VEVENT") { ev = {}; continue; }
+    if (l === "END:VEVENT") { if (ev?.fecha) evs.push(ev); ev = null; continue; }
+    if (!ev) continue;
+    const i = l.indexOf(":"); if (i < 0) continue;
+    const [nombre, ...params] = l.slice(0, i).split(";"), v = l.slice(i + 1);
+    if (nombre === "SUMMARY") ev.titulo = des(v).trim();
+    else if (nombre === "DESCRIPTION") ev.detalle = des(v).trim().slice(0, 2000);
+    else if (nombre === "LOCATION") ev.lugar = des(v).trim();
+    else if (nombre === "UID") ev.uid = v.trim();
+    else if (nombre === "RRULE") ev.repite = true;
+    else if (nombre === "STATUS" && v === "CANCELLED") ev.cancelado = true;
+    else if (nombre === "DTSTART") {
+      const m = v.match(/^(\d{4})(\d{2})(\d{2})(?:T(\d{2})(\d{2})\d{2}(Z?))?/); if (!m) continue;
+      if (!m[4]) { ev.fecha = `${m[1]}-${m[2]}-${m[3]}`; continue; }
+      // Hora UTC (Z) se pasa a la hora local; con TZID o sin zona se toma tal cual
+      const d = m[6] ? new Date(Date.UTC(+m[1], m[2] - 1, +m[3], +m[4], +m[5])) : new Date(+m[1], m[2] - 1, +m[3], +m[4], +m[5]);
+      ev.fecha = iso(d); ev.hora = `${String(d.getHours()).padStart(2, "0")}:${String(d.getMinutes()).padStart(2, "0")}`;
+    }
+  }
+  // Fuera los cancelados y los que vienen de nuestro propio calendario
+  return evs.filter(e => !e.cancelado && !/@majosoft\.es$/.test(e.uid || "")).sort((a, b) => a.fecha.localeCompare(b.fecha));
+}
+
+$("bImp").onclick = () => {
+  let evs = [];
+  $("frm").innerHTML = `<h2>Importar eventos</h2>
+    <p class="hint">Sube un archivo .ics. En Google Calendar: Configuración → Importar y exportar → Exportar (descarga un .zip con un .ics por calendario).</p>
+    <label class="f">Archivo de calendario (.ics)<input type="file" id="iFile" accept=".ics,text/calendar" /></label>
+    <div class="row"><label class="f">Asignar a<select id="iPer">${opts(PERSONAS, yo)}</select></label>
+      <label class="f">Desde<input type="date" id="iDesde" value="${hoy()}" /></label></div>
+    <div id="iLista"></div>
+    <div class="acts"><button type="button" class="btn" id="bCancel">Cancelar</button><button type="button" class="btn btn--ink" id="iOk" disabled>Importar</button></div>`;
+  const ya = new Set(tareas.map(t => t.origen).filter(Boolean));
+  const pintarLista = () => {
+    const desde = $("iDesde").value || "0000";
+    const vis = evs.filter(e => e.fecha >= desde);
+    $("iLista").innerHTML = !evs.length ? "" : vis.length ? `<p class="hint" style="margin-bottom:6px">${vis.length} eventos. Desmarca los que no quieras.${vis.some(e => e.repite) ? " Los repetitivos (🔁) se importan solo en su primera fecha." : ""}</p>
+      <div class="imp-lista">${vis.map(e => { const dup = ya.has(e.uid); return `<label><input type="checkbox" data-uid="${esc(e.uid || "")}" data-i="${evs.indexOf(e)}" ${dup ? "disabled" : "checked"} />
+        <span>${fecha(e.fecha)}${e.hora ? `<br><small>${e.hora}</small>` : ""}</span>
+        <span>${e.repite ? "🔁 " : ""}${esc(e.titulo || "(sin título)")}${dup ? " <small>· ya importado</small>" : ""}${e.lugar ? `<br><small>${esc(e.lugar)}</small>` : ""}</span></label>`; }).join("")}</div>`
+      : `<p class="hint">No hay eventos desde esa fecha.</p>`;
+    $("iOk").disabled = !$("iLista").querySelector("input:checked");
+  };
+  $("iFile").onchange = async () => {
+    const f = $("iFile").files[0]; if (!f) return;
+    evs = leerIcs(await f.text());
+    if (!evs.length) toast("No se han encontrado eventos en el archivo", true);
+    pintarLista();
+  };
+  $("iDesde").onchange = pintarLista;
+  $("iLista").onchange = () => $("iOk").disabled = !$("iLista").querySelector("input:checked");
+  $("bCancel").onclick = () => $("dlg").close();
+  $("iOk").onclick = async () => {
+    const elegidos = [...$("iLista").querySelectorAll("input:checked")].map(c => evs[+c.dataset.i]);
+    $("iOk").disabled = true;
+    let n = 0;
+    for (const e of elegidos) {
+      const t = { id: "t" + Date.now().toString(36) + Math.random().toString(36).slice(2, 5), titulo: e.titulo || "(sin título)",
+        detalle: [e.hora && "Hora: " + e.hora, e.lugar && "Lugar: " + e.lugar, e.detalle].filter(Boolean).join("\n"),
+        persona: $("iPer").value, estado: e.fecha < hoy() ? "hecha" : "pendiente", fecha: e.fecha, creada: Date.now(), origen: e.uid || undefined };
+      if (t.estado === "hecha") t.hechaEn = Date.now();
+      try { await put(t); tareas.push(t); n++; $("iOk").textContent = `Importando… ${n}/${elegidos.length}`; } catch (err) { toast(err.message, true); break; }
+    }
+    $("dlg").close(); pintar(); toast(`${n} ${n === 1 ? "evento importado" : "eventos importados"}`);
+  };
+  $("dlg").showModal();
+};
 
 /* ===== Conexión con Google Calendar (suscripción iCal) ===== */
 const url = p => `${location.origin}/admin/calendario/${ajustes.token}.ics${p ? "?persona=" + p : ""}`;
