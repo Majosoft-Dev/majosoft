@@ -50,7 +50,11 @@ function client(c = config()) {
 
 async function withBox(fn, c) {
   const imap = client(c);
-  await imap.connect();
+  try { await imap.connect(); }
+  catch (e) {
+    if (e.authenticationFailed) throw Object.assign(new Error("El servidor de correo rechaza la contraseña del buzón. Desconéctalo y vuelve a conectarlo con la contraseña actual."), { status: 409 });
+    throw e;
+  }
   try {
     const lock = await imap.getMailboxLock("INBOX");
     try { return await fn(imap); } finally { lock.release(); }
