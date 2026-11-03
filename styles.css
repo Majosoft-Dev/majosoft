@@ -540,3 +540,10 @@ body { overflow-x: hidden; cursor: none; background: #f5f4ec; }
 @media (prefers-reduced-motion: reduce) {
   .float-btn--whatsapp::after { animation: none; }
 }
+
+/* ===== Pantallas grandes: la web escala en proporción en vez de quedarse
+   pequeña y flotando en el centro (Tailwind trabaja en rem) ===== */
+@media (min-width: 1600px) { html { font-size: 17px; } }
+@media (min-width: 1920px) { html { font-size: 18px; } }
+@media (min-width: 2400px) { html { font-size: 21px; } }
+@media (min-width: 3000px) { html { font-size: 25px; } }
