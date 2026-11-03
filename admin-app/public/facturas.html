@@ -221,7 +221,7 @@
   </section>
 
 <script type="module">
-import { mountShell, api, autosaver, toast } from "/admin/panel.js";
+import { mountShell, api, autosaver, toast, confirmar } from "/admin/panel.js";
 await mountShell("facturas");
 // Fecha local en formato aaaa-mm-dd (toISOString usa UTC: en España, de 00:00 a 02:00 daba el día anterior)
 const isoLocal = (d = new Date()) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
@@ -542,7 +542,7 @@ formEl.addEventListener("change", async ev => {
   }
   if (ev.target.id === "emisorPropio") {
     if (ev.target.checked) { cur.emisor = structuredClone(EMISOR_G); cur.emisorPropio = true; }
-    else if (confirm("¿Volver a los datos globales? Se perderán los datos propios de esta factura.")) { cur.emisorPropio = false; cur.emisor = EMISOR_G; }
+    else if (await confirmar("¿Volver a los datos globales? Se perderán los datos propios de esta factura.")) { cur.emisorPropio = false; cur.emisor = EMISOR_G; }
     else { ev.target.checked = true; return; }
     form(); sheet(); save(); return;
   }
@@ -605,7 +605,7 @@ document.getElementById("rows").onclick = async ev => {
   if (del) {
     ev.stopPropagation();
     const f = store.find(x => x.id === del.dataset.delRow); if (!f) return;
-    if (!confirm(`¿Eliminar ${esRecibo(f) ? "el recibo" : "la factura"} ${f.numero || "sin número"} de ${f.cliente.nombre}?`)) return;
+    if (!await confirmar(`¿Eliminar ${esRecibo(f) ? "el recibo" : "la factura"} ${f.numero || "sin número"} de ${f.cliente.nombre}?`)) return;
     try { await api(`docs/facturas/${f.id}`, { method: "DELETE" }); store = store.filter(x => x.id !== f.id); toast(`${TIPO(f)} eliminado/a`); }
     catch (e) { toast(e.message, true); }
     panel(); return;
@@ -652,13 +652,13 @@ document.getElementById("bConvertir").onclick = async () => {
   await refrescar();
   const f = store.find(x => x.id === cur.id); if (!f || !esRecibo(f)) return;
   const numero = siguienteNumero(false), hoy = isoLocal();
-  if (!confirm(`Se emitirá la factura nº ${numero} con fecha ${fecha(hoy)}, marcada como pagada. ¿Continuar?`)) return;
+  if (!await confirmar(`Se emitirá la factura nº ${numero} con fecha ${fecha(hoy)}, marcada como pagada. ¿Continuar?`)) return;
   if (!f.conceptoPago || f.conceptoPago === `Recibo ${f.numero}`) delete f.conceptoPago;
   Object.assign(f, { tipo: "factura", reciboOrigen: f.numero, numero, fecha: hoy, estado: "pagada" });
   await put(f); toast(`Factura ${numero} emitida`); editar(f.id);
 };
 document.getElementById("bDel").onclick = async () => {
-  if (!confirm(`¿Eliminar ${esRecibo(cur) ? "el recibo" : "la factura"} ${cur.numero}?`)) return;
+  if (!await confirmar(`¿Eliminar ${esRecibo(cur) ? "el recibo" : "la factura"} ${cur.numero}?`)) return;
   await api(`docs/facturas/${cur.id}`, { method: "DELETE" });
   store = store.filter(f => f.id !== cur.id); toast("Factura eliminada"); panel();
 };
@@ -672,7 +672,7 @@ document.getElementById("bImport").onclick = () => file.click();
 file.onchange = async () => {
   try {
     const d = JSON.parse(await file.files[0].text()); if (!Array.isArray(d)) throw 0;
-    if (!confirm(`Se importarán ${d.length} facturas (las que tengan el mismo identificador se sobrescriben). ¿Continuar?`)) return;
+    if (!await confirmar(`Se importarán ${d.length} facturas (las que tengan el mismo identificador se sobrescriben). ¿Continuar?`)) return;
     // Las que llegan sin número reciben el siguiente correlativo
     await refrescar();
     d.forEach(f => { if (!String(f.numero ?? "").trim()) { f.numero = siguienteNumero(esRecibo(f)); store.push(f); } });

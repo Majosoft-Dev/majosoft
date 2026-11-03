@@ -109,10 +109,17 @@ function colocar(pop, r, maxAlto) {
   const real = pop.getBoundingClientRect();
   pop.style.top = top + (top - real.top) + "px"; pop.style.left = left + (left - real.left) + "px";
 }
+// Cierre con animación: la lista se desvanece y luego se oculta
+function cerrarPop(pop) {
+  if (!pop || pop.hidden || pop.classList.contains("cerrando")) return;
+  pop.classList.add("cerrando");
+  clearTimeout(pop._t); pop._t = setTimeout(() => { pop.hidden = true; pop.classList.remove("cerrando"); }, 120);
+}
+function abrirPop(pop) { clearTimeout(pop._t); pop.classList.remove("cerrando"); pop.hidden = false; pop.style.animation = "none"; pop.offsetWidth; pop.style.animation = ""; }
 function selCerrar() {
   if (!selActual) return;
   selActual.btn.classList.remove("open"); selActual.btn.setAttribute("aria-expanded", "false");
-  selPop.hidden = true; selActual = null;
+  cerrarPop(selPop); selActual = null;
 }
 function selElegir(sel, i) {
   if (sel.selectedIndex !== i) {
@@ -131,7 +138,7 @@ function selAbrir(sel, btn) {
   if (selPop.parentNode !== caja) caja.appendChild(selPop);
   const opts = [...sel.options];
   selPop.innerHTML = opts.map((o, i) => o.hidden ? "" : `<div class="mj-opt ${i === sel.selectedIndex ? "on" : ""} ${o.disabled ? "off" : ""}" data-i="${i}" role="option">${o.textContent.replace(/</g, "&lt;")}</div>`).join("");
-  selPop.hidden = false; selActual = { sel, btn, foco: sel.selectedIndex };
+  abrirPop(selPop); selActual = { sel, btn, foco: sel.selectedIndex };
   btn.classList.add("open"); btn.setAttribute("aria-expanded", "true");
   colocar(selPop, btn.getBoundingClientRect(), 300);
   selPop.querySelector(".on")?.scrollIntoView({ block: "nearest" });
@@ -203,7 +210,7 @@ new MutationObserver(ms => { for (const m of ms) for (const n of m.addedNodes) i
    al escribir se filtran, y se puede escribir un valor nuevo. */
 let sugPop, sugActual;
 const sinTildes = s => s.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase();
-function sugCerrar() { if (sugPop) sugPop.hidden = true; sugActual = null; }
+function sugCerrar() { cerrarPop(sugPop); sugActual = null; }
 function sugAbrir(inp, filtrar) {
   const dl = document.getElementById(inp.dataset.mjList);
   const todas = dl ? [...dl.options].map(o => o.value).filter(Boolean) : [];
@@ -214,7 +221,7 @@ function sugAbrir(inp, filtrar) {
   if (sugPop.parentNode !== caja) caja.appendChild(sugPop);
   if (!lista.length) return sugCerrar();
   sugPop.innerHTML = lista.slice(0, 200).map((v, i) => `<div class="mj-opt ${v === inp.value ? "on" : ""}" data-v="${v.replace(/&/g, "&amp;").replace(/"/g, "&quot;").replace(/</g, "&lt;")}" data-i="${i}">${v.replace(/&/g, "&amp;").replace(/</g, "&lt;")}</div>`).join("");
-  sugPop.hidden = false;
+  if (sugPop.hidden || sugPop.classList.contains("cerrando")) abrirPop(sugPop);
   sugActual = { inp, foco: -1 };
   colocar(sugPop, inp.getBoundingClientRect(), 280);
 }
@@ -256,3 +263,41 @@ const sugTodos = root => root.querySelectorAll?.("input[list]").forEach(sugMejor
 sugTodos(document);
 new MutationObserver(ms => { for (const m of ms) for (const n of m.addedNodes) if (n.nodeType === 1) n.matches?.("input[list]") ? sugMejorar(n) : sugTodos(n); })
   .observe(document.documentElement, { childList: true, subtree: true });
+
+/* ===== Avisos y confirmaciones propios (sustituyen alert y confirm del navegador) =====
+   await confirmar("¿Eliminar…?") → true/false. aviso("Texto") muestra un aviso con «Entendido». */
+function mjDialogo({ titulo, texto, ok = "Aceptar", cancelar, peligro }) {
+  return new Promise(resolve => {
+    const d = document.createElement("dialog");
+    d.className = "mj-dlg" + (peligro ? " peligro" : "");
+    const e = s => String(s ?? "").replace(/&/g, "&amp;").replace(/</g, "&lt;");
+    d.innerHTML = `<div class="mj-dlg-ic">${peligro ? "!" : "i"}</div>
+      <div class="mj-dlg-txt">${titulo ? `<b>${e(titulo)}</b>` : ""}<p>${e(texto)}</p></div>
+      <div class="mj-dlg-acts">${cancelar ? `<button type="button" class="mj-b" data-r="0">${e(cancelar)}</button>` : ""}<button type="button" class="mj-b mj-b-ok" data-r="1">${e(ok)}</button></div>`;
+    let hecho = false;
+    const fin = r => {
+      if (hecho) return; hecho = true;
+      d.classList.add("cerrando");
+      setTimeout(() => { d.close(); d.remove(); }, 140);
+      resolve(r);
+    };
+    d.addEventListener("click", ev => { const b = ev.target.closest("[data-r]"); if (b) fin(b.dataset.r === "1"); else if (ev.target === d) fin(false); });
+    d.addEventListener("cancel", ev => { ev.preventDefault(); fin(false); });
+    document.body.appendChild(d);
+    d.showModal();
+    d.querySelector(peligro ? "[data-r='0']" : "[data-r='1']")?.focus();
+  });
+}
+const PELIGRO = /eliminar|borrar|desconectar|dejará de funcionar|se perderán|sobrescrib/i;
+export const confirmar = (texto, o = {}) => mjDialogo({ texto, cancelar: "Cancelar", peligro: o.peligro ?? PELIGRO.test(texto),
+  ok: o.ok ?? (/^¿?\s*eliminar/i.test(texto) ? "Eliminar" : /desconectar/i.test(texto) ? "Desconectar" : "Continuar"), titulo: o.titulo });
+export const aviso = (texto, o = {}) => mjDialogo({ texto, ok: o.ok || "Entendido", titulo: o.titulo, peligro: o.peligro });
+window.alert = t => { aviso(String(t)); };
+
+/* ===== Animación al cambiar de página desde el menú (el menú se queda quieto) ===== */
+document.addEventListener("click", e => {
+  const a = e.target.closest?.(".side nav a"); if (!a || a.target === "_blank" || e.metaKey || e.ctrlKey) return;
+  a.closest("nav").querySelectorAll("a").forEach(x => x.classList.toggle("on", x === a));
+  document.querySelector("main")?.classList.add("mj-saliendo");
+});
+addEventListener("pageshow", () => document.querySelector("main")?.classList.remove("mj-saliendo"));

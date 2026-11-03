@@ -67,7 +67,7 @@
     </div>
   </main>
 <script type="module">
-import { mountShell, api, autosaver, toast } from "/admin/panel.js";
+import { mountShell, api, autosaver, toast, confirmar } from "/admin/panel.js";
 await mountShell("bonos");
 const $ = id => document.getElementById(id);
 const esc = s => String(s ?? "").replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
@@ -156,17 +156,17 @@ $("ed").addEventListener("click", async e => {
     await put(cur); toast(`Apuntado: ${hm(minutos)}`); lista(); editor(); return;
   }
   if (e.target.dataset.del != null) {
-    if (!confirm("¿Eliminar esta intervención?")) return;
+    if (!await confirmar("¿Eliminar esta intervención?")) return;
     cur.entradas.splice(+e.target.dataset.del, 1); await put(cur); lista(); editor(); return;
   }
   if (id === "bCopy") { await navigator.clipboard.writeText(enlace(cur)); toast("Enlace copiado"); return; }
   if (id === "bToken") {
-    if (!confirm("Se creará un enlace nuevo y el anterior dejará de funcionar. ¿Continuar?")) return;
+    if (!await confirmar("Se creará un enlace nuevo y el anterior dejará de funcionar. ¿Continuar?")) return;
     cur.token = token(); await put(cur); editor(); toast("Enlace cambiado"); return;
   }
   if (id === "compartido") { cur.compartido = e.target.checked; await put(cur); editor(); return; }
   if (id === "bDel") {
-    if (!confirm(`¿Eliminar el bono de ${cur.cliente || "este cliente"} con todas sus intervenciones?`)) return;
+    if (!await confirmar(`¿Eliminar el bono de ${cur.cliente || "este cliente"} con todas sus intervenciones?`)) return;
     await api(`docs/bonos/${cur.id}`, { method: "DELETE" });
     store = store.filter(b => b.id !== cur.id); cur = null; lista(); $("ed").innerHTML = `<div class="empty">Selecciona un bono.</div>`;
   }

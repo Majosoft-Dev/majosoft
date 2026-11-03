@@ -251,7 +251,7 @@
   </div>
 
 <script type="module">
-import { mountShell, api, autosaver, toast } from "/admin/panel.js";
+import { mountShell, api, autosaver, toast, confirmar } from "/admin/panel.js";
 await mountShell("presupuestos");
 // Fecha local en formato aaaa-mm-dd (toISOString usa UTC: en España, de 00:00 a 02:00 daba el día anterior)
 const isoLocal = (d = new Date()) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
@@ -714,11 +714,11 @@ ed.addEventListener("input", e => {
   set(p, t === "bool" ? el.checked : t === "num" ? (el.value === "" ? "" : Number(el.value)) : t === "lines" ? el.value.split("\n").map(s => s.trim()).filter(Boolean) : el.value);
   refresh(p === "auto");
 });
-ed.addEventListener("click", e => {
+ed.addEventListener("click", async e => {
   const b = e.target.closest("button"); if (!b) return;
   if (b.dataset.add) { get(b.dataset.add).push(NUEVOS[b.dataset.add]()); return refresh(true); }
   const arr = get(b.dataset.arr), i = +b.dataset.i;
-  if (b.dataset.act === "del" && confirm("¿Eliminar este elemento?")) arr.splice(i, 1);
+  if (b.dataset.act === "del" && await confirmar("¿Eliminar este elemento?")) arr.splice(i, 1);
   if (b.dataset.act === "up" && i > 0) [arr[i - 1], arr[i]] = [arr[i], arr[i - 1]];
   if (b.dataset.act === "down" && i < arr.length - 1) [arr[i + 1], arr[i]] = [arr[i], arr[i + 1]];
   refresh(true);
@@ -827,7 +827,7 @@ if (D) {
   document.getElementById("prows").onclick = async e => {
     const del = e.target.closest("[data-del]");
     if (del) {
-      if (!confirm("¿Eliminar este presupuesto?")) return;
+      if (!await confirmar("¿Eliminar este presupuesto?")) return;
       await api(`docs/presupuestos/${del.dataset.del}`, { method: "DELETE" });
       return location.reload();
     }

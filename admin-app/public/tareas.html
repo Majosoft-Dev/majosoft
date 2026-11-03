@@ -164,7 +164,7 @@
   </main>
   <dialog id="dlg"><form method="dialog" id="frm"></form></dialog>
 <script type="module">
-import { mountShell, api, toast } from "/admin/panel.js";
+import { mountShell, api, toast, confirmar } from "/admin/panel.js";
 const me = await mountShell("calendario");
 const $ = id => document.getElementById(id);
 const esc = s => String(s ?? "").replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
@@ -395,7 +395,7 @@ function editarRenov(r) {
       <button type="button" class="btn" id="bCancel">Cancelar</button><button class="btn btn--ink" value="ok">${nueva ? "Crear" : "Guardar"}</button></div>`;
   $("bCancel").onclick = () => $("dlg").close();
   if (!nueva) $("bDel").onclick = async () => {
-    if (!confirm("¿Eliminar esta renovación?")) return;
+    if (!await confirmar("¿Eliminar esta renovación?")) return;
     await api(`docs/renovaciones/${r.id}`, { method: "DELETE" });
     fichas = fichas.filter(x => x.id !== r.id); $("dlg").close(); pintar();
   };
@@ -453,7 +453,7 @@ function editar(t, dia = "") {
   };
   $("bCancel").onclick = () => $("dlg").close();
   if (!nueva) $("bDel").onclick = async () => {
-    if (!confirm("¿Eliminar esta tarea?")) return;
+    if (!await confirmar("¿Eliminar esta tarea?")) return;
     await api(`docs/tareas/${t.id}`, { method: "DELETE" });
     tareas = tareas.filter(x => x.id !== t.id); $("dlg").close(); pintar();
   };
@@ -566,7 +566,7 @@ $("bCal").onclick = () => { $("cal").hidden = !$("cal").hidden; pintarCal(); };
 $("cal").addEventListener("click", async e => {
   if (e.target.dataset.copy != null) { await navigator.clipboard.writeText(url(e.target.dataset.copy)); return toast("Enlace copiado"); }
   if (e.target.id === "bTok") {
-    if (ajustes.token && !confirm("El enlace anterior dejará de funcionar y habrá que volver a añadirlo en Google Calendar. ¿Continuar?")) return;
+    if (ajustes.token && !await confirmar("El enlace anterior dejará de funcionar y habrá que volver a añadirlo en Google Calendar. ¿Continuar?")) return;
     ajustes.token = token();
     try { await api("docs/ajustes/calendario", { method: "PUT", body: ajustes }); } catch (err) { return toast(err.message, true); }
     pintarCal(); toast("Enlace listo");

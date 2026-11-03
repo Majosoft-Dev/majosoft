@@ -114,7 +114,7 @@
   </div>
 
 <script type="module">
-import { mountShell, api, toast } from "/admin/panel.js";
+import { mountShell, api, toast, confirmar } from "/admin/panel.js";
 await mountShell("correo");
 const $ = id => document.getElementById(id);
 const esc = s => String(s ?? "").replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
@@ -189,7 +189,7 @@ $("pager").onclick = e => { const b = e.target.closest("[data-p]"); if (b && !b.
 $("fSearch").onsubmit = e => { e.preventDefault(); buscar = $("q").value.trim(); pagina = 1; cargar(); };
 $("bReload").onclick = () => cargar();
 $("bDisconnect").onclick = async () => {
-  if (!confirm("¿Desconectar el buzón del panel? Se borrará la contraseña guardada.")) return;
+  if (!await confirmar("¿Desconectar el buzón del panel? Se borrará la contraseña guardada.")) return;
   await api("correo/config", { method: "DELETE" }); toast("Buzón desconectado"); inicio();
 };
 $("fConnect").onsubmit = async e => {
