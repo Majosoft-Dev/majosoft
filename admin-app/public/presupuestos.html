@@ -193,6 +193,11 @@
     .red small { display: block; font-size: 7.5pt; font-weight: 500; color: var(--muted); margin-top: .3mm; }
     .red svg { flex: none; width: 6.4mm; height: 6.4mm; padding: 1.3mm; border-radius: 50%; background: var(--ink); color: var(--lime); }
     .redes-nota { font-size: 8.5pt; color: var(--muted); margin: -2mm 0 5mm; }
+    .oferta { display: grid; grid-template-columns: 11mm 1fr; gap: 4mm; align-items: start; border: 2px solid var(--ink); border-radius: 4mm; padding: 5mm 6mm; margin: 4mm 0; background: #fbfcef; break-inside: avoid; }
+    .oferta .ic { width: 11mm; height: 11mm; border-radius: 3mm; background: var(--lime); display: grid; place-items: center; font-size: 15pt; }
+    .oferta small { font-weight: 800; letter-spacing: .12em; text-transform: uppercase; font-size: 7.5pt; color: var(--ink2); }
+    .oferta b { display: block; font-size: 12pt; margin: 1mm 0 1.5mm; }
+    .oferta p { margin: 0; font-size: 9.5pt; color: var(--ink2); line-height: 1.5; }
     table.tar { width: 100%; border-collapse: separate; border-spacing: 0; margin: 2mm 0 3mm; font-size: 9.5pt; break-inside: avoid; }
     table.tar th { font-size: 7pt; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); font-weight: 700; padding: 0 4mm 2mm; text-align: right; }
     table.tar th:first-child { text-align: left; }
@@ -498,7 +503,8 @@ function render() {
     </div>`}
     ${D.tarifas?.filas?.length ? `<table class="tar"><thead><tr>${D.tarifas.cols.map(c => `<th>${esc(c)}</th>`).join("")}</tr></thead>
       <tbody>${D.tarifas.filas.map(f => `<tr>${f.map((c, j) => j === 0 ? `<td>${esc(c)}</td>` : `<td class="${c.dest ? "dest" : ""}"><b>${esc(c.precio)}</b><small>${esc(c.iva || "")}</small>${c.ahorro ? `<span class="ahorro">${esc(c.ahorro)}</span>` : ""}</td>`).join("")}</tr>`).join("")}</tbody></table>` : ""}
-    ${P("cuota.texto", "Texto bajo la cuota (opcional)")}` : `
+    ${P("cuota.texto", "Texto bajo la cuota (opcional)")}
+    ${D.oferta?.titulo ? `<div class="oferta"><div class="ic">🎁</div><div><small>${E("oferta.etiqueta", "Etiqueta", { def: "Oferta" })}</small>${E("oferta.titulo", "Título", { tag: "b" })}${E("oferta.texto", "Texto de la oferta", { tag: "p", multi: true })}</div></div>` : ""}` : `
     <table class="sum">
       <thead><tr><th>${T("colModulo")}</th><th class="r">${T("colHoras")}</th><th class="r">${T("colPrecio")}</th></tr></thead>
       <tbody>
