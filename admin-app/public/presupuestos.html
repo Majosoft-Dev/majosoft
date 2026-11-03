@@ -189,7 +189,8 @@
     .pagos-nota { font-size: 8pt; color: var(--muted); margin-top: 2.5mm; }
     .redes { display: flex; flex-wrap: wrap; gap: 2.5mm; margin: 1mm 0 5mm; break-inside: avoid; }
     .red { display: inline-flex; align-items: center; gap: 2mm; padding: 2mm 3.6mm 2mm 2.4mm; border-radius: 99px; background: var(--cream); font-size: 9pt; font-weight: 700; }
-    .red svg { width: 5.2mm; height: 5.2mm; padding: 1mm; border-radius: 50%; background: var(--ink); color: var(--lime); }
+    .red small { display: block; font-size: 7.5pt; font-weight: 500; color: var(--muted); margin-top: .3mm; }
+    .red svg { flex: none; width: 5.2mm; height: 5.2mm; padding: 1mm; border-radius: 50%; background: var(--ink); color: var(--lime); }
     .redes-nota { font-size: 8.5pt; color: var(--muted); margin: -2mm 0 5mm; }
     table.tar { width: 100%; border-collapse: separate; border-spacing: 0; margin: 2mm 0 3mm; font-size: 9.5pt; break-inside: avoid; }
     table.tar th { font-size: 7pt; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); font-weight: 700; padding: 0 4mm 2mm; text-align: right; }
@@ -204,6 +205,7 @@
     table.tar tr:first-child td.dest { border-radius: 3mm 3mm 0 0; }
     table.tar tr:last-child td.dest { border-radius: 0 0 3mm 3mm; }
     table.tar tr:last-child td { border-bottom: none; }
+    table.tar td.dest .ahorro { background: var(--lime); color: var(--ink); font-weight: 800; }
     table.tar .ahorro { display: inline-block; margin-top: 1mm; font-size: 7.5pt; font-weight: 700; color: var(--ink2); background: var(--cream); border-radius: 99px; padding: .6mm 2.2mm; }
     table.cmp { width: 100%; border-collapse: separate; border-spacing: 0; margin-top: 2mm; font-size: 9.5pt; break-inside: avoid; }
     table.cmp th { font-size: 7pt; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); font-weight: 700; padding: 0 4mm 2mm; text-align: left; }
@@ -470,7 +472,7 @@ function render() {
       ${D.cifras.nota ? E("cifras.nota", "Nota", { tag: "p", cls: "cmp-nota", multi: true }) : ""}` : ""}
 
     ${D.redes?.items?.length ? `<h2 class="h2">${E("redes.titulo", "Título", { def: "Redes que gestionamos" })}</h2>
-      <div class="redes">${D.redes.items.map(k => `<span class="red">${redIcono(k)}${esc(REDES[k]?.[0] || k)}</span>`).join("")}</div>
+      <div class="redes">${D.redes.items.map(it => { const [k, que] = String(it).split("|").map(x => x.trim()); return `<span class="red">${redIcono(k)}<span>${esc(REDES[k]?.[0] || k)}${que ? `<small>${esc(que)}</small>` : ""}</span></span>`; }).join("")}</div>
       ${D.redes.nota ? E("redes.nota", "Nota", { tag: "p", cls: "redes-nota", multi: true }) : ""}` : ""}
 
     <h2 class="h2">${E("modulosTitulo", "Título", { def: "Módulos del proyecto" })}</h2>
@@ -634,9 +636,12 @@ function paginar() {
         if (!llena()) continue;
       }
     }
-    const prev = b.previousElementSibling;
+    // El título (y su párrafo de introducción, si lo hay) pasa a la hoja siguiente con el bloque
+    const prev = b.previousElementSibling, prev2 = prev?.previousElementSibling;
+    const conIntro = prev && prev.tagName === "P" && prev2?.classList.contains("h2") && body.children.length > 3;
     body = nueva();
-    if (prev && prev.classList.contains("h2")) body.appendChild(prev);
+    if (conIntro) { body.appendChild(prev2); body.appendChild(prev); }
+    else if (prev && prev.classList.contains("h2")) body.appendChild(prev);
     body.appendChild(b);
   }
   pages.forEach((pg, i) => pg.querySelector(".n").textContent = `Página ${i + 1} de ${pages.length}`);
@@ -671,7 +676,7 @@ function buildEditor() {
       ${txt("Objetivo del proyecto", "objetivo", { type: "area" })}<div class="hint">Separa párrafos con una línea en blanco</div>
       ${txt("Título del bloque de ventajas", "porqueTitulo")}${txt("Introducción", "porqueIntro", { type: "area" })}
       ${txt("Ventajas", "porque", { type: "lines", h: 160 })}
-      ${txt("Redes sociales (iconos)", "redes.items", { type: "lines", h: 90 })}<div class="hint">Una por línea: ${Object.keys(REDES).join(", ")}</div>
+      ${txt("Redes sociales (iconos)", "redes.items", { type: "lines", h: 90 })}<div class="hint">Una por línea: ${Object.keys(REDES).join(", ")}. Para indicar qué se sube: «instagram | Reels · Carruseles»</div>
       ${txt("Nota bajo las redes", "redes.nota")}<div class="hint">Usa «Título: explicación» para destacar el título</div>`, o("Objetivo y enfoque")) +
     sec("Módulos", D.modulos.map((m, i) => `<div class="item">${head("Módulo " + String(i + 1).padStart(2, "0"), "modulos", i)}
       ${txt("Título", `modulos.${i}.titulo`)}
