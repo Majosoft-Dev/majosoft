@@ -149,8 +149,9 @@
     .renovs td small { display: block; color: var(--muted); }
     @media (max-width: 900px) { .dia { min-height: 70px; } .ev { font-size: 10px; } .renovs .opc { display: none; } }
     @media (max-width: 900px) { main { padding: 24px 16px 40px; } .mes-head { flex-wrap: wrap; } }
-      .ev.umme { background: #fde8f1; color: #8a1c4a; } .leyenda i.umme, .tip .k.umme i { background: #e0559a; }
-</style>
+    .ev.umme { --c-bg: #fde8f1; --c-fg: #8a1c4a; --c-bar: #e0559a; cursor: default; }
+    i.umme, .tip .umme { --c-bar: #e0559a; } i.umme { background: #e0559a; }
+  </style>
 </head>
 <body>
   <main>
@@ -335,6 +336,7 @@ $("mes").addEventListener("click", e => {
   if (ev) ocultarTip();
   if (ev?.dataset.id) return editar(tareas.find(t => t.id === ev.dataset.id));
   if (ev?.dataset.ren) return editarRenov(fichas.find(r => r.id === ev.dataset.ren));
+  if (ev?.dataset.umme) return; // publicación de redes: solo se consulta (ficha al pasar el ratón)
   if (ev?.dataset.pre) return location.href = "/admin/presupuestos?id=" + encodeURIComponent(ev.dataset.pre);
   const dia = e.target.closest("[data-dia]");
   if (dia) editar(null, dia.dataset.dia);
@@ -353,7 +355,7 @@ $("mes").addEventListener("mouseover", e => {
       ${t.sub?.length ? `<ul>${t.sub.slice(0, 8).map(x => `<li class="${x.hecha ? "ok" : ""}">${x.hecha ? "☑" : "☐"} ${esc(x.texto)}</li>`).join("")}${t.sub.length > 8 ? `<li>… y ${t.sub.length - 8} más</li>` : ""}</ul>` : ""}`;
   } else if (ev.dataset.umme) {
     const p = umme.find(x => x.id === ev.dataset.umme); if (!p) return;
-    h = `<b>${esc(p.titulo)}</b><div class="m">${fLarga(p.fecha)}</div>${p.detalle ? `<p>${esc(p.detalle)}</p>` : ""}`;
+    h = `<div class="k umme"><i></i>Redes UMME${p.cuenta ? " · " + esc(p.cuenta) : ""}</div><b>${esc(p.titulo)}</b><div class="m">${fLarga(p.fecha)}${p.hora ? " · " + p.hora : ""}</div>${p.detalle ? `<p>${esc(p.detalle)}</p>` : ""}`;
   } else {
     const r = fuentes().find(x => ev.dataset.ren ? x.ficha?.id === ev.dataset.ren : x.presupuesto?.id === ev.dataset.pre); if (!r) return;
     h = `<div class="k renov"><i></i>Renovación ${r.tipo} · ${PERSONAS[persona(r.persona)]}</div><b>${esc(r.titulo)}</b>
