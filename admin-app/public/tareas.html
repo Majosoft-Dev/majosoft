@@ -1,0 +1,579 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Calendario · Panel Majosoft</title>
+  <meta name="robots" content="noindex, nofollow" />
+  <link rel="icon" type="image/svg+xml" href="/assets/favicon.svg" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/admin/panel.css" />
+  <style>
+    * { box-sizing: border-box; }
+    body { margin: 0; font-family: Inter, system-ui, sans-serif; background: var(--cream); color: var(--ink); font-size: 14px; }
+    main { max-width: 1180px; padding: 34px 32px 60px; }
+    .btn { display: inline-flex; align-items: center; gap: 6px; padding: 9px 15px; border-radius: 10px; border: 1px solid var(--line); background: #fff; color: var(--ink); font: inherit; font-weight: 700; font-size: 13px; cursor: pointer; text-decoration: none; }
+    .btn:hover { border-color: var(--ink); }
+    .btn--ink { background: var(--ink); color: var(--cream); border-color: var(--ink); }
+    .btn--danger:hover { border-color: var(--bad); color: var(--bad); }
+    .tools { display: flex; gap: 8px; flex-wrap: wrap; }
+    .card { background: #fff; border: 1px solid var(--line); border-radius: 16px; overflow: hidden; }
+    .tag { font-size: 11.5px; font-weight: 700; padding: 3px 8px; border-radius: 99px; background: var(--cream); white-space: nowrap; }
+    .tag.curso { background: #f3f4dc; }
+    .tag.tarde { background: #fde7e5; color: var(--bad); }
+    .tag.hoy { background: #fff1d6; color: var(--warn); }
+    .empty { padding: 10px 16px 14px; color: var(--muted); font-size: 13px; }
+    .cal { padding: 16px 18px; margin-bottom: 14px; }
+    .cal h2 { font-size: 15px; margin: 0 0 4px; }
+    .cal p { margin: 0 0 12px; color: var(--muted); font-size: 13px; }
+    .cal .url { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; background: #f3f4dc; border-radius: 10px; padding: 9px 12px; margin-bottom: 8px; }
+    .cal .url b { width: 70px; font-size: 12.5px; }
+    .cal .url code { flex: 1; min-width: 200px; font-size: 12px; word-break: break-all; }
+    .cal ol { margin: 10px 0 0; padding-left: 20px; color: var(--muted); font-size: 13px; line-height: 1.6; }
+    dialog { border: 0; border-radius: 16px; padding: 0; width: min(520px, 94vw); box-shadow: 0 20px 60px rgba(0,0,0,.25); }
+    dialog::backdrop { background: rgba(21,22,26,.4); }
+    dialog form { padding: 22px 24px; display: grid; gap: 12px; }
+    dialog h2 { margin: 0; font-size: 18px; }
+    .row { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 10px; }
+    label.f { display: flex; flex-direction: column; gap: 5px; font-size: 12px; font-weight: 700; color: var(--muted); }
+    label.f input, label.f textarea, label.f select { font: inherit; font-size: 14px; color: var(--ink); padding: 9px 11px; border: 1px solid var(--line); border-radius: 10px; background: #fcfcf8; font-weight: 500; }
+    label.f textarea { min-height: 80px; resize: vertical; }
+    .imp-lista { max-height: 260px; overflow: auto; border: 1px solid var(--line); border-radius: 10px; }
+    .imp-lista label { display: grid; grid-template-columns: 18px 92px 1fr; gap: 8px; align-items: start; padding: 7px 10px; border-bottom: 1px solid #eeede5; font-size: 13px; cursor: pointer; }
+    .imp-lista label:last-child { border-bottom: 0; }
+    .imp-lista small { color: var(--muted); }
+    .hint { font-size: 12px; color: var(--muted); margin: 0; }
+    .acts { display: flex; gap: 8px; justify-content: flex-end; margin-top: 4px; }
+    .acts .btn--danger { margin-right: auto; }
+    .filtro { display: inline-flex; background: var(--cream); border-radius: 10px; padding: 3px; gap: 2px; }
+    .filtro button { display: inline-flex; align-items: center; gap: 6px; border: 0; background: none; font: inherit; font-weight: 700; font-size: 13px; padding: 6px 12px; border-radius: 8px; cursor: pointer; color: var(--muted); transition: background .15s, color .15s; }
+    .filtro button:hover { color: var(--ink); }
+    .filtro button.on { background: #fff; color: var(--ink); box-shadow: 0 1px 3px rgba(21,22,26,.12); }
+    .filtro i { width: 9px; height: 9px; border-radius: 3px; }
+    .mes-head { display: flex; align-items: center; gap: 8px; padding: 12px 16px; border-bottom: 1px solid var(--line); }
+    .mes-head h2 { font-size: 16px; margin: 0 auto 0 0; }
+    .leyenda { display: flex; gap: 12px; font-size: 12px; color: var(--muted); font-weight: 600; margin-right: 8px; }
+    .leyenda i { display: inline-block; width: 9px; height: 9px; border-radius: 3px; margin-right: 4px; }
+    .mes { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); }
+    .mes .dsem { font-size: 11px; font-weight: 700; color: var(--muted); text-transform: uppercase; padding: 8px; border-bottom: 1px solid var(--line); }
+    .dia { position: relative; min-height: 124px; border-right: 1px solid #eeede5; border-bottom: 1px solid #eeede5; padding: 6px 6px 8px; cursor: pointer; transition: background .15s; }
+    .dia:nth-child(7n) { border-right: 0; }
+    .dia:hover { background: #fafaf5; }
+    .dia.fuera { background: #fbfbf7; }
+    .dia.fuera .n { color: #b3b2a8; }
+    .dia.finde { background: #fcfcf9; }
+    .dia .n { font-size: 12px; font-weight: 700; margin: 0 0 5px 2px; display: inline-block; min-width: 22px; height: 22px; line-height: 22px; text-align: center; border-radius: 99px; }
+    .dia.hoy .n { background: var(--ink); color: var(--cream); }
+    .dia .mas { position: absolute; top: 6px; right: 6px; width: 22px; height: 22px; border-radius: 7px; border: 0; background: var(--ink); color: var(--cream); font-weight: 800; font-size: 14px; line-height: 22px; cursor: pointer; opacity: 0; transform: scale(.85); transition: opacity .15s, transform .15s; }
+    .dia:hover .mas { opacity: 1; transform: none; }
+    .ev { position: relative; display: flex; align-items: center; gap: 5px; font-size: 11.5px; font-weight: 600; padding: 3px 7px 3px 9px; border-radius: 6px; margin-bottom: 3px; white-space: nowrap; overflow: hidden; background: var(--c-bg); color: var(--c-fg); cursor: pointer;
+      transition: transform .12s, box-shadow .12s, filter .12s; }
+    .ev::before { content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 3px; background: var(--c-bar); }
+    .ev span { overflow: hidden; text-overflow: ellipsis; }
+    .ev time { font-size: 10.5px; font-weight: 700; opacity: .7; flex: none; }
+    .ev:hover { transform: translateY(-1px); box-shadow: 0 3px 10px rgba(21,22,26,.14); filter: saturate(1.15) brightness(.98); z-index: 2; }
+    .ev.jose { --c-bg: #e3edfc; --c-fg: #17386b; --c-bar: #3b74d4; }
+    .ev.maria { --c-bg: #eef1cf; --c-fg: #474d07; --c-bar: #9aa60a; }
+    .ev.renov { --c-bg: #fff0d4; --c-fg: #6e4300; --c-bar: #e09a1b; }
+    .ev.hecha { opacity: .5; }
+    .ev.hecha span { text-decoration: line-through; }
+    .ev.tarde { --c-bar: var(--bad); }
+    .ev.majosoft { --c-bg: #ebe7f7; --c-fg: #3b2d6e; --c-bar: #6b55c9; }
+    i.jose { background: #3b74d4; } i.maria { background: #9aa60a; } i.majosoft { background: #6b55c9; } i.renov { background: #e09a1b; }
+    .dia .otros { font-size: 11px; font-weight: 700; color: var(--muted); padding: 1px 4px; border: 0; background: none; cursor: pointer; border-radius: 5px; }
+    .dia .otros:hover { color: var(--ink); background: var(--cream); }
+    .dia.abierto { z-index: 3; }
+    .tip { position: fixed; z-index: 50; width: 270px; background: #fff; border: 1px solid var(--line); border-radius: 12px; box-shadow: 0 14px 40px rgba(21,22,26,.18); padding: 12px 14px; pointer-events: none; opacity: 0; transform: translateY(4px); transition: opacity .12s, transform .12s; }
+    .tip.on { opacity: 1; transform: none; }
+    .tip .k { display: flex; align-items: center; gap: 6px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; color: var(--muted); }
+    .tip .k i { width: 8px; height: 8px; border-radius: 3px; background: var(--c-bar); }
+    .tip b { display: block; font-size: 14px; margin: 5px 0 3px; line-height: 1.3; }
+    .tip .m { font-size: 12.5px; color: var(--ink2); }
+    .tip p { font-size: 12.5px; color: var(--muted); margin: 7px 0 0; white-space: pre-line; max-height: 120px; overflow: hidden; }
+    .tip .majosoft { --c-bar: #6b55c9; } .tip .jose { --c-bar: #3b74d4; } .tip .maria { --c-bar: #9aa60a; } .tip .renov { --c-bar: #e09a1b; }
+    .lista { margin-top: 14px; }
+    .lista .mes-head h2 { text-transform: none; }
+    .lista .resumen { font-size: 12.5px; color: var(--muted); font-weight: 600; margin-right: 8px; }
+    .gr { border-bottom: 1px solid #eeede5; }
+    .gr:last-child { border-bottom: 0; }
+    .gr > h3, .gr > summary { display: flex; align-items: center; gap: 8px; margin: 0; padding: 12px 16px 6px; font-size: 11.5px; font-weight: 800; letter-spacing: .05em; text-transform: uppercase; color: var(--muted); list-style: none; }
+    .gr > summary { cursor: pointer; padding-bottom: 12px; }
+    .gr > summary::-webkit-details-marker { display: none; }
+    .gr > summary::before { content: "▸"; transition: transform .15s; }
+    .gr[open] > summary::before { transform: rotate(90deg); }
+    .gr h3 .c, .gr summary .c { background: var(--cream); color: var(--ink); border-radius: 99px; padding: 1px 8px; font-size: 11px; letter-spacing: 0; }
+    .gr.tarde h3 { color: var(--bad); } .gr.tarde h3 .c { background: #fde7e5; color: var(--bad); }
+    .gr.hoy h3 { color: var(--warn); } .gr.hoy h3 .c { background: #fff1d6; color: var(--warn); }
+    .ti { display: grid; grid-template-columns: 20px 1fr auto; gap: 12px; align-items: center; padding: 9px 16px 9px 13px; border-left: 3px solid transparent; cursor: pointer; transition: background .12s, border-color .12s; }
+    .ti:hover { background: #fafaf5; border-left-color: var(--c-bar); }
+    .ti.jose { --c-bar: #3b74d4; } .ti.maria { --c-bar: #9aa60a; } .ti.majosoft { --c-bar: #6b55c9; }
+    .ti input { width: 17px; height: 17px; margin: 0; accent-color: var(--ink); cursor: pointer; }
+    .ti b { display: block; font-weight: 600; font-size: 14px; }
+    .ti small { display: block; color: var(--muted); font-size: 12.5px; margin-top: 1px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .ti.hecha b { text-decoration: line-through; color: var(--muted); }
+    .ti .meta { display: flex; align-items: center; gap: 6px; }
+    .quien { display: inline-flex; align-items: center; gap: 5px; font-size: 11.5px; font-weight: 700; padding: 3px 8px; border-radius: 99px; background: var(--cream); white-space: nowrap; }
+    .quien i { width: 7px; height: 7px; border-radius: 2px; background: var(--c-bar); }
+    .est { font-size: 11px; font-weight: 800; padding: 3px 7px; border-radius: 6px; background: #f3f4dc; color: #474d07; text-transform: uppercase; letter-spacing: .04em; }
+    .lista .vacio { padding: 28px 16px; text-align: center; color: var(--muted); }
+    .prog { display: inline-flex; align-items: center; gap: 5px; font-size: 11.5px; font-weight: 700; padding: 3px 8px; border-radius: 99px; border: 1px solid var(--line); background: #fff; color: var(--ink2); cursor: pointer; white-space: nowrap; }
+    .prog:hover { border-color: var(--ink); }
+    .prog .bar { width: 34px; height: 4px; border-radius: 9px; background: #e4e3d8; overflow: hidden; }
+    .prog .bar i { display: block; height: 100%; background: var(--ok); }
+    .prog.abierto::after { content: "▴"; } .prog:not(.abierto)::after { content: "▾"; }
+    .subs { padding: 0 16px 10px 48px; }
+    .sub { display: flex; align-items: center; gap: 9px; padding: 4px 0; font-size: 13.5px; cursor: pointer; }
+    .sub input { width: 15px; height: 15px; margin: 0; accent-color: var(--ink); cursor: pointer; }
+    .sub.ok span { text-decoration: line-through; color: var(--muted); }
+    .ed-subs { display: grid; gap: 6px; }
+    .ed-sub { display: grid; grid-template-columns: 18px 1fr 26px; gap: 8px; align-items: center; }
+    .ed-sub input[type=checkbox] { width: 16px; height: 16px; margin: 0; accent-color: var(--ink); }
+    .ed-sub input[type=text], .ed-nueva { font: inherit; font-size: 14px; color: var(--ink); padding: 7px 10px; border: 1px solid var(--line); border-radius: 9px; background: #fcfcf8; width: 100%; }
+    .ed-sub.ok input[type=text] { text-decoration: line-through; color: var(--muted); }
+    .ed-sub button { border: 0; background: none; cursor: pointer; color: var(--muted); font-size: 14px; border-radius: 6px; height: 26px; }
+    .ed-sub button:hover { background: #fde7e5; color: var(--bad); }
+    .ed-nueva { border-style: dashed; background: #fff; }
+    .tip ul { margin: 7px 0 0; padding: 0; list-style: none; font-size: 12.5px; color: var(--ink2); }
+    .tip li.ok { text-decoration: line-through; color: var(--muted); }
+    .cli { font-size: 11.5px; font-weight: 700; padding: 3px 8px; border-radius: 6px; background: #fff; border: 1px solid var(--line); color: var(--ink2); white-space: nowrap; max-width: 180px; overflow: hidden; text-overflow: ellipsis; }
+    .lista .mes-head { flex-wrap: wrap; }
+    .renovs { margin-top: 14px; }
+    .renovs .mes-head h2 { text-transform: none; }
+    .renovs table { width: 100%; border-collapse: collapse; }
+    .renovs td, .renovs th { padding: 10px 16px; text-align: left; border-bottom: 1px solid #eeede5; vertical-align: top; }
+    .renovs th { font-size: 11.5px; color: var(--muted); text-transform: uppercase; letter-spacing: .05em; }
+    .renovs tbody tr { cursor: pointer; }
+    .renovs tbody tr:hover { background: #fafaf5; }
+    .renovs td small { display: block; color: var(--muted); }
+    @media (max-width: 900px) { .dia { min-height: 70px; } .ev { font-size: 10px; } .renovs .opc { display: none; } }
+    @media (max-width: 900px) { main { padding: 24px 16px 40px; } .mes-head { flex-wrap: wrap; } }
+  </style>
+</head>
+<body>
+  <main>
+    <div class="page-head">
+      <div><div class="crumbs">General</div><h1>Calendario</h1><p>Tareas de Jose, de María y de Majosoft, con las renovaciones de los clientes.</p></div>
+      <div class="tools"><button class="btn" id="bImp">⬆ Importar eventos</button><button class="btn" id="bCal">📅 Google Calendar</button><button class="btn btn--ink" id="bNew">+ Nueva tarea</button></div>
+    </div>
+    <div class="card cal" id="cal" hidden></div>
+    <div class="card" id="mes"></div>
+    <div class="card lista" id="lista"></div>
+    <div class="card renovs" id="renovs"></div>
+  </main>
+  <dialog id="dlg"><form method="dialog" id="frm"></form></dialog>
+<script type="module">
+import { mountShell, api, toast, confirmar } from "/admin/panel.js";
+const me = await mountShell("calendario");
+const $ = id => document.getElementById(id);
+const esc = s => String(s ?? "").replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+const iso = d => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+const hoy = () => iso(new Date());
+const fecha = s => new Date(s + "T12:00").toLocaleDateString("es-ES", { weekday: "short", day: "numeric", month: "short" });
+const token = () => btoa(String.fromCharCode(...crypto.getRandomValues(new Uint8Array(24)))).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
+const PERSONAS = { majosoft: "Majosoft (ambos)", jose: "Jose", maria: "María" };
+const persona = x => PERSONAS[x] ? x : "majosoft"; // sin asignar = de los dos
+const ESTADOS = { pendiente: "Pendiente", curso: "En curso", hecha: "Hecha" };
+const yo = /jos[eé]/i.test(`${me?.name} ${me?.email}`) ? "jose" : "maria"; // persona por defecto de las tareas nuevas
+
+let tareas = await api("docs/tareas");
+let fichas = await api("docs/renovaciones");
+const presupuestos = await api("docs/presupuestos");
+let [facturas, bonos] = await Promise.all([api("docs/facturas"), api("docs/bonos")]).catch(() => [[], []]);
+// Clientes conocidos: facturas, presupuestos, bonos, renovaciones y los ya usados en tareas
+const clientes = () => [...new Set([...facturas.map(f => f.cliente?.nombre || f.cliente), ...presupuestos.map(p => p.cliente), ...bonos.map(b => b.cliente),
+  ...fichas.map(r => r.cliente), ...tareas.map(t => t.cliente)].filter(x => typeof x === "string" && x.trim()).map(x => x.trim()))].sort((a, b) => a.localeCompare(b, "es"));
+let ajustes = (await api("docs/ajustes")).find(a => a.id === "calendario") || { id: "calendario" };
+const put = t => api(`docs/tareas/${t.id}`, { method: "PUT", body: t });
+const PERIODOS = { mensual: ["Mensual", 1], trimestral: ["Trimestral", 3], semestral: ["Semestral", 6], anual: ["Anual", 12] };
+const FECHA = /^\d{4}-\d{2}-\d{2}$/;
+
+// Todo lo que se renueva: fichas propias y presupuestos con renovación
+const fuentes = () => [
+  ...fichas.map(r => ({ ...r, titulo: [r.cliente, r.concepto].filter(Boolean).join(" · ") || "Renovación", ficha: r })),
+  ...presupuestos.filter(p => PERIODOS[p.renov?.tipo]).map(p => ({ ...p.renov, titulo: p.cliente || p.titulo, presupuesto: p })),
+].filter(r => PERIODOS[r.tipo] && FECHA.test(r.inicio || ""));
+// Misma cuenta que el servidor: inicio + n periodos, ajustando al último día de los meses cortos
+const sumar = (f, tipo, n) => { const [y, m, d] = f.split("-").map(Number), k = PERIODOS[tipo][1] * n; return iso(new Date(y, m - 1 + k, Math.min(d, new Date(y, m + k, 0).getDate()))); };
+function ocurrencias(r, desde, hasta) {
+  const out = [];
+  for (let n = 1; n < 2000; n++) {
+    const f = sumar(r.inicio, r.tipo, n);
+    if (f > hasta || (r.hasta && f > r.hasta)) break;
+    if (f >= desde) out.push(f);
+  }
+  return out;
+}
+const siguiente = r => ocurrencias(r, hoy(), "9999-12-31")[0] || "";
+
+const etiquetaFecha = (f, hecha) => {
+  if (!f) return "";
+  const cls = hecha ? "" : f < hoy() ? "tarde" : f === hoy() ? "hoy" : "";
+  return `<span class="tag ${cls}">${f === hoy() ? "Hoy" : fecha(f)}</span>`;
+};
+
+function pintar() { pintarMes(); pintarLista(); pintarRenovs(); }
+const hm = min => { const h = Math.floor(min / 60), m = min % 60; return h && m ? `${h} h ${m} min` : h ? `${h} h` : `${m} min`; };
+const nombreBono = b => [b.cliente, b.titulo].filter(Boolean).join(" · ") || "Bono";
+// Al terminar una tarea con bono y tiempo, se apunta en el bono como intervención (una sola vez)
+async function apuntarEnBono(t) {
+  if (t.estado !== "hecha" || !t.bono || !(t.minutos > 0) || t.apuntado) return;
+  bonos = await api("docs/bonos"); // copia fresca para no pisar cambios hechos en Bonos
+  const b = bonos.find(x => x.id === t.bono);
+  if (!b) return toast("El bono de esta tarea ya no existe", true);
+  (b.entradas ||= []).push({ fecha: t.fecha && t.fecha <= hoy() ? t.fecha : hoy(), tarea: t.titulo, detalle: t.detalle || "", minutos: t.minutos, tareaId: t.id });
+  await api(`docs/bonos/${b.id}`, { method: "PUT", body: b });
+  t.apuntado = true; await put(t);
+  toast(`Apuntado en el bono de ${b.cliente || "cliente"}: ${hm(t.minutos)}`);
+}
+const progreso = t => { const l = t.sub || []; return l.length ? { hechas: l.filter(x => x.hecha).length, total: l.length } : null; };
+const desplegadas = new Set(); // tareas con las subtareas desplegadas en el panel
+
+/* ===== Panel de tareas, agrupadas por cuándo toca ===== */
+let agrupar = (() => { try { return localStorage.getItem("mj-tareas-agrupar"); } catch {} })() === "cliente" ? "cliente" : "fecha";
+function pintarLista() {
+  const h = hoy(), d = new Date(), finSemana = iso(new Date(d.getFullYear(), d.getMonth(), d.getDate() + (7 - (d.getDay() || 7))));
+  const finMes = iso(new Date(d.getFullYear(), d.getMonth() + 1, 0));
+  const mias = tareas.filter(t => visible(t.persona));
+  const abiertas = mias.filter(t => t.estado !== "hecha").sort((a, b) => (a.fecha || "9999").localeCompare(b.fecha || "9999") || (a.hora || "99").localeCompare(b.hora || "99"));
+  const grupos = [
+    ["tarde", "Atrasadas", t => t.fecha && t.fecha < h],
+    ["hoy", "Hoy", t => t.fecha === h],
+    ["", "Esta semana", t => t.fecha > h && t.fecha <= finSemana],
+    ["", "Este mes", t => t.fecha > finSemana && t.fecha <= finMes],
+    ["", "Más adelante", t => t.fecha > finMes],
+    ["", "Sin fecha", t => !t.fecha],
+  ];
+  const fila = t => `<div class="ti ${persona(t.persona)} ${t.estado === "hecha" ? "hecha" : ""}" data-id="${t.id}">
+    <input type="checkbox" data-done="${t.id}" ${t.estado === "hecha" ? "checked" : ""} title="Marcar como hecha" />
+    <div><b>${esc(t.titulo)}</b>${t.fecha || t.detalle ? `<small>${[t.fecha && fLarga(t.fecha) + (t.hora ? " · " + t.hora : ""), t.detalle].filter(Boolean).map(esc).join(" — ")}</small>` : ""}</div>
+    <div class="meta">${t.bono ? `<span class="cli" title="${esc(nombreBono(bonos.find(b => b.id === t.bono) || {}))}">⏱ Bono${t.minutos ? " · " + hm(t.minutos) : ""}${t.apuntado ? " ✓" : ""}</span>` : ""}${t.cliente && agrupar !== "cliente" ? `<span class="cli">${esc(t.cliente)}</span>` : ""}${(p => p ? `<button class="prog ${desplegadas.has(t.id) ? "abierto" : ""}" data-subs="${t.id}" title="Subtareas"><span class="bar"><i style="width:${p.hechas / p.total * 100}%"></i></span>${p.hechas}/${p.total}</button>` : "")(progreso(t))}${t.estado === "curso" ? `<span class="est">En curso</span>` : ""}<span class="quien"><i></i>${PERSONAS[persona(t.persona)].replace(" (ambos)", "")}</span></div></div>
+    ${progreso(t) && desplegadas.has(t.id) ? `<div class="subs">${t.sub.map((x, i) => `<label class="sub ${x.hecha ? "ok" : ""}"><input type="checkbox" data-sub="${t.id}" data-i="${i}" ${x.hecha ? "checked" : ""} /><span>${esc(x.texto)}</span></label>`).join("")}</div>` : ""}`;
+  const hechas = mias.filter(t => t.estado === "hecha").sort((a, b) => (b.hechaEn || 0) - (a.hechaEn || 0));
+  const usados = new Set();
+  if (agrupar === "cliente") {
+    const por = new Map();
+    for (const t of abiertas) { const k = t.cliente || ""; if (!por.has(k)) por.set(k, []); por.get(k).push(t); }
+    const claves = [...por.keys()].sort((a, b) => !a ? 1 : !b ? -1 : a.localeCompare(b, "es"));
+    grupos.length = 0;
+    for (const k of claves) grupos.push(["", k || "Sin cliente", t => (t.cliente || "") === k]);
+  }
+  const html = grupos.map(([cls, titulo, f]) => {
+    const l = abiertas.filter(t => !usados.has(t) && f(t)); l.forEach(t => usados.add(t));
+    return l.length ? `<div class="gr ${cls}"><h3>${titulo} <span class="c">${l.length}</span></h3>${l.map(fila).join("")}</div>` : "";
+  }).join("");
+  const curso = abiertas.filter(t => t.estado === "curso").length;
+  $("lista").innerHTML = `<div class="mes-head"><h2>Tareas</h2><span class="resumen">${abiertas.length} abiertas${curso ? ` · ${curso} en curso` : ""}</span>
+    <div class="filtro">${[["fecha", "Por fecha"], ["cliente", "Por cliente"]].map(([k, l]) => `<button data-agrupar="${k}" class="${agrupar === k ? "on" : ""}">${l}</button>`).join("")}</div><button class="btn btn--ink" data-nueva>+ Nueva tarea</button></div>
+    ${html || `<div class="vacio">No hay tareas pendientes 🎉</div>`}
+    ${hechas.length ? `<details class="gr"><summary>Hechas <span class="c">${hechas.length}</span></summary>${hechas.slice(0, 40).map(fila).join("")}</details>` : ""}`;
+}
+$("lista").addEventListener("click", async e => {
+  if (e.target.closest("[data-nueva]")) return editar(null);
+  const ag = e.target.closest("[data-agrupar]");
+  if (ag) { agrupar = ag.dataset.agrupar; try { localStorage.setItem("mj-tareas-agrupar", agrupar); } catch {} return pintarLista(); }
+  const bs = e.target.closest("[data-subs]");
+  if (bs) { desplegadas.has(bs.dataset.subs) ? desplegadas.delete(bs.dataset.subs) : desplegadas.add(bs.dataset.subs); return pintarLista(); }
+  if (e.target.dataset.sub) {
+    const t = tareas.find(x => x.id === e.target.dataset.sub);
+    t.sub[+e.target.dataset.i].hecha = e.target.checked;
+    try { await put(t); } catch (err) { toast(err.message, true); }
+    if (t.sub.every(x => x.hecha) && t.estado !== "hecha") toast("Todas las subtareas hechas. Puedes marcar la tarea como hecha.");
+    return pintar();
+  }
+  if (e.target.closest(".subs")) return;
+  const done = e.target.dataset.done;
+  if (done) {
+    const t = tareas.find(x => x.id === done);
+    t.estado = e.target.checked ? "hecha" : "pendiente";
+    if (e.target.checked) t.hechaEn = Date.now(); else delete t.hechaEn;
+    try { await put(t); await apuntarEnBono(t); } catch (err) { toast(err.message, true); }
+    return pintar();
+  }
+  const f = e.target.closest(".ti[data-id]");
+  if (f) editar(tareas.find(x => x.id === f.dataset.id));
+});
+
+/* ===== Calendario del mes ===== */
+let mesVisto = new Date(); mesVisto.setDate(1);
+let filtro = (() => { try { return localStorage.getItem("mj-cal-filtro"); } catch {} })();
+if (!PERSONAS[filtro]) filtro = "majosoft";
+// Majosoft = todo; Jose o María = lo suyo y lo de los dos
+const visible = p => filtro === "majosoft" || persona(p) === filtro || persona(p) === "majosoft";
+function pintarMes() {
+  const y = mesVisto.getFullYear(), m = mesVisto.getMonth();
+  const ini = new Date(y, m, 1 - (new Date(y, m, 1).getDay() + 6) % 7); // lunes de la primera semana
+  const dias = Array.from({ length: 42 }, (_, i) => new Date(ini.getFullYear(), ini.getMonth(), ini.getDate() + i));
+  const desde = iso(dias[0]), hasta = iso(dias[41]), por = {};
+  const add = (f, html) => (por[f] ||= []).push(html);
+  for (const t of [...tareas].sort((x, y) => (x.hora || "99").localeCompare(y.hora || "99"))) if (t.fecha >= desde && t.fecha <= hasta && visible(t.persona))
+    add(t.fecha, `<div class="ev ${persona(t.persona)} ${t.estado === "hecha" ? "hecha" : t.fecha < hoy() ? "tarde" : ""}" data-id="${t.id}">${t.hora ? `<time>${t.hora}</time>` : ""}<span>${esc(t.titulo)}</span>${(p => p ? `<time>${p.hechas}/${p.total}</time>` : "")(progreso(t))}</div>`);
+  for (const r of fuentes().filter(r => visible(r.persona))) for (const f of ocurrencias(r, desde, hasta))
+    add(f, `<div class="ev renov" ${r.ficha ? `data-ren="${r.ficha.id}"` : `data-pre="${r.presupuesto.id}"`} data-f="${f}"><span>🔁 ${esc(r.titulo)}</span></div>`);
+  const MAX = 3;
+  const celda = f => { const l = por[f] || []; return l.length > MAX + 1 ? l.slice(0, MAX).join("") + `<button class="otros" data-otros>+${l.length - MAX} más</button><div hidden>${l.slice(MAX).join("")}</div>` : l.join(""); };
+  $("mes").innerHTML = `<div class="mes-head"><h2>${(m => m[0].toUpperCase() + m.slice(1))(mesVisto.toLocaleDateString("es-ES", { month: "long", year: "numeric" }))}</h2>
+      <div class="filtro">${[["majosoft", "Majosoft"], ["jose", "Jose"], ["maria", "María"]].map(([k, l]) => `<button data-filtro="${k}" class="${filtro === k ? "on" : ""}"><i class="${k}"></i>${l}</button>`).join("")}</div>
+      <div class="leyenda"><span><i class="renov"></i>Renovación</span></div>
+      <button class="btn" data-mes="-1">‹</button><button class="btn" data-mes="0">Hoy</button><button class="btn" data-mes="1">›</button></div>
+    <div class="mes">${["lun", "mar", "mié", "jue", "vie", "sáb", "dom"].map(d => `<div class="dsem">${d}</div>`).join("")}
+    ${dias.map(d => { const f = iso(d); return `<div class="dia ${d.getMonth() !== m ? "fuera" : ""} ${f === hoy() ? "hoy" : ""} ${d.getDay() % 6 === 0 ? "finde" : ""}" data-dia="${f}"><div class="n">${d.getDate()}</div><button class="mas" title="Nueva tarea este día">+</button>${celda(f)}</div>`; }).join("")}</div>`;
+}
+$("mes").addEventListener("click", e => {
+  const b = e.target.closest("[data-mes]");
+  if (b) { const k = +b.dataset.mes; mesVisto = k ? new Date(mesVisto.getFullYear(), mesVisto.getMonth() + k, 1) : (d => (d.setDate(1), d))(new Date()); return pintarMes(); }
+  const fb = e.target.closest("[data-filtro]");
+  if (fb) { filtro = fb.dataset.filtro; try { localStorage.setItem("mj-cal-filtro", filtro); } catch {} return pintar(); }
+  if (e.target.closest("[data-otros]")) { const b = e.target.closest("[data-otros]"); b.nextElementSibling.hidden = false; b.remove(); return; }
+  const ev = e.target.closest(".ev");
+  if (ev) ocultarTip();
+  if (ev?.dataset.id) return editar(tareas.find(t => t.id === ev.dataset.id));
+  if (ev?.dataset.ren) return editarRenov(fichas.find(r => r.id === ev.dataset.ren));
+  if (ev?.dataset.pre) return location.href = "/admin/presupuestos?id=" + encodeURIComponent(ev.dataset.pre);
+  const dia = e.target.closest("[data-dia]");
+  if (dia) editar(null, dia.dataset.dia);
+});
+// Ficha con los detalles al pasar el ratón por un evento
+const tip = document.body.appendChild(Object.assign(document.createElement("div"), { className: "tip" }));
+const ocultarTip = () => tip.classList.remove("on");
+const fLarga = f => new Date(f + "T12:00").toLocaleDateString("es-ES", { weekday: "long", day: "numeric", month: "long" });
+$("mes").addEventListener("mouseover", e => {
+  const ev = e.target.closest(".ev"); if (!ev) return;
+  let h;
+  if (ev.dataset.id) {
+    const t = tareas.find(x => x.id === ev.dataset.id); if (!t) return;
+    h = `<div class="k ${persona(t.persona)}"><i></i>${PERSONAS[persona(t.persona)]} · ${ESTADOS[t.estado || "pendiente"]}${t.cliente ? " · " + esc(t.cliente) : ""}</div>${t.bono ? `<div class="m">⏱ ${esc(nombreBono(bonos.find(b => b.id === t.bono) || {}))}${t.minutos ? " · " + hm(t.minutos) : ""}${t.apuntado ? " · apuntado" : ""}</div>` : ""}<b>${esc(t.titulo)}</b>
+      <div class="m">${fLarga(t.fecha)}${t.hora ? " · " + t.hora : ""}</div>${t.detalle ? `<p>${esc(t.detalle)}</p>` : ""}
+      ${t.sub?.length ? `<ul>${t.sub.slice(0, 8).map(x => `<li class="${x.hecha ? "ok" : ""}">${x.hecha ? "☑" : "☐"} ${esc(x.texto)}</li>`).join("")}${t.sub.length > 8 ? `<li>… y ${t.sub.length - 8} más</li>` : ""}</ul>` : ""}`;
+  } else {
+    const r = fuentes().find(x => ev.dataset.ren ? x.ficha?.id === ev.dataset.ren : x.presupuesto?.id === ev.dataset.pre); if (!r) return;
+    h = `<div class="k renov"><i></i>Renovación ${r.tipo} · ${PERSONAS[persona(r.persona)]}</div><b>${esc(r.titulo)}</b>
+      <div class="m">${fLarga(ev.dataset.f)}${r.importe ? " · " + esc(r.importe) : ""}</div>${r.nota ? `<p>${esc(r.nota)}</p>` : ""}`;
+  }
+  tip.innerHTML = h;
+  const b = ev.getBoundingClientRect(), w = 270, alto = tip.offsetHeight;
+  tip.style.left = Math.max(8, Math.min(innerWidth - w - 8, b.left)) + "px";
+  tip.style.top = (b.bottom + alto + 12 > innerHeight ? b.top - alto - 6 : b.bottom + 6) + "px";
+  tip.classList.add("on");
+});
+$("mes").addEventListener("mouseout", e => { if (e.target.closest(".ev") && !e.relatedTarget?.closest?.(".ev")) ocultarTip(); });
+addEventListener("scroll", ocultarTip, { passive: true });
+
+
+/* ===== Renovaciones de clientes ===== */
+function pintarRenovs() {
+  const lista = fuentes().map(r => ({ r, prox: siguiente(r) })).sort((a, b) => (a.prox || "9999").localeCompare(b.prox || "9999"));
+  $("renovs").innerHTML = `<div class="mes-head"><h2>Renovaciones de clientes · ${lista.length}</h2><button class="btn btn--ink" id="bNewRen">+ Nueva renovación</button></div>
+    ${lista.length ? `<table><thead><tr><th>Cliente y servicio</th><th>Periodicidad</th><th>Próxima</th><th class="opc">Importe</th><th class="opc">Responsable</th></tr></thead><tbody>
+    ${lista.map(({ r, prox }) => `<tr ${r.ficha ? `data-ren="${r.ficha.id}"` : `data-pre="${r.presupuesto.id}"`}>
+      <td><b>${esc(r.titulo)}</b>${r.nota ? `<small>${esc(r.nota)}</small>` : ""}${r.presupuesto ? "<small>Desde el presupuesto</small>" : ""}</td>
+      <td>${PERIODOS[r.tipo][0]}</td><td>${prox ? etiquetaFecha(prox) : "Terminada"}</td>
+      <td class="opc">${esc(r.importe || "")}</td><td class="opc">${PERSONAS[persona(r.persona)]}</td></tr>`).join("")}</tbody></table>`
+    : `<div class="empty">Todavía no hay renovaciones.</div>`}`;
+}
+$("renovs").addEventListener("click", e => {
+  if (e.target.id === "bNewRen") return editarRenov();
+  const tr = e.target.closest("tr");
+  if (tr?.dataset.ren) editarRenov(fichas.find(r => r.id === tr.dataset.ren));
+  if (tr?.dataset.pre) location.href = "/admin/presupuestos?id=" + encodeURIComponent(tr.dataset.pre);
+});
+const opts = (obj, v) => Object.entries(obj).map(([k, l]) => `<option value="${k}" ${v === k ? "selected" : ""}>${Array.isArray(l) ? l[0] : l}</option>`).join("");
+function editarRenov(r) {
+  const nueva = !r;
+  r ??= { id: "r" + Date.now().toString(36) + Math.random().toString(36).slice(2, 5), cliente: "", concepto: "", tipo: "mensual", inicio: hoy(), hasta: "", importe: "", persona: "", nota: "" };
+  $("frm").innerHTML = `<h2>${nueva ? "Nueva renovación" : "Editar renovación"}</h2>
+    <div class="row"><label class="f">Cliente<input name="cliente" required value="${esc(r.cliente)}" /></label>
+      <label class="f">Servicio<input name="concepto" value="${esc(r.concepto)}" placeholder="Mantenimiento, dominio, licencia…" /></label></div>
+    <div class="row"><label class="f">Periodicidad<select name="tipo">${opts(PERIODOS, r.tipo)}</select></label>
+      <label class="f">Importe (opcional)<input name="importe" value="${esc(r.importe)}" placeholder="75 €/mes" /></label></div>
+    <div class="row"><label class="f">Inicio del periodo actual o del servicio<input type="date" name="inicio" required value="${esc(r.inicio)}" /></label>
+      <label class="f">Hasta (opcional)<input type="date" name="hasta" value="${esc(r.hasta)}" /></label></div>
+    <label class="f">Responsable<select name="persona">${opts(PERSONAS, persona(r.persona))}</select></label>
+    <label class="f">Nota (opcional)<textarea name="nota">${esc(r.nota)}</textarea></label>
+    <div class="acts">${nueva ? "" : `<button type="button" class="btn btn--danger" id="bDel">Eliminar</button>`}
+      <button type="button" class="btn" id="bCancel">Cancelar</button><button class="btn btn--ink" value="ok">${nueva ? "Crear" : "Guardar"}</button></div>`;
+  $("bCancel").onclick = () => $("dlg").close();
+  if (!nueva) $("bDel").onclick = async () => {
+    if (!await confirmar("¿Eliminar esta renovación?")) return;
+    await api(`docs/renovaciones/${r.id}`, { method: "DELETE" });
+    fichas = fichas.filter(x => x.id !== r.id); $("dlg").close(); pintar();
+  };
+  $("frm").onsubmit = async () => {
+    const f = Object.fromEntries(new FormData($("frm")));
+    Object.assign(r, { cliente: f.cliente.trim(), concepto: f.concepto.trim(), tipo: f.tipo, inicio: f.inicio, hasta: f.hasta, importe: f.importe.trim(), persona: f.persona, nota: f.nota.trim() });
+    try { await api(`docs/renovaciones/${r.id}`, { method: "PUT", body: r }); } catch (e) { return toast(e.message, true); }
+    if (nueva) fichas.push(r);
+    pintar(); toast(nueva ? "Renovación creada" : "Guardado");
+  };
+  $("dlg").showModal();
+}
+
+function editar(t, dia = "") {
+  const nueva = !t;
+  t ??= { id: "t" + Date.now().toString(36) + Math.random().toString(36).slice(2, 5), titulo: "", detalle: "", persona: filtro === "majosoft" ? yo : filtro, estado: "pendiente", fecha: dia, creada: Date.now() };
+  $("frm").innerHTML = `<h2>${nueva ? "Nueva tarea" : "Editar tarea"}</h2>
+    <label class="f">Tarea<input name="titulo" required value="${esc(t.titulo)}" placeholder="Qué hay que hacer" /></label>
+    <label class="f">Cliente (opcional)<input name="cliente" list="lClientes" autocomplete="off" value="${esc(t.cliente || "")}" placeholder="Elige o escribe un cliente" /></label>
+    <datalist id="lClientes">${clientes().map(c => `<option value="${esc(c)}"></option>`).join("")}</datalist>
+    <div class="row"><label class="f">Bono de horas (opcional)<select name="bono" id="eBono"><option value="">Sin bono</option>${bonos.map(b => `<option value="${esc(b.id)}" ${t.bono === b.id ? "selected" : ""}>${esc(nombreBono(b))}</option>`).join("")}</select></label>
+      <div class="f" style="display:flex;flex-direction:column;gap:5px;font-size:12px;font-weight:700;color:var(--muted);min-width:0">Tiempo dedicado<div style="display:flex;gap:6px">
+        <label class="f" style="flex:1;min-width:0"><input style="width:100%;min-width:0" type="number" name="th" min="0" step="1" value="${Math.floor((t.minutos || 0) / 60)}" ${t.apuntado ? "disabled" : ""} /></label><span style="align-self:center">h</span>
+        <label class="f" style="flex:1;min-width:0"><input style="width:100%;min-width:0" type="number" name="tm" min="0" max="59" step="15" value="${(t.minutos || 0) % 60}" ${t.apuntado ? "disabled" : ""} /></label><span style="align-self:center">min</span></div></div></div>
+    <p class="hint" id="eBonoHint">${t.apuntado ? "Ya apuntado en el bono. Para cambiar el tiempo, edítalo en Bonos de horas." : "Al marcarla como hecha, el tiempo se apunta solo en el bono."}</p>
+    <label class="f">Detalle (opcional)<textarea name="detalle">${esc(t.detalle)}</textarea></label>
+    <div class="f" style="display:flex;flex-direction:column;gap:6px;font-size:12px;font-weight:700;color:var(--muted)">Subtareas<div class="ed-subs" id="eSubs"></div>
+      <input class="ed-nueva" id="eNueva" placeholder="+ Añadir subtarea y pulsa Intro" /></div>
+    <div class="row"><label class="f">Persona<select name="persona">${opts(PERSONAS, persona(t.persona))}</select></label>
+      <label class="f">Estado<select name="estado">${opts(ESTADOS, t.estado)}</select></label></div>
+    <div class="row"><label class="f">Fecha (opcional, sale en el calendario)<input type="date" name="fecha" value="${esc(t.fecha)}" /></label>
+      <label class="f">Hora (opcional)<input type="time" name="hora" value="${esc(t.hora || "")}" /></label></div>
+    <div class="acts">${nueva ? "" : `<button type="button" class="btn btn--danger" id="bDel">Eliminar</button>`}
+      <button type="button" class="btn" id="bCancel">Cancelar</button><button class="btn btn--ink" value="ok">${nueva ? "Crear" : "Guardar"}</button></div>`;
+  const subs = structuredClone(t.sub || []);
+  const verHint = () => $("eBonoHint").hidden = !$("eBono").value;
+  verHint();
+  $("eBono").onchange = () => { // al elegir un bono, el cliente se rellena si está vacío
+    verHint();
+    const b = bonos.find(x => x.id === $("eBono").value);
+    if (b?.cliente && !$("frm").cliente.value.trim()) $("frm").cliente.value = b.cliente;
+  };
+  const pintarSubs = () => $("eSubs").innerHTML = subs.map((x, i) => `<div class="ed-sub ${x.hecha ? "ok" : ""}">
+    <input type="checkbox" data-i="${i}" ${x.hecha ? "checked" : ""} /><input type="text" data-i="${i}" value="${esc(x.texto)}" />
+    <button type="button" data-quitar="${i}" title="Quitar">✕</button></div>`).join("");
+  pintarSubs();
+  $("eSubs").oninput = e => { const i = +e.target.dataset.i; if (e.target.type === "checkbox") { subs[i].hecha = e.target.checked; pintarSubs(); } else subs[i].texto = e.target.value; };
+  $("eSubs").onclick = e => { if (e.target.dataset.quitar != null) { subs.splice(+e.target.dataset.quitar, 1); pintarSubs(); } };
+  $("eSubs").onkeydown = e => { if (e.key === "Enter") { e.preventDefault(); $("eNueva").focus(); } };
+  $("eNueva").onkeydown = e => {
+    if (e.key !== "Enter") return;
+    e.preventDefault();
+    const v = e.target.value.trim(); if (!v) return;
+    subs.push({ texto: v, hecha: false }); e.target.value = ""; pintarSubs();
+  };
+  $("bCancel").onclick = () => $("dlg").close();
+  if (!nueva) $("bDel").onclick = async () => {
+    if (!await confirmar("¿Eliminar esta tarea?")) return;
+    await api(`docs/tareas/${t.id}`, { method: "DELETE" });
+    tareas = tareas.filter(x => x.id !== t.id); $("dlg").close(); pintar();
+  };
+  $("frm").onsubmit = async () => {
+    const f = Object.fromEntries(new FormData($("frm")));
+    if (f.estado === "hecha" && t.estado !== "hecha") t.hechaEn = Date.now();
+    const pendiente = $("eNueva").value.trim(); // lo escrito sin pulsar Intro también cuenta
+    if (pendiente) subs.push({ texto: pendiente, hecha: false });
+    Object.assign(t, { titulo: f.titulo.trim(), cliente: f.cliente.trim(), detalle: f.detalle.trim(), persona: f.persona, estado: f.estado, fecha: f.fecha, hora: f.fecha ? f.hora : "",
+      sub: subs.map(x => ({ texto: x.texto.trim(), hecha: !!x.hecha })).filter(x => x.texto), bono: f.bono || "" });
+    if (!t.apuntado) t.minutos = f.bono ? (Number(f.th) || 0) * 60 + (Number(f.tm) || 0) : 0;
+    try { await put(t); } catch (e) { return toast(e.message, true); }
+    if (nueva) tareas.push(t);
+    pintar(); toast(nueva ? "Tarea creada" : "Guardado");
+    try { await apuntarEnBono(t); pintar(); } catch (e) { toast(e.message, true); }
+  };
+  $("dlg").showModal();
+  $("frm").titulo.focus();
+}
+
+$("bNew").onclick = () => editar(null);
+/* ===== Importar eventos de un calendario (.ics) ===== */
+// Lee los VEVENT de un .ics (Google Calendar, Outlook, Apple): título, fecha, hora y descripción
+function leerIcs(txt) {
+  const lineas = txt.replace(/\r?\n[ \t]/g, "").split(/\r?\n/), evs = [];
+  const des = v => v.replace(/\\n/gi, "\n").replace(/\\([,;\\])/g, "$1");
+  let ev = null;
+  for (const l of lineas) {
+    if (l === "BEGIN:VEVENT") { ev = {}; continue; }
+    if (l === "END:VEVENT") { if (ev?.fecha) evs.push(ev); ev = null; continue; }
+    if (!ev) continue;
+    const i = l.indexOf(":"); if (i < 0) continue;
+    const [nombre, ...params] = l.slice(0, i).split(";"), v = l.slice(i + 1);
+    if (nombre === "SUMMARY") ev.titulo = des(v).trim();
+    else if (nombre === "DESCRIPTION") ev.detalle = des(v).trim().slice(0, 2000);
+    else if (nombre === "LOCATION") ev.lugar = des(v).trim();
+    else if (nombre === "UID") ev.uid = v.trim();
+    else if (nombre === "RRULE") ev.repite = true;
+    else if (nombre === "STATUS" && v === "CANCELLED") ev.cancelado = true;
+    else if (nombre === "DTSTART") {
+      const m = v.match(/^(\d{4})(\d{2})(\d{2})(?:T(\d{2})(\d{2})\d{2}(Z?))?/); if (!m) continue;
+      if (!m[4]) { ev.fecha = `${m[1]}-${m[2]}-${m[3]}`; continue; }
+      // Hora UTC (Z) se pasa a la hora local; con TZID o sin zona se toma tal cual
+      const d = m[6] ? new Date(Date.UTC(+m[1], m[2] - 1, +m[3], +m[4], +m[5])) : new Date(+m[1], m[2] - 1, +m[3], +m[4], +m[5]);
+      ev.fecha = iso(d); ev.hora = `${String(d.getHours()).padStart(2, "0")}:${String(d.getMinutes()).padStart(2, "0")}`;
+    }
+  }
+  // Fuera los cancelados y los que vienen de nuestro propio calendario
+  return evs.filter(e => !e.cancelado && !/@majosoft\.es$/.test(e.uid || "")).sort((a, b) => a.fecha.localeCompare(b.fecha));
+}
+
+$("bImp").onclick = () => {
+  let evs = [];
+  $("frm").innerHTML = `<h2>Importar eventos</h2>
+    <p class="hint">Sube un archivo .ics. En Google Calendar: Configuración → Importar y exportar → Exportar (descarga un .zip con un .ics por calendario).</p>
+    <label class="f">Archivo de calendario (.ics)<input type="file" id="iFile" accept=".ics,text/calendar" /></label>
+    <div class="row"><label class="f">Asignar a<select id="iPer">${opts(PERSONAS, yo)}</select></label>
+      <label class="f">Desde<input type="date" id="iDesde" value="${hoy()}" /></label></div>
+    <div id="iLista"></div>
+    <div class="acts"><button type="button" class="btn" id="bCancel">Cancelar</button><button type="button" class="btn btn--ink" id="iOk" disabled>Importar</button></div>`;
+  const ya = new Set(tareas.map(t => t.origen).filter(Boolean));
+  const pintarLista = () => {
+    const desde = $("iDesde").value || "0000";
+    const vis = evs.filter(e => e.fecha >= desde);
+    $("iLista").innerHTML = !evs.length ? "" : vis.length ? `<p class="hint" style="margin-bottom:6px">${vis.length} eventos. Desmarca los que no quieras.${vis.some(e => e.repite) ? " Los repetitivos (🔁) se importan solo en su primera fecha." : ""}</p>
+      <div class="imp-lista">${vis.map(e => { const dup = ya.has(e.uid); return `<label><input type="checkbox" data-uid="${esc(e.uid || "")}" data-i="${evs.indexOf(e)}" ${dup ? "disabled" : "checked"} />
+        <span>${fecha(e.fecha)}${e.hora ? `<br><small>${e.hora}</small>` : ""}</span>
+        <span>${e.repite ? "🔁 " : ""}${esc(e.titulo || "(sin título)")}${dup ? " <small>· ya importado</small>" : ""}${e.lugar ? `<br><small>${esc(e.lugar)}</small>` : ""}</span></label>`; }).join("")}</div>`
+      : `<p class="hint">No hay eventos desde esa fecha.</p>`;
+    $("iOk").disabled = !$("iLista").querySelector("input:checked");
+  };
+  $("iFile").onchange = async () => {
+    const f = $("iFile").files[0]; if (!f) return;
+    evs = leerIcs(await f.text());
+    if (!evs.length) toast("No se han encontrado eventos en el archivo", true);
+    pintarLista();
+  };
+  $("iDesde").onchange = pintarLista;
+  $("iLista").onchange = () => $("iOk").disabled = !$("iLista").querySelector("input:checked");
+  $("bCancel").onclick = () => $("dlg").close();
+  $("iOk").onclick = async () => {
+    const elegidos = [...$("iLista").querySelectorAll("input:checked")].map(c => evs[+c.dataset.i]);
+    $("iOk").disabled = true;
+    let n = 0;
+    for (const e of elegidos) {
+      const t = { id: "t" + Date.now().toString(36) + Math.random().toString(36).slice(2, 5), titulo: e.titulo || "(sin título)",
+        hora: e.hora || "", detalle: [e.lugar && "Lugar: " + e.lugar, e.detalle].filter(Boolean).join("\n"),
+        persona: $("iPer").value, estado: e.fecha < hoy() ? "hecha" : "pendiente", fecha: e.fecha, creada: Date.now(), origen: e.uid || undefined };
+      if (t.estado === "hecha") t.hechaEn = Date.now();
+      try { await put(t); tareas.push(t); n++; $("iOk").textContent = `Importando… ${n}/${elegidos.length}`; } catch (err) { toast(err.message, true); break; }
+    }
+    $("dlg").close(); pintar(); toast(`${n} ${n === 1 ? "evento importado" : "eventos importados"}`);
+  };
+  $("dlg").showModal();
+};
+
+/* ===== Conexión con Google Calendar (suscripción iCal) ===== */
+const url = p => `${location.origin}/admin/calendario/${ajustes.token}.ics${p ? "?persona=" + p : ""}`;
+function pintarCal() {
+  $("cal").innerHTML = `<h2>Conectar con Google Calendar</h2>
+    <p>Google Calendar se suscribe a un enlace privado y muestra las tareas con fecha y las renovaciones. Las actualizaciones pueden tardar unas horas en aparecer en Google.</p>
+    ${ajustes.token ? [["", "Todo"], ["jose", "Jose"], ["maria", "María"]].map(([k, l]) => `<div class="url"><b>${l}</b><code>${esc(url(k))}</code><button class="btn" data-copy="${k}">Copiar</button></div>`).join("") + `
+    <ol><li>En Google Calendar (en el ordenador), junto a «Otros calendarios», pulsa <b>+</b> y luego <b>Desde URL</b>.</li>
+      <li>Pega el enlace (el de «Todo» o solo el tuyo) y pulsa <b>Añadir calendario</b>.</li>
+      <li>No compartáis el enlace: quien lo tenga ve las tareas.</li></ol>
+    <p style="margin:12px 0 0"><button class="btn btn--danger" id="bTok">Cambiar enlace</button></p>`
+    : `<button class="btn btn--ink" id="bTok">Crear enlace del calendario</button>`}`;
+}
+$("bCal").onclick = () => { $("cal").hidden = !$("cal").hidden; pintarCal(); };
+$("cal").addEventListener("click", async e => {
+  if (e.target.dataset.copy != null) { await navigator.clipboard.writeText(url(e.target.dataset.copy)); return toast("Enlace copiado"); }
+  if (e.target.id === "bTok") {
+    if (ajustes.token && !await confirmar("El enlace anterior dejará de funcionar y habrá que volver a añadirlo en Google Calendar. ¿Continuar?")) return;
+    ajustes.token = token();
+    try { await api("docs/ajustes/calendario", { method: "PUT", body: ajustes }); } catch (err) { return toast(err.message, true); }
+    pintarCal(); toast("Enlace listo");
+  }
+});
+
+pintar();
+</script>
+</body>
+</html>

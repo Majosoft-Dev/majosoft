@@ -101,11 +101,12 @@
     ul.b.neg li::before { background: #c9c8bc; }
 
     .why { display: grid; grid-template-columns: 1fr 1fr; gap: 3mm; margin-top: 4mm; }
+    .why > div:last-child:nth-child(odd) { grid-column: 1 / -1; } /* número impar: la última ocupa todo el ancho */
     .why div { background: var(--cream); border-radius: 3mm; padding: 3.5mm 4mm; break-inside: avoid; }
     .why b { display: block; font-size: 10pt; margin-bottom: 1mm; }
     .why div > span { color: var(--ink2); font-size: 9pt; }
 
-    .mod { display: grid; grid-template-columns: 16mm 1fr; gap: 4mm; border: 1px solid var(--line); border-radius: 4mm; padding: 5mm; margin-bottom: 4mm; break-inside: avoid; }
+    .mod { display: grid; grid-template-columns: 16mm 1fr; gap: 4mm; border: 1px solid var(--line); border-radius: 4mm; padding: 4.5mm 5mm; margin-bottom: 3mm; break-inside: avoid; }
     .mod--cont .mod-n::after { display: none; }
     .mod-n { font-size: 20pt; font-weight: 900; letter-spacing: -.04em; color: var(--ink); line-height: 1; }
     .mod-n::after { content: ""; display: block; width: 8mm; height: 3px; background: var(--lime); margin-top: 2mm; }
@@ -116,16 +117,26 @@
     .mod-price b { display: block; font-size: 13pt; }
     .mod-price small { color: var(--muted); }
     .mod-desc { color: var(--ink2); margin: 2mm 0 0; }
+    /* Textos justificados: todas las líneas acaban a la misma altura (guiones automáticos para evitar huecos) */
+    .page-body p, .why div > span, .mod-desc, .callout, ul.b li { text-align: justify; hyphens: auto; -webkit-hyphens: auto; }
+    .why div > span { display: block; }
 
-    table.sum { width: 100%; border-collapse: collapse; margin-top: 2mm; break-inside: avoid; }
-    table.sum th { text-align: left; font-size: 7.5pt; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); padding: 2mm 3mm; border-bottom: 2px solid var(--ink); }
-    table.sum td { padding: 2.3mm 3mm; border-bottom: 1px solid var(--line); }
+    table.sum { width: 100%; border-collapse: collapse; margin-top: 2mm; }
+    table.sum th { text-align: left; font-size: 7pt; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); padding: 0 3mm 2mm; border-bottom: 1px solid var(--line); font-weight: 700; }
+    table.sum td { padding: 2.4mm 3mm; border-bottom: 1px solid #eeede5; }
+    table.sum tr:last-child td { border-bottom: none; }
+    table.sum td:nth-child(2) { color: var(--muted); }
     table.sum .r { text-align: right; white-space: nowrap; }
-    table.sum tr.sub td { font-weight: 700; border-bottom: none; padding-top: 4mm; }
-    table.sum tr.iva td { color: var(--muted); }
-    table.sum tr.tot td { background: var(--ink); color: var(--cream); font-weight: 800; font-size: 12pt; border: none; }
-    table.sum tr.tot td:first-child { border-radius: 3mm 0 0 3mm; }
-    table.sum tr.tot td:last-child { border-radius: 0 3mm 3mm 0; color: var(--lime); }
+    .totales { display: grid; grid-template-columns: 1fr 62mm; gap: 0; margin-top: 4mm; background: var(--ink); color: var(--cream); border-radius: 4mm; overflow: hidden; break-inside: avoid; }
+    .totales .desglose { padding: 5mm 6mm; display: grid; gap: 2.2mm; font-size: 9.5pt; }
+    .totales .desglose div { display: flex; justify-content: space-between; gap: 4mm; color: #cfcfc4; }
+    .totales .desglose b { color: var(--cream); font-weight: 700; }
+    .totales .dto-l span, .totales .dto-l b { color: var(--lime) !important; font-weight: 700; }
+    .totales .dto-l i { font-style: normal; background: var(--lime); color: var(--ink); font-size: 7pt; font-weight: 800; padding: .3mm 1.6mm; border-radius: 99px; margin-left: 1mm; }
+    .totales .final { background: #23241f; padding: 5mm 6mm; display: flex; flex-direction: column; justify-content: center; align-items: flex-end; text-align: right; }
+    .totales .final small { font-size: 7pt; letter-spacing: .12em; text-transform: uppercase; color: #a9a99c; font-weight: 700; }
+    .totales .final b { font-size: 20pt; font-weight: 900; letter-spacing: -.03em; color: var(--lime); line-height: 1.15; margin-top: 1mm; }
+    .totales .final span { font-size: 8pt; color: #a9a99c; margin-top: 1mm; }
 
     .cuota { display: grid; grid-template-columns: 1fr auto; gap: 8mm; align-items: center; background: var(--ink); color: var(--cream); border-radius: 4mm; padding: 7mm; margin: 2mm 0 4mm; break-inside: avoid; }
     .cuota small { font-weight: 800; letter-spacing: .12em; text-transform: uppercase; font-size: 7.5pt; color: var(--lime); }
@@ -139,6 +150,13 @@
     .ed:empty::before { content: attr(data-ph); color: #b9b8ad; }
     .cover .ed:hover { outline-color: #55564f; }
     li.ed { display: list-item; }
+    .cover-meta i.ivai { font-style: normal; font-weight: 500; font-size: 7.5pt; color: #a9a99c; margin-left: 1.5mm; }
+    .cover-meta .antes { display: flex; align-items: center; gap: 2mm; margin-bottom: .8mm; }
+    .cover-meta .antes s { color: #8a8a80; font-weight: 500; font-size: 8pt; text-decoration-thickness: 1px; }
+    .cover-meta .dto { background: var(--lime); color: var(--ink); font-size: 6.5pt; font-weight: 800; padding: .3mm 1.6mm; border-radius: 99px; letter-spacing: .02em; }
+    ul.b li.add-pt { color: #9a998e; font-size: .9em; cursor: pointer; user-select: none; }
+    ul.b li.add-pt::before { background: none; border: 1px dashed #c9c8bc; }
+    ul.b li.add-pt:hover { color: var(--ink, #222); }
     @media print { .solo-pantalla { display: none !important; } }
     /* Al imprimir no se ve el resaltado de edición (sin tocar fondos propios como el de la etiqueta de portada) */
     @media print { .ed, .ed:hover, .ed:focus { outline: none !important; } .ed:focus:not(.kicker) { background: none !important; } .ed:empty::before { content: ""; } .ed:empty { display: none; } }
@@ -159,7 +177,33 @@
     .cols { display: grid; grid-template-columns: 1fr 1fr; gap: 6mm; }
     .cols h4, .req h4 { margin: 3mm 0 1mm; font-size: 10pt; }
     .req { display: grid; grid-template-columns: 1fr 1fr; gap: 2mm 6mm; }
+    .req:has(> div:only-child) { grid-template-columns: 1fr; } /* un solo grupo: a todo el ancho */
     .req > div { break-inside: avoid; }
+    .pagos { display: grid; grid-template-columns: 1fr 1fr; gap: 3mm; margin-top: 2mm; break-inside: avoid; }
+    .pago { border: 1px solid var(--line); border-radius: 3.5mm; padding: 4.5mm 5mm; display: flex; flex-direction: column; gap: 1.2mm; }
+    .pago .p-t { font-size: 7pt; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); font-weight: 700; }
+    .pago .p-i { font-size: 18pt; font-weight: 900; letter-spacing: -.03em; line-height: 1.15; color: var(--ink); }
+    .pago .p-d { font-size: 9pt; color: var(--ink2); }
+    .pago.dest { background: var(--ink); border-color: var(--ink); }
+    .pago.dest .p-t { color: #a9a99c; } .pago.dest .p-i { color: var(--lime); } .pago.dest .p-d { color: #cfcfc4; }
+    .pagos-nota { font-size: 8pt; color: var(--muted); margin-top: 2.5mm; }
+    table.cmp { width: 100%; border-collapse: separate; border-spacing: 0; margin-top: 2mm; font-size: 9.5pt; break-inside: avoid; }
+    table.cmp th { font-size: 7pt; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); font-weight: 700; padding: 0 4mm 2mm; text-align: left; }
+    table.cmp td { padding: 2.6mm 4mm; border-bottom: 1px solid #eeede5; }
+    table.cmp tr:last-child td { border-bottom: none; }
+    table.cmp .r { text-align: right; white-space: nowrap; }
+    table.cmp td.hoy { color: #b42318; font-weight: 600; }
+    table.cmp .nueva { background: var(--ink); color: var(--lime); font-weight: 800; width: 34mm; }
+    table.cmp th.nueva { color: var(--cream); border-radius: 3mm 3mm 0 0; padding-top: 2.5mm; }
+    table.cmp tr:last-child td.nueva { border-radius: 0 0 3mm 3mm; }
+    table.cmp td.nueva { border-bottom-color: #2a2b26; }
+    .cmp-nota { font-size: 7.5pt; color: var(--muted); margin-top: 2mm; }
+    .pags { column-count: 2; column-gap: 3mm; margin-top: 2mm; }
+    .pags > div { background: var(--cream, #f5f4ec); border-radius: 3mm; padding: 3.5mm 4.5mm; break-inside: avoid; display: inline-block; width: 100%; margin-bottom: 3mm; }
+    .pags h4 { display: flex; justify-content: space-between; align-items: baseline; gap: 3mm; margin: 0 0 1.5mm; font-size: 10pt; }
+    .pags .cifra { font-size: 7.5pt; font-weight: 800; background: var(--ink); color: var(--lime); padding: .4mm 2mm; border-radius: 99px; white-space: nowrap; }
+    .pags ul.b { margin-top: 1mm; font-size: 8.8pt; }
+    .pags ul.b li { margin-bottom: 1mm; }
 
     .contact { margin-top: 10mm; background: var(--ink); color: var(--cream); border-radius: 4mm; padding: 6mm; display: flex; justify-content: space-between; align-items: center; break-inside: avoid; }
     .contact b { font-size: 12pt; display: block; }
@@ -197,6 +241,7 @@
       <a class="btn" href="/admin/presupuestos">← Presupuestos</a>
       <span class="doc-title" id="docTitle"></span>
       <span class="save-state" data-save-state></span>
+      <a class="btn" id="bBono" hidden>Ver consumo de horas</a>
       <button class="btn" id="bSave">Exportar JSON</button>
       <button class="btn btn--lime" id="bPrint">Exportar PDF</button>
       <input type="file" id="file" accept="application/json" hidden />
@@ -206,7 +251,7 @@
   </div>
 
 <script type="module">
-import { mountShell, api, autosaver, toast } from "/admin/panel.js";
+import { mountShell, api, autosaver, toast, confirmar } from "/admin/panel.js";
 await mountShell("presupuestos");
 // Fecha local en formato aaaa-mm-dd (toISOString usa UTC: en España, de 00:00 a 02:00 daba el día anterior)
 const isoLocal = (d = new Date()) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
@@ -289,15 +334,18 @@ const VACIO = {
 
 let D = null;
 const migrar = d => {
+  d.irpf ??= 0;
+  d.descuento ??= { activo: false, porcentaje: 0, etiqueta: "" };
   d.cuota ??= { activo: false, precio: "", nota: "", etiqueta: "", detalle: "", texto: "" };
   d.textos ??= {};
-  if (d.totalConIva == null) { d.auto = true; d.totalConIva = Number(d.totalRedondeado) || Math.round(d.modulos.reduce((s, m) => s + Number(m.precio || 0), 0) * (1 + d.iva / 100)); }
+  d.renov ??= { tipo: "", persona: "", inicio: "", hasta: "", nota: "" };
+  if (d.totalConIva == null) { d.auto ??= true; d.totalConIva = Number(d.totalRedondeado) || Math.round(d.modulos.reduce((s, m) => s + Number(m.precio || 0), 0) * (1 + d.iva / 100)); }
   delete d.totalRedondeado; return d;
 };
 
 /* ===== Utilidades ===== */
 const esc = s => String(s ?? "").replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
-const eur = n => Number(n || 0).toLocaleString("es-ES", { minimumFractionDigits: 0, maximumFractionDigits: 2, useGrouping: "always" }) + " €";
+const eur = n => { const v = Number(n || 0); return v.toLocaleString("es-ES", { minimumFractionDigits: Number.isInteger(v) ? 0 : 2, maximumFractionDigits: 2, useGrouping: "always" }) + " €"; };
 const fecha = s => s ? new Date(s + "T00:00").toLocaleDateString("es-ES", { day: "numeric", month: "long", year: "numeric" }) : "";
 const paras = s => String(s || "").split(/\n\s*\n/).filter(x => x.trim()).map(x => `<p>${esc(x)}</p>`).join("");
 const list = (arr, cls = "b") => arr?.length ? `<ul class="${cls}">${arr.map(i => `<li>${esc(i)}</li>`).join("")}</ul>` : "";
@@ -322,8 +370,14 @@ function calc() {
   if (D.auto) repartir();
   const subtotal = D.modulos.reduce((s, m) => s + Number(m.precio || 0), 0);
   const horas = D.modulos.reduce((s, m) => s + Number(m.horas || 0), 0);
-  const total = D.auto ? Number(D.totalConIva || 0) : Math.round(subtotal * (1 + D.iva / 100) * 100) / 100;
-  return { subtotal, horas, iva: Math.round((total - subtotal) * 100) / 100, total };
+  // Descuento sobre el precio de lista (p. ej. bono de bienvenida): el IVA se calcula sobre la base ya descontada
+  const pct = !D.auto && D.descuento?.activo ? Number(D.descuento.porcentaje || 0) : 0;
+  const descuento = Math.round(subtotal * pct) / 100, base = Math.round((subtotal - descuento) * 100) / 100;
+  const total = D.auto ? Number(D.totalConIva || 0) : Math.round(base * (1 + D.iva / 100) * 100) / 100;
+  // Retención de IRPF (si el cliente es empresa): se resta sobre la base y deja el total a pagar
+  const irpf = Math.round(base * Number(D.irpf || 0)) / 100, pagar = Math.round((total - irpf) * 100) / 100;
+  const pagarLista = Math.round((subtotal * (1 + D.iva / 100) - subtotal * Number(D.irpf || 0) / 100) * 100) / 100;
+  return { subtotal, horas, pct, descuento, base, iva: Math.round((total - base) * 100) / 100, total, irpf, pagar, pagarLista };
 }
 
 /* ===== Edición directa sobre el documento =====
@@ -332,7 +386,7 @@ function calc() {
 const TEXTOS = {
   lblCliente: "Cliente", lblInversion: "Inversión", lblLanzamiento: "Lanzamiento objetivo",
   objetivoTitulo: "Objetivo del proyecto", resumenTitulo: "Resumen económico", pagoTitulo: "Condiciones de pago",
-  colModulo: "Módulo", colHoras: "Horas", colPrecio: "Precio", subtotal: "Subtotal (sin IVA)", ivaLabel: "IVA", totalLabel: "Total (IVA incluido)",
+  colModulo: "Módulo", colHoras: "Horas", colPrecio: "Precio", subtotal: "Subtotal (sin IVA)", baseLabel: "Base imponible", ivaLabel: "IVA", totalLabel: "Total (IVA incluido)", totalPagar: "Total a pagar", irpfLabel: "Retención IRPF", aPagar: "a pagar",
   incluido: "Incluido", ivaIncluido: "IVA incluido", ivaIncl: "IVA incl.", horas: "horas", hastaEl: "hasta el",
   incluyeTitulo: "Qué incluye", noIncluyeTitulo: "Qué no incluye", requisitosTitulo: "Requisitos por parte del cliente",
   pie: "Majosoft · Estudio de desarrollo de software en Jaén · Presupuesto válido 30 días desde su emisión"
@@ -347,7 +401,8 @@ const P = (path, ph = "Escribe aquí…") => {
   return (ps.length ? ps : [""]).map((x, i) => `<p class="ed" contenteditable="plaintext-only" spellcheck="false" data-p="${path}" data-para="${i}" data-multi="1" data-ph="${esc(ph)}">${esc(x)}</p>`).join("");
 };
 // Listas editables: cada punto tiene su ruta (lista.0, lista.1…)
-const L = (path, cls = "b") => { const arr = get(path) || []; return arr.length ? `<ul class="${cls}">${arr.map((_, j) => E(`${path}.${j}`, "Punto", { tag: "li" })).join("")}</ul>` : ""; };
+// Al final de cada lista, un botón (solo en pantalla) para añadir puntos; Enter en un punto también crea otro
+const L = (path, cls = "b") => { const arr = get(path) || []; return `<ul class="${cls}">${arr.map((_, j) => E(`${path}.${j}`, "Punto", { tag: "li" })).join("")}<li class="add-pt solo-pantalla" data-addpt="${path}">+ Añadir punto</li></ul>`; };
 
 function render() {
   const c = calc();
@@ -368,13 +423,18 @@ function render() {
     <p class="tag${D.tagline ? "" : " solo-pantalla"}">${E("tagline", "Frase destacada")}</p>
     <div class="cover-meta">
       <div><small>${T("lblCliente")}</small><b>${E("cliente", "Cliente")}</b></div>
-      <div><small>${T("lblInversion")}</small><b>${D.cuota?.activo ? `${E("cuota.precio", "75 €/mes")} ${E("cuota.nota", "IVA incluido")}` : `${eur(c.total)} ${T("ivaIncl")}`}</b></div>
+      <div><small>${T("lblInversion")}</small><b>${D.cuota?.activo ? `${E("cuota.precio", "75 €/mes")} ${E("cuota.nota", "IVA incluido")}` : c.descuento ? `<span class="antes"><s>${c.pagarLista.toLocaleString("es-ES", { minimumFractionDigits: 2, maximumFractionDigits: 2, useGrouping: "always" })} €</s><span class="dto">−${String(c.pct).replace(".", ",")} %</span></span>${eur(c.pagar)}<i class="ivai">${c.irpf ? "IVA incl. · IRPF desc." : "IVA incl."}</i>` : `${eur(c.pagar)} ${T("ivaIncl")}`}</b></div>
       <div><small>${T("lblLanzamiento")}</small><b>${E("lanzamiento", "Fecha prevista")}</b></div>
     </div>
   </section>
   <div class="body">
     <h2 class="h2${D.objetivo ? "" : " solo-pantalla"}">${T("objetivoTitulo")}</h2>${P("objetivo", "Describe el objetivo del proyecto…")}
     ${D.porque.length ? `<h2 class="h2">${E("porqueTitulo", "Título", { def: "¿Por qué este enfoque?" })}</h2>${P("porqueIntro", "Introducción (opcional)")}<div class="why">${porque}</div>` : ""}
+
+    ${D.cifras?.filas?.length ? `<h2 class="h2">${E("cifras.titulo", "Título", { def: "El cambio en cifras" })}</h2>${P("cifras.intro", "Introducción (opcional)")}
+      <table class="cmp"><thead><tr><th></th><th class="r">${E("cifras.colHoy", "Hoy", { def: "Web actual" })}</th><th class="r nueva">${E("cifras.colNueva", "Nueva", { def: "Nueva web" })}</th></tr></thead>
+      <tbody>${D.cifras.filas.map((f, i) => `<tr><td>${E(`cifras.filas.${i}.0`, "Medida")}</td><td class="r hoy">${E(`cifras.filas.${i}.1`, "—")}</td><td class="r nueva">${E(`cifras.filas.${i}.2`, "—")}</td></tr>`).join("")}</tbody></table>
+      ${D.cifras.nota ? E("cifras.nota", "Nota", { tag: "p", cls: "cmp-nota", multi: true }) : ""}` : ""}
 
     <h2 class="h2">${E("modulosTitulo", "Título", { def: "Módulos del proyecto" })}</h2>
     ${D.modulos.map((m, i) => `
@@ -387,6 +447,9 @@ function render() {
         </div>
       </div>`).join("")}
 
+    ${D.paginas?.grupos?.length ? `<h2 class="h2">${E("paginas.titulo", "Título", { def: "Páginas de la nueva web" })}</h2>${P("paginas.intro", "Introducción (opcional)")}
+      <div class="pags">${D.paginas.grupos.map((g, i) => `<div><h4>${E(`paginas.grupos.${i}.titulo`, "Grupo")}${g.cifra ? `<span class="cifra">${E(`paginas.grupos.${i}.cifra`, "nº")}</span>` : ""}</h4>${L(`paginas.grupos.${i}.items`)}</div>`).join("")}</div>` : ""}
+
     <h2 class="h2">${T("resumenTitulo")}</h2>
     ${D.cuota?.activo ? `
     <div class="cuota">
@@ -398,14 +461,24 @@ function render() {
       <thead><tr><th>${T("colModulo")}</th><th class="r">${T("colHoras")}</th><th class="r">${T("colPrecio")}</th></tr></thead>
       <tbody>
         ${D.modulos.map((m, i) => `<tr><td>${E(`modulos.${i}.titulo`, "Título del módulo")}${m.nuevo ? '<span class="badge">Nuevo</span>' : ""}</td><td class="r">${m.horas ? m.horas + "h" : "—"}</td><td class="r">${Number(m.precio) ? eur(m.precio) : T("incluido")}</td></tr>`).join("")}
-        <tr class="sub"><td>${T("subtotal")}</td><td class="r">${c.horas}h</td><td class="r">${eur(c.subtotal)}</td></tr>
-        <tr class="iva"><td>${T("ivaLabel")} (${D.iva}%)</td><td></td><td class="r">${eur(c.iva)}</td></tr>
-        <tr class="tot"><td>${T("totalLabel")}</td><td class="r">${c.horas}h</td><td class="r">${eur(c.total)}</td></tr>
       </tbody>
-    </table>`}
+    </table>
+    <div class="totales">
+      <div class="desglose">
+        <div><span>${c.descuento ? "Precio del proyecto" : T("subtotal")}</span><b>${eur(c.subtotal)}</b></div>
+        ${c.descuento ? `<div class="dto-l"><span>${E("descuento.etiqueta", "Descuento", { def: "Descuento" })} <i>−${String(c.pct).replace(".", ",")} %</i></span><b>−${eur(c.descuento)}</b></div>
+        <div><span>${T("baseLabel")}</span><b>${eur(c.base)}</b></div>` : ""}
+        <div><span>${T("ivaLabel")} (${D.iva}%)</span><b>+${eur(c.iva)}</b></div>
+        ${c.irpf ? `<div><span>${T("irpfLabel")} (${String(D.irpf).replace(".", ",")}%)</span><b>−${eur(c.irpf)}</b></div>` : ""}
+      </div>
+      <div class="final"><small>${c.irpf ? T("totalPagar") : T("totalLabel")}</small><b>${eur(c.pagar)}</b><span>${c.horas} horas de trabajo</span></div>
+    </div>`}
 
     <h2 class="h2">${T("pagoTitulo")}</h2>
-    ${E("formaPago", "Forma de pago", { tag: "div", cls: "callout", multi: true })}
+    ${D.pagos?.opciones?.length ? `${D.pagos.intro ? E("pagos.intro", "Introducción", { tag: "p" }) : ""}
+      <div class="pagos">${D.pagos.opciones.map((o, i) => `<div class="pago${i === 0 ? " dest" : ""}"><div class="p-t">${E(`pagos.opciones.${i}.titulo`, "Opción")}</div><div class="p-i">${E(`pagos.opciones.${i}.importe`, "Importe")}</div><div class="p-d">${E(`pagos.opciones.${i}.detalle`, "Cuándo se paga", { multi: true })}</div></div>`).join("")}</div>
+      ${D.pagos.nota ? E("pagos.nota", "Nota", { tag: "p", cls: "pagos-nota", multi: true }) : ""}`
+      : E("formaPago", "Forma de pago", { tag: "div", cls: "callout", multi: true })}
     ${D.bono.activo ? `
       <div class="bono">
         <div><small>${E("bono.titulo", "Nombre del bono")}${D.bono.fechaLimite ? ` · ${T("hastaEl")} ` + fecha(D.bono.fechaLimite) : ""}</small><p style="margin:2mm 0 0">${E("bono.texto", "Texto del bono", { multi: true })}</p></div>
@@ -478,11 +551,31 @@ function paginar() {
     if (!llena()) continue;
     if (body.children.length === 1) continue; // bloque más alto que una hoja: se queda
     // Rejillas (ventajas, requisitos): se parten por tarjetas entre hojas
+    // Tarjetas de páginas: van en columnas, así que pasan de una en una
+    if (b.matches(".pags") && b.children.length > 1) {
+      const resto = b.cloneNode(false);
+      while (llena() && b.children.length > 1) resto.prepend(b.lastElementChild);
+      if (!llena()) { bloques.splice(i + 1, 0, resto); continue; }
+      while (resto.firstElementChild) b.appendChild(resto.firstElementChild);
+    }
     if (b.matches(".why, .req") && b.children.length > 2) {
       const resto = b.cloneNode(false);
       while (llena() && b.children.length > 2) { resto.prepend(b.lastElementChild); if (b.children.length % 2) resto.prepend(b.lastElementChild); }
       if (!llena()) { bloques.splice(i + 1, 0, resto); continue; }
       while (resto.firstElementChild) b.appendChild(resto.firstElementChild);
+    }
+    // Tabla de módulos y listas de puntos sueltas: siguen en la hoja siguiente (la tabla repite su cabecera)
+    if (b.matches("table.sum, ul.b")) {
+      const filas = b.matches("table") ? b.tBodies[0] : b;
+      const real = () => [...filas.children].filter(x => !x.classList.contains("add-pt"));
+      if (real().length > 1) {
+        const resto = b.cloneNode(true), rf = resto.matches("table") ? resto.tBodies[0] : resto;
+        rf.innerHTML = "";
+        while (llena() && real().length > 1) rf.prepend(filas.lastElementChild);
+        if (!llena() && [...rf.children].some(x => !x.classList.contains("add-pt"))) { bloques.splice(i + 1, 0, resto); continue; }
+        while (rf.firstElementChild) filas.appendChild(rf.firstElementChild);
+        if (!llena()) continue;
+      }
     }
     // Módulos: si no caben, sus puntos continúan en la hoja siguiente
     if (b.matches(".mod")) {
@@ -493,11 +586,13 @@ function paginar() {
         cont.querySelector(".mod-desc")?.remove();
         cont.querySelector(".mod-price")?.remove();
         cont.querySelector(".mod-n").textContent = "";
-        cont.querySelector("h3").insertAdjacentHTML("beforeend", ' <small style="font-weight:500;color:var(--muted)">(continuación)</small>');
         cont.classList.add("mod--cont");
         while (llena() && ul.children.length > 1) cul.prepend(ul.lastElementChild);
-        if (!llena()) { bloques.splice(i + 1, 0, cont); continue; }
+        // Si a la hoja siguiente solo pasaría el botón «+ Añadir punto», no se crea la continuación
+        const soloBoton = [...cul.children].every(x => x.classList.contains("add-pt"));
+        if (!llena() && !soloBoton) { bloques.splice(i + 1, 0, cont); continue; }
         while (cul.firstElementChild) ul.appendChild(cul.firstElementChild);
+        if (!llena()) continue;
       }
     }
     const prev = b.previousElementSibling;
@@ -516,6 +611,7 @@ const txt = (label, path, opts = {}) => {
   const t = opts.type || "text";
   if (t === "area") return `<label class="f">${label}<textarea data-p="${path}" data-t="text">${esc(v)}</textarea></label>`;
   if (t === "lines") return `<label class="f">${label}<textarea data-p="${path}" data-t="lines" style="min-height:${opts.h || 110}px">${esc((v || []).join("\n"))}</textarea><div class="hint">Un punto por línea</div></label>`;
+  if (t === "select") return `<label class="f">${label}<select data-p="${path}" data-t="text">${opts.options.map(([k, l]) => `<option value="${k}" ${String(v) === k ? "selected" : ""}>${esc(l)}</option>`).join("")}</select></label>`;
   if (t === "check") return `<label class="chk"><input type="checkbox" data-p="${path}" data-t="bool" ${v ? "checked" : ""}/> ${label}</label>`;
   return `<label class="f">${label}<input type="${t}" data-p="${path}" data-t="${t === "number" ? "num" : "text"}" value="${esc(v)}" ${opts.ph ? `placeholder="${esc(opts.ph)}"` : ""} ${opts.list ? `list="${opts.list}" autocomplete="off"` : ""}/></label>`;
 };
@@ -552,6 +648,9 @@ function buildEditor() {
       <div class="row">${txt("Precio final (€ IVA incluido)", "totalConIva", { type: "number" })}${txt("IVA (%)", "iva", { type: "number" })}</div>
       <div class="hint" id="calcHint"></div>
       ${txt("Forma de pago", "formaPago", { type: "area" })}
+      ${txt("Retención de IRPF (%) · 0 si el cliente es particular", "irpf", { type: "number" })}
+      ${txt("Aplicar descuento en el resumen económico", "descuento.activo", { type: "check" })}
+      <div class="row">${txt("Descuento (%)", "descuento.porcentaje", { type: "number" })}${txt("Nombre del descuento", "descuento.etiqueta", { ph: "Bono de bienvenida" })}</div>
       ${txt("Incluir bono / descuento", "bono.activo", { type: "check" })}
       ${txt("Nombre del bono", "bono.titulo")}
       <div class="row">${txt("Precio final (€ IVA incl.)", "bono.precio", { type: "number" })}${txt("Fecha límite", "bono.fechaLimite", { type: "date" })}</div>
@@ -573,6 +672,11 @@ function buildEditor() {
       ${D.requisitos.map((r, i) => `<div class="item">${head("Grupo " + (i + 1), "requisitos", i)}
         ${txt("Título", `requisitos.${i}.titulo`)}${txt("Requisitos", `requisitos.${i}.items`, { type: "lines" })}</div>`).join("")}
       <button class="add" data-add="requisitos">+ Añadir grupo</button>`, o("Garantía y requisitos")) +
+    sec("Renovación", `
+      <div class="row">${txt("Periodicidad", "renov.tipo", { type: "select", options: [["", "Sin renovación"], ["mensual", "Mensual"], ["trimestral", "Trimestral"], ["semestral", "Semestral"], ["anual", "Anual"]] })}${txt("Responsable", "renov.persona", { type: "select", options: [["", "Majosoft (ambos)"], ["jose", "Jose"], ["maria", "María"]] })}</div>
+      <div class="row">${txt("Inicio del servicio", "renov.inicio", { type: "date" })}${txt("Hasta (opcional)", "renov.hasta", { type: "date" })}</div>
+      ${txt("Nota para la renovación", "renov.nota", { ph: "Revisar precio, avisar al cliente…" })}
+      <div class="hint">Cada renovación aparece en Tareas y en el calendario de Google.</div>`, o("Renovación")) +
     sec("Contacto", `
       ${txt("Nombre", "contacto.nombre")}
       <div class="row">${txt("Teléfono", "contacto.telefono")}${txt("Email", "contacto.email")}</div>
@@ -610,11 +714,11 @@ ed.addEventListener("input", e => {
   set(p, t === "bool" ? el.checked : t === "num" ? (el.value === "" ? "" : Number(el.value)) : t === "lines" ? el.value.split("\n").map(s => s.trim()).filter(Boolean) : el.value);
   refresh(p === "auto");
 });
-ed.addEventListener("click", e => {
+ed.addEventListener("click", async e => {
   const b = e.target.closest("button"); if (!b) return;
   if (b.dataset.add) { get(b.dataset.add).push(NUEVOS[b.dataset.add]()); return refresh(true); }
   const arr = get(b.dataset.arr), i = +b.dataset.i;
-  if (b.dataset.act === "del" && confirm("¿Eliminar este elemento?")) arr.splice(i, 1);
+  if (b.dataset.act === "del" && await confirmar("¿Eliminar este elemento?")) arr.splice(i, 1);
   if (b.dataset.act === "up" && i > 0) [arr[i - 1], arr[i]] = [arr[i], arr[i - 1]];
   if (b.dataset.act === "down" && i < arr.length - 1) [arr[i + 1], arr[i]] = [arr[i], arr[i + 1]];
   refresh(true);
@@ -624,11 +728,28 @@ ed.addEventListener("click", e => {
 const docEl = document.getElementById("doc");
 const txtDe = x => x.innerText.replace(/\u00a0/g, " ").replace(/\n+$/, "");
 // Puntos vacíos de las listas: se quitan al terminar de editar
-const LISTAS = () => ["porque", "garantia", "mant.incluye", "mant.noIncluye", ...D.modulos.map((_, i) => `modulos.${i}.items`), ...D.requisitos.map((_, i) => `requisitos.${i}.items`)];
+const LISTAS = () => ["porque", "garantia", "mant.incluye", "mant.noIncluye", ...(D.paginas?.grupos || []).map((_, i) => `paginas.grupos.${i}.items`), ...D.modulos.map((_, i) => `modulos.${i}.items`), ...D.requisitos.map((_, i) => `requisitos.${i}.items`)];
 const limpiar = () => LISTAS().forEach(p => { const a = get(p); if (Array.isArray(a)) set(p, a.filter(x => String(x).trim() && String(x).trim() !== ":")); });
 docEl.addEventListener("keydown", e => {
   const el = e.target.closest(".ed"); if (!el) return;
-  if (e.key === "Enter" && !el.dataset.multi) { e.preventDefault(); el.blur(); }
+  if (e.key === "Enter" && !el.dataset.multi) {
+    e.preventDefault();
+    const m = el.tagName === "LI" && el.dataset.p.match(/^(.*)\.(\d+)$/);
+    if (m) return nuevoPunto(m[1], +m[2] + 1);
+    el.blur();
+  }
+});
+// Inserta un punto vacío en la lista y lo deja listo para escribir
+function nuevoPunto(path, pos) {
+  const arr = get(path); if (!Array.isArray(arr)) return;
+  arr.splice(pos ?? arr.length, 0, "");
+  render();
+  docEl.querySelector(`.ed[data-p="${path}.${pos ?? arr.length - 1}"]`)?.focus();
+  save();
+}
+docEl.addEventListener("mousedown", e => {
+  const b = e.target.closest(".add-pt"); if (!b) return;
+  e.preventDefault(); nuevoPunto(b.dataset.addpt);
 });
 docEl.addEventListener("input", e => {
   const el = e.target.closest(".ed"); if (!el) return;
@@ -664,6 +785,7 @@ const file = document.getElementById("file");
 const nuevoId = () => "p" + Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
 async function crear(base) {
   const d = migrar({ ...structuredClone(VACIO), ...structuredClone(base), id: nuevoId(), fecha: isoLocal() });
+  d.renov = { tipo: "", persona: "", inicio: "", hasta: "", nota: "" }; // una copia no hereda la renovación
   await api(`docs/presupuestos/${d.id}`, { method: "PUT", body: d });
   location.href = "/admin/presupuestos?id=" + d.id;
 }
@@ -689,10 +811,15 @@ if (D) {
   document.getElementById("app").hidden = false;
   document.getElementById("docTitle").textContent = D.titulo;
   buildEditor(); render(); syncEditor();
+  // Si este presupuesto es un bono de horas, enlace a su registro de consumo
+  api("docs/bonos").then(bs => { const b = bs.find(x => x.presupuesto === D.id); if (b) Object.assign(document.getElementById("bBono"), { hidden: false, href: "/admin/bonos?id=" + encodeURIComponent(b.id) }); }).catch(() => {});
   document.fonts?.ready.then(render); // las medidas cambian al cargar Inter
 } else {
   document.getElementById("plist").hidden = false;
-  const totalP = p => p.auto ? Number(p.totalConIva || 0) : Math.round(p.modulos.reduce((s, m) => s + Number(m.precio || 0), 0) * (1 + p.iva / 100) * 100) / 100;
+  const totalP = p => { if (p.auto) return Number(p.totalConIva || 0);
+    const sub = p.modulos.reduce((s, m) => s + Number(m.precio || 0), 0), pct = p.descuento?.activo ? Number(p.descuento.porcentaje || 0) : 0;
+    const base = sub - Math.round(sub * pct) / 100;
+    return Math.round((base * (1 + p.iva / 100) - base * Number(p.irpf || 0) / 100) * 100) / 100; };
   document.getElementById("prows").innerHTML = lista.length ? lista.map(p => `<tr data-id="${esc(p.id)}">
     <td><b>${esc(p.titulo)}</b></td><td>${esc(p.cliente)}</td><td>${fecha(p.fecha)}</td><td class="r"><b>${eur(totalP(p))}</b></td>
     <td class="r"><button class="del" data-del="${esc(p.id)}" title="Eliminar">✕</button></td></tr>`).join("")
@@ -700,7 +827,7 @@ if (D) {
   document.getElementById("prows").onclick = async e => {
     const del = e.target.closest("[data-del]");
     if (del) {
-      if (!confirm("¿Eliminar este presupuesto?")) return;
+      if (!await confirmar("¿Eliminar este presupuesto?")) return;
       await api(`docs/presupuestos/${del.dataset.del}`, { method: "DELETE" });
       return location.reload();
     }

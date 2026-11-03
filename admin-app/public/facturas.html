@@ -20,6 +20,7 @@
     .btn { display: inline-flex; align-items: center; gap: 6px; padding: 9px 15px; border-radius: 10px; border: 1px solid var(--line); background: #fff; color: var(--ink); font: inherit; font-weight: 700; font-size: 13px; cursor: pointer; text-decoration: none; white-space: nowrap; }
     .btn:hover { border-color: var(--ink); }
     .btn--ink { background: var(--ink); color: var(--cream); border-color: var(--ink); }
+    .btn--lime { background: var(--lime); color: var(--ink); border-color: var(--lime); }
     .btn--ink:hover { background: #2a2b26; }
     .btn--danger:hover { border-color: #b42318; color: #b42318; }
 
@@ -63,8 +64,11 @@
     .pill.pendiente { background: #fff5d6; color: #8a6200; }
     .pill.pagada { background: #e6f3ea; color: #2f7d4f; }
     .pill.borrador { background: #eeede5; color: var(--muted); }
+    .pill.recibo { background: #f1f4c8; color: #5d6300; }
     button.pill { border: 1px solid transparent; font: inherit; font-size: 11.5px; font-weight: 700; cursor: pointer; }
     button.pill:hover { border-color: currentColor; }
+    .del-row { border: 0; background: none; cursor: pointer; font-size: 14px; opacity: .35; padding: 2px 6px; border-radius: 6px; }
+    .del-row:hover { opacity: 1; background: #fbe4e4; }
     .empty { text-align: center; padding: 48px; color: var(--muted); }
     .scroll { overflow-x: auto; }
     @media (max-width: 1100px) { .kpis { grid-template-columns: repeat(2, 1fr); } }
@@ -114,6 +118,8 @@
     .s-top { background: var(--ink); color: var(--cream); margin: -16mm -18mm 0; padding: 12mm 18mm 10mm; display: flex; justify-content: space-between; align-items: flex-start; position: relative; overflow: hidden; }
     .s-top::before { content: ""; position: absolute; width: 70mm; height: 70mm; border-radius: 50%; background: var(--lime); opacity: .14; filter: blur(30px); top: -35mm; right: -25mm; }
     .s-top > * { position: relative; }
+    /* Recibo: misma estética que la factura, con una franja que deja claro que no es una factura */
+    .aviso-recibo { margin: 0 -18mm; padding: 2.4mm 18mm; background: var(--lime); color: var(--ink); font-size: 8pt; font-weight: 800; letter-spacing: .04em; }
     .s-top .me .mark { display: flex; align-items: center; gap: 2mm; }
     .s-top .me img { height: 18px; filter: invert(1); }
     .s-top .me .mark span { font-size: 10.5pt; font-weight: 800; letter-spacing: -.03em; }
@@ -175,33 +181,35 @@
 <body>
   <header class="topbar" id="topbar" hidden>
     <button class="btn" id="toPanel">← Facturas</button>
-    <span class="doc-title"><small>Factura</small><span id="docTitle"></span></span>
+    <span class="doc-title"><small id="docTipo">Factura</small><span id="docTitle"></span></span>
     <span class="save-state" data-save-state></span>
     <span id="editBtns" hidden>
       <button class="btn btn--danger" id="bDel">Eliminar</button>
       <button class="btn" id="bDup">Duplicar</button>
+      <button class="btn btn--lime" id="bConvertir" hidden>Pagado: convertir en factura</button>
       <button class="btn btn--ink" id="bPrint">Descargar PDF</button>
     </span>
   </header>
 
   <section class="panel" id="panel">
     <div class="page-head">
-      <div><div class="crumbs">Comercial</div><h1>Facturas</h1><p>Emisión, numeración y seguimiento de cobros.</p></div>
+      <div><div class="crumbs">Comercial</div><h1>Facturas</h1><p>Primero el recibo para pedir el pago; al cobrar, se convierte en factura con su número correlativo.</p></div>
       <div class="actions">
         <button class="btn" id="bImport">Importar</button>
         <button class="btn" id="bExport">Exportar copia</button>
-        <button class="btn btn--ink" id="bNew">+ Nueva factura</button>
+        <button class="btn" id="bNew">+ Nueva factura</button>
+        <button class="btn btn--ink" id="bNewRecibo">+ Nuevo recibo</button>
         <input type="file" id="file" accept="application/json" hidden />
       </div>
     </div>
     <div class="kpis" id="kpis"></div>
     <div class="card">
       <div class="card-tools">
-        <div class="tabs" id="tabs"><button data-f="" class="on">Todas</button><button data-f="pendiente">Pendientes</button><button data-f="pagada">Pagadas</button><button data-f="borrador">Borradores</button></div>
+        <div class="tabs" id="tabs"><button data-f="" class="on">Todas</button><button data-f="pendiente">Pendientes</button><button data-f="pagada">Pagadas</button><button data-f="borrador">Borradores</button><button data-f="recibo">Recibos</button></div>
         <input class="search" id="q" placeholder="Buscar cliente, número o concepto" />
       </div>
       <div class="scroll"><table class="list">
-        <thead><tr><th>Nº</th><th>Cliente</th><th>Concepto</th><th>Fecha</th><th>Estado</th><th class="r">Total</th></tr></thead>
+        <thead><tr><th>Nº</th><th>Cliente</th><th>Concepto</th><th>Fecha</th><th>Estado</th><th class="r">Total</th><th></th></tr></thead>
         <tbody id="rows"></tbody>
       </table></div>
     </div>
@@ -213,7 +221,7 @@
   </section>
 
 <script type="module">
-import { mountShell, api, autosaver, toast } from "/admin/panel.js";
+import { mountShell, api, autosaver, toast, confirmar } from "/admin/panel.js";
 await mountShell("facturas");
 // Fecha local en formato aaaa-mm-dd (toISOString usa UTC: en España, de 00:00 a 02:00 daba el día anterior)
 const isoLocal = (d = new Date()) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
@@ -269,10 +277,14 @@ const totales = f => {
   const irpf = r2(base * (f.irpf ?? IRPF_DEFECTO) / 100);
   return { base, iva, irpf, total: r2(base + iva - irpf) };
 };
-const siguienteNumero = () => {
-  // Numeración correlativa: 01, 02, 03…
-  const n = store.map(f => parseInt(String(f.numero).replace(/\D/g, ""), 10)).filter(Number.isFinite);
-  return String((n.length ? Math.max(...n) : 0) + 1).padStart(2, "0");
+// Recibo: documento para pedir el pago, sin efecto fiscal. Al cobrarlo se convierte en factura.
+const esRecibo = f => f.tipo === "recibo";
+const TIPO = f => esRecibo(f) ? "Recibo" : "Factura";
+const siguienteNumero = (recibo = false) => {
+  // Numeración correlativa: facturas 01, 02, 03…; recibos R-01, R-02… (series separadas)
+  const n = store.filter(f => esRecibo(f) === recibo).map(f => parseInt(String(f.numero).replace(/\D/g, ""), 10)).filter(Number.isFinite);
+  const sig = String((n.length ? Math.max(...n) : 0) + 1).padStart(2, "0");
+  return recibo ? "R-" + sig : sig;
 };
 
 /* ===== Panel ===== */
@@ -281,7 +293,10 @@ const clientesConocidos = () => {
   const m = new Map();
   [...store].sort((a, b) => (a.updated_at || 0) - (b.updated_at || 0)).forEach(f => {
     const n = String(f.cliente?.nombre || "").trim();
-    if (n && n !== "Nuevo cliente" && n !== "Nombre del cliente") m.set(n.toLowerCase(), { ...f.cliente });
+    if (!n || n === "Nuevo cliente" || n === "Nombre del cliente") return;
+    // Los datos vacíos de una factura nueva no borran los que ya se conocían
+    const prev = m.get(n.toLowerCase()) || {};
+    m.set(n.toLowerCase(), { ...prev, ...Object.fromEntries(Object.entries(f.cliente).filter(([, v]) => String(v ?? "").trim())) });
   });
   return [...m.values()].sort((a, b) => a.nombre.localeCompare(b.nombre, "es"));
 };
@@ -294,24 +309,26 @@ function panel() {
   document.getElementById("topbar").hidden = true;
   history.replaceState(null, "", "/admin/facturas");
   const q = document.getElementById("q").value.toLowerCase();
-  const lista = store.filter(f => (!filtro || f.estado === filtro) && (!q || [f.numero, f.cliente.nombre, ...f.lineas.map(l => l.concepto)].join(" ").toLowerCase().includes(q)))
+  const lista = store.filter(f => (!filtro || (filtro === "recibo" ? esRecibo(f) : !esRecibo(f) && f.estado === filtro)) && (!q || [f.numero, f.cliente.nombre, ...f.lineas.map(l => l.concepto)].join(" ").toLowerCase().includes(q)))
     .sort((a, b) => String(b.numero).localeCompare(String(a.numero), "es", { numeric: true }));
   const y = String(new Date().getFullYear());
   const sum = arr => arr.reduce((s, f) => s + totales(f).total, 0);
-  const año = store.filter(f => f.fecha.startsWith(y) && f.estado !== "borrador");
-  const pend = store.filter(f => f.estado === "pendiente"), pag = store.filter(f => f.estado === "pagada");
+  const facts = store.filter(f => !esRecibo(f)), recibos = store.filter(esRecibo);
+  const año = facts.filter(f => f.fecha.startsWith(y) && f.estado !== "borrador");
+  // Pendiente de cobro: recibos sin cobrar y facturas pendientes
+  const pend = [...recibos, ...facts.filter(f => f.estado === "pendiente")], pag = facts.filter(f => f.estado === "pagada");
   document.getElementById("kpis").innerHTML = `
     <div class="kpi dark"><small>Facturado ${y}</small><b>${eur(sum(año))}</b><span>IVA incluido</span></div>
-    <div class="kpi"><small>Pendiente de cobro</small><b>${eur(sum(pend))}</b><span>${pend.length} ${pend.length === 1 ? "factura" : "facturas"}</span></div>
+    <div class="kpi"><small>Pendiente de cobro</small><b>${eur(sum(pend))}</b><span>${recibos.length} ${recibos.length === 1 ? "recibo" : "recibos"} · ${pend.length - recibos.length} ${pend.length - recibos.length === 1 ? "factura" : "facturas"}</span></div>
     <div class="kpi"><small>Cobrado</small><b>${eur(sum(pag))}</b><span>${pag.length} ${pag.length === 1 ? "factura" : "facturas"}</span></div>
-    <div class="kpi"><small>Facturas emitidas</small><b>${store.filter(f => f.estado !== "borrador").length}</b><span>${store.filter(f => f.estado === "borrador").length} en borrador</span></div>`;
+    <div class="kpi"><small>Facturas emitidas</small><b>${facts.filter(f => f.estado !== "borrador").length}</b><span>${facts.filter(f => f.estado === "borrador").length} en borrador</span></div>`;
   const ini = n => String(n || "?").trim().split(/\s+/).slice(0, 2).map(w => w[0]).join("").toUpperCase();
   document.getElementById("rows").innerHTML = lista.length ? lista.map(f => `
     <tr data-id="${f.id}"><td class="num">${esc(f.numero)}</td>
     <td><span class="cli">${f.cliente.logo ? `<img src="${esc(f.cliente.logo)}" alt="" />` : `<i>${esc(ini(f.cliente.nombre))}</i>`}${esc(f.cliente.nombre)}</span></td>
     <td class="muted">${esc(f.resumen || f.lineas[0]?.concepto || "")}</td><td class="muted">${fecha(f.fecha)}</td>
-    <td>${f.estado === "borrador" ? `<span class="pill borrador">borrador</span>` : `<button class="pill ${f.estado}" data-toggle="${esc(f.id)}" title="Marcar como ${f.estado === "pagada" ? "pendiente" : "pagada"}">${f.estado}</button>`}</td><td class="r"><b>${eur(totales(f).total)}</b></td></tr>`).join("")
-    : `<tr><td colspan="6" class="empty">${store.length ? "Ninguna factura coincide con el filtro." : "Aún no hay facturas. Crea la primera con «+ Nueva factura»."}</td></tr>`;
+    <td>${esRecibo(f) ? `<span class="pill recibo">recibo</span>` : f.estado === "borrador" ? `<span class="pill borrador">borrador</span>` : `<button class="pill ${f.estado}" data-toggle="${esc(f.id)}" title="Marcar como ${f.estado === "pagada" ? "pendiente" : "pagada"}">${f.estado}</button>`}</td><td class="r"><b>${eur(totales(f).total)}</b></td><td class="r"><button class="del-row" data-del-row="${esc(f.id)}" title="Eliminar">🗑</button></td></tr>`).join("")
+    : `<tr><td colspan="7" class="empty">${store.length ? "Ninguna factura coincide con el filtro." : "Aún no hay facturas. Crea la primera con «+ Nueva factura»."}</td></tr>`;
 }
 
 /* ===== Editor ===== */
@@ -340,14 +357,19 @@ function editar(id) {
   document.getElementById("editBtns").hidden = false;
   document.getElementById("topbar").hidden = false;
   document.getElementById("docTitle").textContent = `Nº ${cur.numero} · ${cur.cliente.nombre}`;
+  document.getElementById("docTipo").textContent = TIPO(cur);
+  document.getElementById("bConvertir").hidden = !esRecibo(cur);
   history.replaceState(null, "", "/admin/facturas#" + id);
   form(); sheet();
 }
 
 function form() {
   document.getElementById("form").innerHTML = `
-    <section class="sec"><h3>Factura</h3>
-      <div class="row"><label class="f">Número (automático)<input type="text" value="${esc(cur.numero)}" readonly tabindex="-1" class="ro" title="Se asigna solo al crear la factura" /></label><label class="f">Estado<select data-p="estado">${["borrador", "pendiente", "pagada"].map(e => `<option ${cur.estado === e ? "selected" : ""}>${e}</option>`).join("")}</select></label></div>
+    <section class="sec"><h3>${TIPO(cur)}</h3>
+      <div class="row"><label class="f">Número (automático)<input type="text" value="${esc(cur.numero)}" readonly tabindex="-1" class="ro" title="Se asigna solo al crear el documento" /></label>${esRecibo(cur)
+        ? `<label class="f">Estado<input type="text" value="Pendiente de cobro" readonly tabindex="-1" class="ro" /></label>`
+        : `<label class="f">Estado<select data-p="estado">${["borrador", "pendiente", "pagada"].map(e => `<option ${cur.estado === e ? "selected" : ""}>${e}</option>`).join("")}</select></label>`}</div>
+      ${esRecibo(cur) ? `<p class="hint-own">Sin efecto fiscal. Cuando te paguen, pulsa «Pagado: convertir en factura» y recibirá el siguiente número de factura con fecha de hoy.</p>` : cur.reciboOrigen ? `<p class="hint-own">Procede del recibo ${esc(cur.reciboOrigen)}.</p>` : ""}
       <div class="row">${fld("Fecha", "fecha", "date")}
         <label class="f"><span class="chk-venc"><input type="checkbox" id="conVenc" ${cur.vencimiento ? "checked" : ""} /> Vencimiento</span>
           <input type="date" data-p="vencimiento" value="${esc(cur.vencimiento || "")}" ${cur.vencimiento ? "" : "disabled"} /></label></div>
@@ -355,8 +377,8 @@ function form() {
       ${fld("Resumen (si no hay periodo)", "resumen")}
     </section>
     <section class="sec"><h3>Cliente</h3>
-      <label class="f">Nombre / razón social<input type="text" data-p="cliente.nombre" value="${esc(cur.cliente.nombre || "")}" list="clientesList" autocomplete="off" placeholder="Elige o escribe un cliente" /></label>
-      <datalist id="clientesList">${clientesConocidos().map(c => `<option value="${esc(c.nombre)}">${esc(c.nif || "")}</option>`).join("")}</datalist>
+      <label class="f">Cliente guardado<select id="cliElegir"><option value="">— Elegir un cliente guardado (${clientesConocidos().length}) —</option>${clientesConocidos().map((c, i) => `<option value="${i}">${esc(c.nombre)}${c.nif ? " · " + esc(c.nif) : ""}</option>`).join("")}</select></label>
+      <label class="f">Nombre / razón social<input type="text" data-p="cliente.nombre" value="${esc(cur.cliente.nombre || "")}" autocomplete="off" placeholder="Escribe el cliente" /></label>
       <div class="row">${fld("NIF / CIF", "cliente.nif")}${fld("Email", "cliente.email")}</div>
       ${fld("Dirección (calle y número)", "cliente.direccion")}
       ${fld("C.P. y ciudad", "cliente.cpCiudad")}
@@ -408,24 +430,37 @@ const ed = (p, ph, multi) => `<span class="ed" contenteditable="plaintext-only" 
 const edFecha = p => `<span class="ed" contenteditable="plaintext-only" spellcheck="false" data-p="${p}" data-t="fecha" data-ph="dd/mm/aaaa">${val(p) ? fecha(val(p)) : ""}</span>`;
 
 function sheet() {
-  const f = cur, t = totales(f), e = f.emisor, c = f.cliente;
+  const f = cur, t = totales(f), e = f.emisor, c = f.cliente, rec = esRecibo(f);
+  document.getElementById("sheet").classList.toggle("recibo", rec);
   document.getElementById("sheet").innerHTML = `
     <div class="s-top">
-      <div class="me"><div class="mark"><img src="/assets/logo.svg" alt="" /><span>majosoft<i>.</i></span></div><h1>Factura</h1></div>
+      <div class="me"><div class="mark"><img src="/assets/logo.svg" alt="" /><span>majosoft<i>.</i></span></div><h1>${rec ? "Recibo de pago" : "Factura"}</h1></div>
       <div class="meta"><b>Nº ${esc(f.numero)}</b>Fecha: ${edFecha("fecha")}${f.vencimiento ? `<br />Vencimiento: ${edFecha("vencimiento")}` : ""}</div>
     </div>
-    <div class="parties">
-      <div><span class="lbl">Emisor</span><b>${ed("emisor.titular", "Nombre del emisor")}</b>${ed("emisor.empresa", "Actividad o empresa")}<br />NIF: ${ed("emisor.nif", "NIF")}<br />${ed("emisor.direccion", "Calle y número")}<br />${ed("emisor.cpCiudad", "C.P. y ciudad")}<br />${ed("emisor.email", "Email")} · ${ed("emisor.telefono", "Teléfono")}</div>
-      <div class="to">${c.logo ? `<img src="${c.logo}" alt="" />` : ""}<span class="lbl">Facturar a</span><b>${ed("cliente.nombre", "Nombre del cliente")}</b>NIF/CIF: ${ed("cliente.nif", "NIF/CIF")}<br />${ed("cliente.direccion", "Calle y número")}<br />${ed("cliente.cpCiudad", "C.P. y ciudad")}<br />${ed("cliente.email", "Email")}</div>
-    </div>
+    ${rec ? `<div class="aviso-recibo">SOLICITUD DE PAGO · NO ES UNA FACTURA · La factura se emitirá al recibir el pago</div>` : ""}
+    ${rec ? `<div class="parties">
+      <div><span class="lbl">De</span><b>${ed("emisor.titular", "Nombre del emisor")}</b>${ed("emisor.email", "Email")} · ${ed("emisor.telefono", "Teléfono")}</div>
+      <div class="to">${c.logo ? `<img src="${c.logo}" alt="" />` : ""}<span class="lbl">Para</span><b>${ed("cliente.nombre", "Nombre del cliente")}</b></div>
+    </div>` : `<div class="parties">
+      <div><span class="lbl">${rec ? "De" : "Emisor"}</span><b>${ed("emisor.titular", "Nombre del emisor")}</b>${ed("emisor.empresa", "Actividad o empresa")}<br />NIF: ${ed("emisor.nif", "NIF")}<br />${ed("emisor.direccion", "Calle y número")}<br />${ed("emisor.cpCiudad", "C.P. y ciudad")}<br />${ed("emisor.email", "Email")} · ${ed("emisor.telefono", "Teléfono")}</div>
+      <div class="to">${c.logo ? `<img src="${c.logo}" alt="" />` : ""}<span class="lbl">${rec ? "Para" : "Facturar a"}</span><b>${ed("cliente.nombre", "Nombre del cliente")}</b>NIF/CIF: ${ed("cliente.nif", "NIF/CIF")}<br />${ed("cliente.direccion", "Calle y número")}<br />${ed("cliente.cpCiudad", "C.P. y ciudad")}<br />${ed("cliente.email", "Email")}</div>
+    </div>`}
     <div class="strip${f.vencimiento ? "" : " strip--2"}">
-      <div><small>Fecha de emisión</small><b>${edFecha("fecha")}</b></div>
+      <div><small>${rec ? "Fecha" : "Fecha de emisión"}</small><b>${edFecha("fecha")}</b></div>
       ${f.vencimiento ? `<div><small>Vencimiento</small><b>${edFecha("vencimiento")}</b></div>` : ""}
       ${f.periodo.desde || !f.resumen
         ? `<div><small>Periodo de servicio</small><b>${f.periodo.desde ? fecha(f.periodo.desde) + " – " + fecha(f.periodo.hasta) : "—"}</b></div>`
         : `<div><small>Concepto</small><b>${esc(f.resumen)}</b></div>`}
     </div>
-    <table class="items">
+    ${rec ? `<table class="items">
+      <thead><tr><th>#</th><th>Concepto</th><th class="r">Importe</th></tr></thead>
+      <tbody>${f.lineas.map((l, i) => `<tr><td class="n">${String(i + 1).padStart(2, "0")}</td><td><b>${esc(l.concepto)}</b>${l.detalle ? `<small>${esc(l.detalle)}</small>` : ""}</td><td class="r"><b>${eur(l.cantidad * l.precio)}</b></td></tr>`).join("")}</tbody>
+    </table>
+    <div class="sum"><div></div><div class="totals">
+      <div><span>Importe</span><span>${eur(t.base)}</span></div>
+      <div><span>IVA ${f.iva}%</span><span>+ ${eur(t.iva)}</span></div>
+      ${t.irpf ? `<div><span>Retención IRPF ${f.irpf ?? IRPF_DEFECTO}%</span><span>− ${eur(t.irpf)}</span></div>` : ""}
+      <div class="t"><span>Importe a pagar</span><span>${eur(t.total)}</span></div></div></div>` : `<table class="items">
       <thead><tr><th>#</th><th>Descripción</th><th class="r">Cant.</th><th class="r">Precio</th><th class="r">Importe</th></tr></thead>
       <tbody>${f.lineas.map((l, i) => `<tr><td class="n">${String(i + 1).padStart(2, "0")}</td><td><b>${esc(l.concepto)}</b>${l.detalle ? `<small>${esc(l.detalle)}</small>` : ""}${f.periodo.desde ? `<small>Del ${fecha(f.periodo.desde)} al ${fecha(f.periodo.hasta)}</small>` : ""}</td><td class="r">${l.cantidad}</td><td class="r">${eur(l.precio)}</td><td class="r"><b>${eur(l.cantidad * l.precio)}</b></td></tr>`).join("")}</tbody>
     </table>
@@ -437,19 +472,20 @@ function sheet() {
         ${t.irpf ? `<div><span>Retención IRPF ${f.irpf ?? IRPF_DEFECTO}%</span><span>− ${eur(t.irpf)}</span></div>` : ""}
         <div class="t"><span>Total a pagar</span><span>${eur(t.total)}</span></div>
       </div>
-    </div>
+    </div>`}
     <div class="s-bottom">
       <div class="pay">
-        ${(f.irpf ?? IRPF_DEFECTO) == 7 ? `<p class="legal">${NOTA_IRPF}</p>` : ""}
+        ${!rec && (f.irpf ?? IRPF_DEFECTO) == 7 ? `<p class="legal">${NOTA_IRPF}</p>` : ""}
         <div><span class="lbl">Forma de pago</span><p>Transferencia bancaria${f.vencimiento ? ` antes del ${fecha(f.vencimiento)}` : ""}</p>
           ${e.iban ? `<p class="iban" style="margin-top:2mm">${esc(e.iban)}</p>` : `<p style="margin-top:2mm;color:var(--muted)">IBAN pendiente de indicar</p>`}
-          <p style="margin-top:2mm">Concepto: <b class="ed" contenteditable="plaintext-only" spellcheck="false" data-p="conceptoPago" data-ph="Factura ${esc(f.numero)}">${esc(f.conceptoPago || `Factura ${f.numero}`)}</b></p></div>
+          <p style="margin-top:2mm">Concepto: <b class="ed" contenteditable="plaintext-only" spellcheck="false" data-p="conceptoPago" data-ph="${TIPO(f)} ${esc(f.numero)}">${esc(f.conceptoPago || `${TIPO(f)} ${f.numero}`)}</b></p></div>
+
         ${f.notas ? `<div><span class="lbl">Condiciones</span><p>${esc(f.notas)}</p></div>` : ""}
       </div>
       <div class="thanks"><b>Gracias por confiar en Majosoft<i>.</i></b></div>
-      <div class="s-foot"><span>Majosoft · Estudio de desarrollo de software · majosoft.es</span><span>Factura ${esc(f.numero)} · Página 1 de 1</span></div>
+      <div class="s-foot"><span>Majosoft · Estudio de desarrollo de software · majosoft.es</span><span>${TIPO(f)} ${esc(f.numero)} · Página 1 de 1</span></div>
     </div>`;
-  document.title = `Factura ${f.numero} · ${f.cliente.nombre}`;
+  document.title = `${TIPO(f)} ${f.numero} · ${f.cliente.nombre}`;
   ajustarVista();
 }
 
@@ -473,7 +509,26 @@ formEl.addEventListener("input", ev => {
   if (p === "estado") { saveCur.flush(); toast(`Factura ${cur.numero}: ${cur.estado}`); }
 });
 formEl.addEventListener("change", async ev => {
-  // Al elegir un cliente conocido se completan sus datos
+  // Datos del cliente cambiados: se copian a sus otras facturas en borrador.
+  // Las emitidas (pendientes o pagadas) no se tocan.
+  const p = ev.target.dataset.p;
+  if (p?.startsWith("cliente.") && p !== "cliente.nombre") {
+    const k = p.split(".")[1], n = String(cur.cliente.nombre || "").trim().toLowerCase();
+    const otras = store.filter(f => f.id !== cur.id && f.estado === "borrador" && String(f.cliente?.nombre || "").trim().toLowerCase() === n && f.cliente[k] !== cur.cliente[k]);
+    if (n && otras.length) {
+      otras.forEach(f => { f.cliente[k] = cur.cliente[k]; });
+      try { await Promise.all(otras.map(put)); toast(`Actualizado también en ${otras.length} ${otras.length === 1 ? "borrador" : "borradores"} de ${cur.cliente.nombre}`); }
+      catch (e) { toast(e.message, true); }
+    }
+  }
+  // Desplegable de clientes guardados: copia todos sus datos a la factura
+  if (ev.target.id === "cliElegir") {
+    const c = clientesConocidos()[+ev.target.value]; if (!c) return;
+    cur.cliente = { ...cur.cliente, nombre: c.nombre, nif: c.nif || "", direccion: c.direccion || "", cpCiudad: c.cpCiudad || "", email: c.email || "", logo: c.logo || "" };
+    form(); sheet(); save(); toast(`Datos de ${c.nombre} completados`);
+    return;
+  }
+  // Al escribir el nombre de un cliente conocido se completan sus datos
   if (ev.target.dataset.p === "cliente.nombre") {
     const c = clientesConocidos().find(x => x.nombre.toLowerCase() === ev.target.value.trim().toLowerCase());
     if (c) { Object.assign(cur.cliente, { nif: c.nif || "", direccion: c.direccion || "", cpCiudad: c.cpCiudad || "", email: c.email || "", logo: c.logo || cur.cliente.logo || "" }); form(); sheet(); save(); toast(`Datos de ${c.nombre} completados`); }
@@ -487,7 +542,7 @@ formEl.addEventListener("change", async ev => {
   }
   if (ev.target.id === "emisorPropio") {
     if (ev.target.checked) { cur.emisor = structuredClone(EMISOR_G); cur.emisorPropio = true; }
-    else if (confirm("¿Volver a los datos globales? Se perderán los datos propios de esta factura.")) { cur.emisorPropio = false; cur.emisor = EMISOR_G; }
+    else if (await confirmar("¿Volver a los datos globales? Se perderán los datos propios de esta factura.")) { cur.emisorPropio = false; cur.emisor = EMISOR_G; }
     else { ev.target.checked = true; return; }
     form(); sheet(); save(); return;
   }
@@ -545,6 +600,16 @@ document.getElementById("rows").onclick = async ev => {
     catch (e) { toast(e.message, true); try { await refrescar(); } catch {} panel(); }
     return;
   }
+  // Eliminar desde el listado
+  const del = ev.target.closest("button[data-del-row]");
+  if (del) {
+    ev.stopPropagation();
+    const f = store.find(x => x.id === del.dataset.delRow); if (!f) return;
+    if (!await confirmar(`¿Eliminar ${esRecibo(f) ? "el recibo" : "la factura"} ${f.numero || "sin número"} de ${f.cliente.nombre}?`)) return;
+    try { await api(`docs/facturas/${f.id}`, { method: "DELETE" }); store = store.filter(x => x.id !== f.id); toast(`${TIPO(f)} eliminado/a`); }
+    catch (e) { toast(e.message, true); }
+    panel(); return;
+  }
   const tr = ev.target.closest("tr[data-id]"); if (!tr) return;
   try { await refrescar(); } catch {}
   if (store.some(f => f.id === tr.dataset.id)) editar(tr.dataset.id); else { toast("Esa factura ya no existe", true); panel(); }
@@ -565,22 +630,35 @@ document.getElementById("toPanel").onclick = async ev => {
 document.getElementById("bPrint").onclick = () => window.print();
 // Antes de numerar se recarga la lista del servidor, por si se creó otra factura en otro dispositivo
 const refrescar = async () => { store = await api("docs/facturas"); };
-document.getElementById("bNew").onclick = async () => {
+const nuevo = async recibo => {
   await refrescar();
-  const ult = store.at(-1);
   const hoy = isoLocal();
-  const f = { id: "f" + Date.now(), numero: siguienteNumero(), fecha: hoy, vencimiento: "", estado: "borrador",
+  const f = { id: "f" + Date.now(), tipo: recibo ? "recibo" : "factura", numero: siguienteNumero(recibo), fecha: hoy, vencimiento: "", estado: recibo ? "pendiente" : "borrador",
     cliente: { nombre: "Nuevo cliente", nif: "", direccion: "", cpCiudad: "", email: "", logo: "" }, periodo: { desde: "", hasta: "" },
     lineas: [{ concepto: "", detalle: "", cantidad: 1, precio: 0 }], iva: 21, notas: "", emisor: EMISOR_G };
   store.push(f); await put(f); editar(f.id);
 };
+document.getElementById("bNew").onclick = () => nuevo(false);
+document.getElementById("bNewRecibo").onclick = () => nuevo(true);
 document.getElementById("bDup").onclick = async () => {
   await refrescar();
-  const f = { ...structuredClone(cur), id: "f" + Date.now(), numero: siguienteNumero(), estado: "borrador", fecha: isoLocal() };
+  const f = { ...structuredClone(cur), id: "f" + Date.now(), numero: siguienteNumero(esRecibo(cur)), estado: esRecibo(cur) ? "pendiente" : "borrador", fecha: isoLocal() };
+  delete f.reciboOrigen;
   store.push(f); await put(f); editar(f.id);
 };
+// Recibo cobrado: pasa a ser factura pagada con el siguiente número y la fecha de hoy
+document.getElementById("bConvertir").onclick = async () => {
+  await saveCur.flush();
+  await refrescar();
+  const f = store.find(x => x.id === cur.id); if (!f || !esRecibo(f)) return;
+  const numero = siguienteNumero(false), hoy = isoLocal();
+  if (!await confirmar(`Se emitirá la factura nº ${numero} con fecha ${fecha(hoy)}, marcada como pagada. ¿Continuar?`)) return;
+  if (!f.conceptoPago || f.conceptoPago === `Recibo ${f.numero}`) delete f.conceptoPago;
+  Object.assign(f, { tipo: "factura", reciboOrigen: f.numero, numero, fecha: hoy, estado: "pagada" });
+  await put(f); toast(`Factura ${numero} emitida`); editar(f.id);
+};
 document.getElementById("bDel").onclick = async () => {
-  if (!confirm(`¿Eliminar la factura ${cur.numero}?`)) return;
+  if (!await confirmar(`¿Eliminar ${esRecibo(cur) ? "el recibo" : "la factura"} ${cur.numero}?`)) return;
   await api(`docs/facturas/${cur.id}`, { method: "DELETE" });
   store = store.filter(f => f.id !== cur.id); toast("Factura eliminada"); panel();
 };
@@ -594,7 +672,10 @@ document.getElementById("bImport").onclick = () => file.click();
 file.onchange = async () => {
   try {
     const d = JSON.parse(await file.files[0].text()); if (!Array.isArray(d)) throw 0;
-    if (!confirm(`Se importarán ${d.length} facturas (las que tengan el mismo identificador se sobrescriben). ¿Continuar?`)) return;
+    if (!await confirmar(`Se importarán ${d.length} facturas (las que tengan el mismo identificador se sobrescriben). ¿Continuar?`)) return;
+    // Las que llegan sin número reciben el siguiente correlativo
+    await refrescar();
+    d.forEach(f => { if (!String(f.numero ?? "").trim()) { f.numero = siguienteNumero(esRecibo(f)); store.push(f); } });
     await Promise.all(d.map(put)); store = await api("docs/facturas"); toast("Facturas importadas"); panel();
   } catch { toast("El archivo no es una copia válida", true); }
   file.value = "";

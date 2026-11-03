@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Servidores · Panel Majosoft</title>
+  <meta name="robots" content="noindex, nofollow" />
+  <link rel="icon" type="image/svg+xml" href="/assets/favicon.svg" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/admin/panel.css" />
+  <style>
+    * { box-sizing: border-box; }
+    body { margin: 0; font-family: Inter, system-ui, sans-serif; background: var(--cream); color: var(--ink); font-size: 14px; }
+    main { max-width: 1180px; padding: 34px 32px 60px; }
+    .grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 14px; }
+    .card { background: #fff; border: 1px solid var(--line); border-radius: 16px; padding: 20px; min-width: 0; }
+    .card.wide { grid-column: 1 / -1; }
+    .card h2 { font-size: 15px; margin: 0 0 4px; }
+    .card h3 { font-size: 13px; margin: 18px 0 6px; }
+    .card .sub { color: var(--muted); font-size: 12.5px; margin: 0 0 14px; line-height: 1.5; }
+    .card p, .card li { line-height: 1.55; }
+    .card ol, .card ul { padding-left: 20px; margin: 6px 0; }
+    table { width: 100%; border-collapse: collapse; }
+    th { text-align: left; font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); padding: 8px 10px; border-bottom: 1px solid var(--line); }
+    td { padding: 10px; border-bottom: 1px solid #eeede5; font-size: 13px; vertical-align: top; }
+    code { overflow-wrap: anywhere; font-size: 12px; background: var(--cream); padding: 1px 5px; border-radius: 5px; }
+    pre { background: var(--ink); color: var(--cream); padding: 12px 14px; border-radius: 10px; font-size: 12px; overflow-x: auto; margin: 6px 0; }
+    pre code { background: none; padding: 0; }
+    .tag { display: inline-block; padding: 2px 8px; border-radius: 999px; font-size: 11px; font-weight: 700; background: var(--lime); }
+    .tag.warn { background: #fde2c4; }
+    .scroll { overflow-x: auto; }
+    #servidores { display: grid; gap: 26px; }
+    .srv-head { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+    .srv-head h2 { font-size: 15px; margin: 0; }
+    .srv-head p { margin: 1px 0 0; color: var(--muted); font-size: 12.5px; }
+    .srv-head code { margin-left: auto; color: var(--muted); }
+    .srv-ico { width: 40px; height: 40px; border-radius: 10px; flex: none; display: grid; place-items: center; overflow: hidden; background: var(--c); }
+    .srv-ico img { width: 100%; height: 100%; object-fit: contain; padding: 5px; }
+    .srv-ico.propio { background: none; } .srv-ico.propio img { padding: 0; }
+    .filas { border: 1px solid var(--line); border-radius: 14px; overflow: hidden; }
+    .fila { display: grid; grid-template-columns: minmax(0, 2.4fr) minmax(0, 1.3fr) minmax(0, 1fr) minmax(0, .9fr) 56px; gap: 16px; align-items: center; padding: 13px 16px; }
+    .fila + .fila { border-top: 1px solid #eeede5; }
+    .fila.cab { padding: 9px 16px; background: var(--cream); font-size: 10.5px; letter-spacing: .07em; text-transform: uppercase; color: var(--muted); font-weight: 600; }
+    .fila.cab > :last-child { text-align: right; }
+    .nombre { display: flex; align-items: center; gap: 9px; min-width: 0; }
+    .nombre h3 { font-size: 13.5px; margin: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .nombre > div { min-width: 0; }
+    .links { display: flex; flex-wrap: wrap; gap: 4px 12px; margin-top: 3px; }
+    .links a, .links span { display: inline-flex; align-items: center; gap: 4px; font-size: 12px; color: var(--muted); text-decoration: none; }
+    .links a:hover { color: var(--ink); text-decoration: underline; }
+    .dato { font-size: 12.5px; }
+    .dato small { display: block; color: var(--muted); font-size: 11.5px; }
+    .est-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; }
+    .btn-est { border: 1px solid var(--line); background: #fff; border-radius: 10px; padding: 8px 13px; font: inherit; font-weight: 700; font-size: 12.5px; cursor: pointer; }
+    .btn-est:hover { border-color: var(--ink); }
+    .alertas { display: grid; gap: 6px; margin-bottom: 14px; }
+    .alerta { display: flex; gap: 10px; align-items: flex-start; padding: 10px 13px; border-radius: 10px; font-size: 13px; line-height: 1.45; }
+    .alerta.bad { background: #fbe9e7; color: #8c1d18; } .alerta.warn { background: #fff5d6; color: #7a5600; } .alerta.ok { background: #e6f3ea; color: #2f7d4f; }
+    .alerta b { font-weight: 800; }
+    .metricas { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; margin-bottom: 16px; }
+    .met { background: var(--cream); border-radius: 12px; padding: 11px 13px; }
+    .met small { display: block; color: var(--muted); font-size: 11.5px; font-weight: 700; }
+    .met b { font-size: 18px; letter-spacing: -.02em; }
+    .met .barra { height: 5px; background: #e4e3d8; border-radius: 9px; margin-top: 7px; overflow: hidden; }
+    .met .barra i { display: block; height: 100%; background: var(--ink); }
+    .met .barra i.warn { background: var(--warn); } .met .barra i.bad { background: var(--bad); }
+    .tabla-est { width: 100%; border-collapse: collapse; font-size: 13px; }
+    .tabla-est th { text-align: left; font-size: 11px; text-transform: uppercase; letter-spacing: .05em; color: var(--muted); padding: 7px 8px; border-bottom: 1px solid var(--line); }
+    .tabla-est td { padding: 9px 8px; border-bottom: 1px solid #eeede5; vertical-align: middle; }
+    .tabla-est td.r, .tabla-est th.r { text-align: right; white-space: nowrap; }
+    .tabla-est .nom { display: flex; gap: 9px; align-items: center; }
+    .tabla-est small { color: var(--muted); display: block; }
+    .tabla-est small a { color: var(--muted); text-decoration: none; } .tabla-est small a:hover { color: var(--ink); text-decoration: underline; }
+    .cod { font-weight: 800; font-variant-numeric: tabular-nums; }
+    .cod.bad { color: var(--bad); } .cod.warn { color: #9a6a00; } .cod.ok { color: var(--ok); }
+    .scroll-x { overflow-x: auto; }
+    .hist { list-style: none; padding: 0 !important; margin: 0 !important; }
+    .hist li { display: flex; gap: 10px; padding: 9px 0; border-bottom: 1px solid #eeede5; font-size: 13px; }
+    .hist li:last-child { border: 0; }
+    .hist .cuando { color: var(--muted); white-space: nowrap; min-width: 92px; font-size: 12px; padding-top: 1px; }
+    .hist .txt { white-space: pre-line; }
+    .dot { width: 8px; height: 8px; border-radius: 50%; flex: none; }
+    .dot.ok { background: var(--ok); } .dot.bad { background: var(--bad); } .dot.warn { background: var(--warn); } .dot.off { background: var(--line); }
+    .ctrl { display: flex; justify-content: flex-end; }
+    .abrir { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 7px; }
+    .btn-web { font-size: 12px; font-weight: 700; padding: 5px 10px; border-radius: 8px; border: 1px solid var(--line); background: #fff; color: var(--ink); text-decoration: none; white-space: nowrap; }
+    .btn-web:hover { border-color: var(--ink); }
+    .gestion { font-size: 12px; font-weight: 600; color: var(--muted); text-decoration: none; white-space: nowrap; }
+    .gestion:hover { color: var(--ink); }
+    @media (max-width: 760px) {
+      .fila.cab { display: none; }
+      .fila { grid-template-columns: minmax(0, 1fr) auto; gap: 6px 12px; }
+      .nombre { grid-column: 1; } .ctrl { grid-column: 2; grid-row: 1; }
+      .dato { grid-column: 1 / -1; padding-left: 17px; }
+      .dato small { display: inline; margin-left: 4px; }
+      .srv-head code { display: none; }
+    }
+    .muted { color: var(--muted); }
+    .bad { color: var(--bad); font-weight: 700; }
+    .sw { position: relative; display: inline-block; width: 40px; height: 22px; cursor: pointer; }
+    .sw input { opacity: 0; width: 0; height: 0; }
+    .sw span { position: absolute; inset: 0; background: var(--line); border-radius: 999px; transition: background .15s; }
+    .sw span::before { content: ""; position: absolute; width: 16px; height: 16px; left: 3px; top: 3px; background: #fff; border-radius: 50%; transition: transform .15s; }
+    .sw input:checked + span { background: var(--ok); }
+    .sw input:checked + span::before { transform: translateX(18px); }
+    .sw input:disabled + span { opacity: .5; cursor: wait; }
+    .sw input:focus-visible + span { outline: 3px solid rgba(214,224,34,.5); }
+    @media (max-width: 900px) { .grid { grid-template-columns: minmax(0, 1fr); } main { padding: 24px 16px 40px; } }
+  </style>
+</head>
+<body>
+  <main>
+    <div class="page-head"><div><div class="crumbs">Sistemas</div><h1>Servidores</h1><p>Si todo funciona, qué hay en cada servidor y el estado de sus copias. Actualizado: 14-oct-2026.</p></div></div>
+    <div class="grid">
+
+      <div class="card wide">
+        <div class="est-head"><div><h2>Estado en directo</h2><p class="sub" id="estSub">Comprobando las webs…</p></div><button class="btn-est" id="estRefresh">Comprobar ahora</button></div>
+        <div id="estado"></div>
+      </div>
+
+      <div class="card wide">
+        <div class="est-head"><div><h2>Avisos por email</h2><p class="sub" id="vigSub">Cargando…</p></div><button class="btn-est" id="vigPrueba">Enviar email de prueba</button></div>
+        <div id="vigilancia"></div>
+      </div>
+
+      <div class="card wide">
+        <h2>Webs y copias automáticas</h2>
+        <p class="sub">Estado en directo. Copia diaria a las 05:00; se guardan 35 diarias y 12 mensuales. Desactivar una copia no borra las ya hechas.</p>
+        <div id="servidores"><p class="sub">Consultando los servidores…</p></div>
+      </div>
+
+      <div class="card wide">
+        <h2>Historial</h2>
+        <ul>
+          <li><b>14-oct-2026</b> — WordPress de Objetivo Baeza trasladado del servidor «guiadelbombero» a «objetivo» (<code>/var/www/objetivobaeza</code>, BD MariaDB <code>objetivobaeza_wp</code>, nginx en :8081, cerrado al exterior por el firewall de IONOS). La web pública <code>objetivobaeza.com</code> sigue en el hosting anterior.</li>
+          <li><b>14-oct-2026</b> — Las copias diarias guardan la web entera (BD, código con <code>.env</code>, nginx, servicio y certificados) para poder reconstruirla. Fichaje vuelve a gestionar su BD desde su app.</li>
+          <li><b>14-oct-2026</b> — Copia completa de los tres servidores guardada en el Mac.</li>
+          <li><b>14-oct-2026</b> — Publicación automática con cada push a <code>main</code> en las cinco webs de «majosoft».</li>
+          <li><b>14-oct-2026</b> — Limpieza de «guiadelbombero»: borradas las copias antiguas de Bambina, Majosoft, Fichaje y María Sánchez (carpetas, nginx, certificados y BD <code>bambinasigns</code>). Archivo de lo borrado en «majosoft»: <code>/var/backups/restos-majosoft/restos-majosoft-2026-10-14.tar.gz</code>. Copias diarias de web-playa y bambinasigns en marcha.</li>
+        </ul>
+      </div>
+
+    </div>
+  </main>
+<script type="module">
+import { mountShell, api, toast } from "/admin/panel.js";
+await mountShell("servidores");
+const esc = v => String(v ?? "").replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+const when = t => t ? new Date(t).toLocaleString("es-ES", { day: "2-digit", month: "2-digit", hour: "2-digit", minute: "2-digit" }) : "—";
+const BD = { postgres: "PostgreSQL", mariadb: "MariaDB", sqlite: "SQLite", ninguna: "—" };
+const caja = document.getElementById("servidores");
+
+const COLOR = { guiadelbombero: "#c8102e", objetivo: "#1f6f43", apartamentos: "#1d6fa5" };
+// Logos oficiales (blancos sobre el color de la marca; el de Majosoft ya trae su fondo)
+const LOGO = { guiadelbombero: "/assets/servidores/guiadelbombero.png", objetivo: "/assets/servidores/objetivo.png", apartamentos: "/assets/servidores/majosoft.svg" };
+const GH = '<svg viewBox="0 0 16 16" width="14" height="14" fill="currentColor"><path d="M8 0a8 8 0 0 0-2.53 15.59c.4.07.55-.17.55-.38v-1.33c-2.23.48-2.7-1.07-2.7-1.07-.36-.92-.89-1.17-.89-1.17-.73-.5.06-.49.06-.49.8.06 1.23.83 1.23.83.72 1.22 1.88.87 2.34.66.07-.52.28-.87.5-1.07-1.78-.2-3.65-.89-3.65-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82a7.6 7.6 0 0 1 4 0c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.28.82 2.15 0 3.07-1.87 3.75-3.66 3.95.29.25.54.73.54 1.48v2.2c0 .21.15.46.55.38A8 8 0 0 0 8 0z"/></svg>';
+
+function que(w) {
+  const p = [];
+  if (w.bd !== "ninguna") p.push(BD[w.bd] || w.bd);
+  if (w.gestion) p.push("BD (en su app)");
+  if (w.carpeta) p.push("ficheros");
+  return p.length ? p.join(" + ") : "—";
+}
+
+function estadoCopia(w) {
+  if (!w.activa) return { cls: "off", txt: "Copia desactivada" };
+  if (!w.ultima) return { cls: "warn", txt: "Aún sin copias" };
+  if (w.resultado === "error") return { cls: "bad", txt: "La última copia falló" };
+  return { cls: "ok", txt: "Copia al día" };
+}
+
+function fila(s, w) {
+  const e = estadoCopia(w);
+  const dominio = w.url ? `<a href="${esc(w.url)}" target="_blank" rel="noopener">🌐 ${esc(w.url.replace("https://", ""))}</a>` : "<span>Sin dominio</span>";
+  const abrir = (w.url ? `<a class="btn-web" href="${esc(w.url)}" target="_blank" rel="noopener">Abrir web ↗</a>` : "")
+    + (w.acceso ? `<a class="btn-web" href="${esc(w.acceso)}" target="_blank" rel="noopener" title="Acceso al escritorio de WordPress">Entrar al WordPress ↗</a>` : "");
+  const repo = w.github ? `<a href="${esc(w.github)}" target="_blank" rel="noopener">${GH} ${esc(w.github.split("/").pop())}</a>` : "";
+  const ctrl = w.gestion
+    ? `<a class="gestion" href="${esc(w.gestion)}" target="_blank" rel="noopener" title="Copias de la BD gestionadas desde su app (pestaña Sistema)">En su app ↗</a>`
+    : `<label class="sw" title="Copia diaria"><input type="checkbox" data-srv="${esc(s.id)}" data-web="${esc(w.web)}" ${w.activa ? "checked" : ""}><span></span></label>`;
+  return `
+    <div class="fila">
+      <div class="nombre"><span class="dot ${e.cls}" title="${e.txt}"></span><div><h3>${esc(w.nombre)}</h3><div class="links">${dominio}${repo}</div>${abrir ? `<div class="abrir">${abrir}</div>` : ""}</div></div>
+      <div class="dato">${esc(que(w))}</div>
+      <div class="dato estado">${when(w.ultima)}<small>${e.txt}</small></div>
+      <div class="dato">${w.copias} copias<small>${esc(w.total || "0")}</small></div>
+      <div class="ctrl">${ctrl}</div>
+    </div>`;
+}
+
+function pintar(servidores) {
+  caja.innerHTML = servidores.map(s => `
+    <section style="--c:${COLOR[s.id] || "var(--ink)"}">
+      <div class="srv-head">
+        <span class="srv-ico${s.id === "apartamentos" ? " propio" : ""}">${LOGO[s.id] ? `<img src="${LOGO[s.id]}" alt="">` : "🖥️"}</span>
+        <div><h2>${esc(s.nombre)}</h2><p>${esc(s.uso)}</p></div>
+        <code>${esc(s.ip)}</code>
+      </div>
+      ${s.error ? `<p class="bad">${esc(s.error)}</p>` : `<div class="filas">
+        <div class="fila cab"><div>Web</div><div>Qué guarda</div><div>Última copia</div><div>Guardadas</div><div>Diaria</div></div>
+        ${s.webs.map(w => fila(s, w)).join("")}
+      </div>`}
+    </section>`).join("");
+}
+
+// Un solo listener para todos los interruptores (la tabla se repinta entera)
+caja.addEventListener("change", async e => {
+  const el = e.target.closest("input[data-web]");
+  if (!el) return;
+  el.disabled = true;
+  try {
+    await api("servidores/copias", { method: "POST", body: { servidor: el.dataset.srv, web: el.dataset.web, activa: el.checked } });
+    toast(el.checked ? "Copia diaria activada" : "Copia diaria desactivada");
+    const f = el.closest(".fila"), dot = f.querySelector(".dot"), txt = f.querySelector(".estado small");
+    dot.className = el.checked ? "dot ok" : "dot off";
+    txt.textContent = el.checked ? "Activada" : "Copia desactivada";
+  } catch (err) {
+    el.checked = !el.checked;
+    toast(err.message, true);
+  } finally {
+    el.disabled = false;
+  }
+});
+
+/* ===== Estado en directo ===== */
+const GB = n => (n / 1024 ** 3).toFixed(1).replace(".", ",") + " GB";
+const pct = (a, b) => b ? Math.round(a / b * 100) : 0;
+const nivel = (p, w, b) => p >= b ? "bad" : p >= w ? "warn" : "";
+function estadoWeb(w) {
+  if (!w.codigo || w.codigo >= 500) return "bad";
+  if (w.codigo >= 400 || w.ms > 3000 || (w.ssl != null && w.ssl < 20)) return "warn";
+  return "ok";
+}
+function bloqueServidor(s) {
+  if (s.error) return `<h3>${esc(s.nombre)}</h3><p class="sub">Sin datos del servidor todavía (${esc(s.error)}). Sus webs se comprueban igualmente abajo.</p>`;
+  const pd = pct(s.disco.usado, s.disco.total), pm = pct(s.memoria.total - s.memoria.libre, s.memoria.total), pc = pct(s.carga[0], s.cpus);
+  return `<h3>${esc(s.nombre)}</h3>
+    <div class="metricas">
+      <div class="met"><small>Disco</small><b>${pd} %</b> <small>${GB(s.disco.usado)} de ${GB(s.disco.total)}</small><div class="barra"><i class="${nivel(pd, 75, 85)}" style="width:${pd}%"></i></div></div>
+      <div class="met"><small>Memoria</small><b>${pm} %</b> <small>${GB(s.memoria.total - s.memoria.libre)} de ${GB(s.memoria.total)}</small><div class="barra"><i class="${nivel(pm, 80, 92)}" style="width:${pm}%"></i></div></div>
+      <div class="met"><small>Carga (1 min)</small><b>${s.carga[0].toFixed(2).replace(".", ",")}</b> <small>${s.cpus} CPU · 15 min: ${s.carga[2].toFixed(2).replace(".", ",")}</small><div class="barra"><i class="${nivel(pc, 70, 100)}" style="width:${Math.min(100, pc)}%"></i></div></div>
+      <div class="met"><small>Peticiones 24 h</small><b>${s.nginx.peticiones.toLocaleString("es-ES")}</b> <small>${s.nginx.total} con error 5xx</small></div>
+      <div class="met"><small>Encendido</small><b>${s.actividad} días</b> <small>sin reiniciar</small></div>
+    </div>
+    ${s.nginx.rutas.length ? `<div class="scroll-x"><table class="tabla-est"><thead><tr><th>Error 5xx (últimas 24 h)</th><th class="r">Veces</th><th class="r">Última</th></tr></thead><tbody>
+      ${s.nginx.rutas.map(r => `<tr><td><code>${esc(r.ruta)}</code></td><td class="r">${r.veces}</td><td class="r">${when(r.ultima)}</td></tr>`).join("")}</tbody></table></div>` : ""}`;
+}
+function pintarEstado(d) {
+  const al = [];
+  for (const w of d.webs) {
+    if (!w.codigo) al.push(["bad", `<b>${esc(w.nombre)}</b> no responde: ${esc(w.error)}`]);
+    else if (w.codigo >= 500) al.push(["bad", `<b>${esc(w.nombre)}</b> da error ${w.codigo}`]);
+    else if (w.codigo >= 400) al.push(["warn", `<b>${esc(w.nombre)}</b> responde ${w.codigo}`]);
+    if (w.ssl != null && w.ssl < 20) al.push([w.ssl < 7 ? "bad" : "warn", `El certificado SSL de <b>${esc(new URL(w.url).hostname)}</b> caduca en ${w.ssl} días`]);
+    if (w.codigo && w.ms > 3000) al.push(["warn", `<b>${esc(w.nombre)}</b> va lenta: ${(w.ms / 1000).toFixed(1).replace(".", ",")} s`]);
+  }
+  for (const s of d.servidores) {
+    if (s.error) continue;
+    const pd = pct(s.disco.usado, s.disco.total), pm = pct(s.memoria.total - s.memoria.libre, s.memoria.total);
+    if (s.certbot.length) al.push(["bad", `${esc(s.nombre)}: certbot no consigue renovar <b>${s.certbot.map(esc).join(", ")}</b>`]);
+    for (const x of s.servicios.filter(x => !(x === "certbot.service" && s.certbot.length))) al.push(["bad", `${esc(s.nombre)}: servicio caído <b>${esc(x)}</b>`]);
+    if (s.nginx.total) al.push([s.nginx.total >= 20 ? "bad" : "warn", `${esc(s.nombre)}: <b>${s.nginx.total}</b> ${s.nginx.total === 1 ? "error" : "errores"} 5xx en las últimas 24 h`]);
+    if (pd >= 85) al.push(["bad", `${esc(s.nombre)}: disco al ${pd} %`]);
+    if (pm >= 92) al.push(["warn", `${esc(s.nombre)}: memoria al ${pm} %`]);
+  }
+  const filas = [...d.webs].sort((a, b) => ({ bad: 0, warn: 1, ok: 2 }[estadoWeb(a)] - { bad: 0, warn: 1, ok: 2 }[estadoWeb(b)]) || a.servidor.localeCompare(b.servidor));
+  document.getElementById("estado").innerHTML = `
+    <div class="alertas">${al.length ? al.sort((a, b) => (a[0] === "bad" ? 0 : 1) - (b[0] === "bad" ? 0 : 1)).map(([c, t]) => `<div class="alerta ${c}">${c === "bad" ? "⛔" : "⚠️"}<span>${t}</span></div>`).join("") : `<div class="alerta ok">✅<span>Todo funciona: ${d.webs.length === 1 ? "la web responde" : `las ${d.webs.length} webs responden`} bien.</span></div>`}</div>
+    ${d.servidores.map(bloqueServidor).join("")}
+    <h3>Webs</h3>
+    <div class="scroll-x"><table class="tabla-est"><thead><tr><th>Web</th><th>Servidor</th><th class="r">Código</th><th class="r">Tiempo</th><th class="r">SSL</th></tr></thead><tbody>
+      ${filas.map(w => { const e = estadoWeb(w); return `<tr>
+        <td><div class="nom"><span class="dot ${e}"></span><div>${esc(w.nombre)}<small><a href="${esc(w.url)}" target="_blank" rel="noopener">${esc(w.url.replace("https://", ""))}</a></small></div></div></td>
+        <td>${esc(w.servidor)}</td>
+        <td class="r"><span class="cod ${!w.codigo || w.codigo >= 500 ? "bad" : w.codigo >= 400 ? "warn" : "ok"}" title="${esc(w.error)}">${w.codigo || "—"}</span></td>
+        <td class="r">${w.codigo ? (w.ms < 1000 ? w.ms + " ms" : (w.ms / 1000).toFixed(1).replace(".", ",") + " s") : "—"}</td>
+        <td class="r">${w.ssl == null ? "—" : `<span class="cod ${w.ssl < 7 ? "bad" : w.ssl < 20 ? "warn" : ""}">${w.ssl} días</span>`}</td></tr>`; }).join("")}
+    </tbody></table></div>`;
+  document.getElementById("estSub").textContent = `Comprobado a las ${new Date(d.comprobado).toLocaleTimeString("es-ES", { hour: "2-digit", minute: "2-digit", second: "2-digit" })}. Se actualiza solo cada minuto.`;
+}
+async function comprobar() {
+  const b = document.getElementById("estRefresh"); b.disabled = true; b.textContent = "Comprobando…";
+  try { pintarEstado(await api("servidores/estado")); }
+  catch (err) { document.getElementById("estado").innerHTML = `<p class="bad">${esc(err.message)}</p>`; }
+  finally { b.disabled = false; b.textContent = "Comprobar ahora"; }
+}
+document.getElementById("estRefresh").onclick = comprobar;
+
+/* ===== Avisos por email ===== */
+const durac = ms => ms < 3600e3 ? Math.max(1, Math.round(ms / 60e3)) + " min" : (ms / 3600e3).toFixed(1).replace(".", ",") + " h";
+async function vigilancia() {
+  const v = await api("servidores/vigilancia");
+  const activos = Object.values(v.activos || {});
+  document.getElementById("vigSub").textContent = (v.buzon?.configurado ? `Se envían a ${v.buzon.user}` : "El buzón no está conectado: conéctalo en Correo para recibir avisos")
+    + ` · Revisión automática cada ${v.cada / 60e3} min` + (v.ultima ? ` · Última: ${new Date(v.ultima).toLocaleTimeString("es-ES", { hour: "2-digit", minute: "2-digit" })}` : " · Primera revisión en curso");
+  document.getElementById("vigilancia").innerHTML = `
+    ${v.error ? `<div class="alertas"><div class="alerta bad">⛔<span>${esc(v.error)}</span></div></div>` : ""}
+    <div class="alertas">${activos.length ? activos.map(p => `<div class="alerta bad">⛔<span>${esc(p.texto)} <small>· desde hace ${durac(Date.now() - p.desde)}</small></span></div>`).join("") : `<div class="alerta ok">✅<span>Sin problemas abiertos. Te escribiré si una web da error, aparecen errores 5xx (en cualquier página o API) o algo del servidor falla, y otra vez cuando se arregle.</span></div>`}</div>
+    ${v.historial?.length ? `<h3>Historial</h3><ul class="hist">${v.historial.slice(0, 15).map(h => `<li><span class="cuando">${when(h.desde)}</span><span>${h.tipo === "ok" ? "✅" : h.tipo === "5xx" ? "⚠️" : "⛔"}</span><span class="txt">${esc(h.texto)}${h.tipo === "ok" ? ` <small style="color:var(--muted)">· arreglado tras ${durac(h.hasta - h.desde)}</small>` : ""}</span></li>`).join("")}</ul>` : ""}`;
+}
+document.getElementById("vigPrueba").onclick = async e => {
+  const b = e.target; b.disabled = true; b.textContent = "Enviando…";
+  try { await api("servidores/vigilancia/prueba", { method: "POST" }); toast("Email de prueba enviado"); }
+  catch (err) { toast(err.message, true); }
+  finally { b.disabled = false; b.textContent = "Enviar email de prueba"; }
+};
+vigilancia().catch(err => { document.getElementById("vigilancia").innerHTML = `<p class="bad">${esc(err.message)}</p>`; });
+setInterval(() => { if (!document.hidden) vigilancia().catch(() => {}); }, 60e3);
+comprobar();
+setInterval(() => { if (!document.hidden) comprobar(); }, 60e3);
+
+try { pintar(await api("servidores")); }
+catch (err) { caja.innerHTML = `<p class="bad">${esc(err.message)}</p>`; }
+</script>
+</body>
+</html>

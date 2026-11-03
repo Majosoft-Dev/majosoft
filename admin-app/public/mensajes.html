@@ -71,7 +71,7 @@
     </div>
   </main>
 <script type="module">
-import { mountShell, api, toast } from "/admin/panel.js";
+import { mountShell, api, toast, confirmar } from "/admin/panel.js";
 await mountShell("mensajes");
 const $ = id => document.getElementById(id);
 const esc = s => String(s ?? "").replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
@@ -116,7 +116,7 @@ async function abrir(id) {
   </div>`;
   $("bUnread").onclick = async () => { await api(`mensajes/${id}/leido`, { method: "POST", body: { leido: false } }); m.leido = 0; actual = null; pintar(); $("detail").innerHTML = `<div class="placeholder">Marcado como no leído.</div>`; };
   $("bDel").onclick = async () => {
-    if (!confirm(`¿Eliminar el mensaje de ${m.nombre}?`)) return;
+    if (!await confirmar(`¿Eliminar el mensaje de ${m.nombre}?`)) return;
     await api(`mensajes/${id}`, { method: "DELETE" }); todos = todos.filter(x => x.id !== id); actual = null; pintar();
     $("detail").innerHTML = `<div class="placeholder">Mensaje eliminado.</div>`; toast("Mensaje eliminado");
   };

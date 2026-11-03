@@ -1,10 +1,10 @@
 name: Publicar en majosoft.es
 
-# Se publica al subir a la rama produccion (servidor de apartamentos, 31.70.154.16).
-# main es la rama de trabajo: no publica.
+# Se publica en cada push a main (o a produccion) en el servidor de
+# apartamentos (31.70.154.16). Se despliega exactamente el commit subido.
 on:
   push:
-    branches: [produccion]
+    branches: [main, produccion]
   workflow_dispatch:
 
 concurrency:
@@ -38,7 +38,7 @@ jobs:
           printf '%s\n' "$DEPLOY_KEY" > ~/.ssh/deploy && chmod 600 ~/.ssh/deploy
           printf '%s\n' "$DEPLOY_KNOWN_HOSTS" > ~/.ssh/known_hosts
           # La clave solo puede ejecutar el script de despliegue del servidor
-          ssh -i ~/.ssh/deploy -o StrictHostKeyChecking=yes "root@$DEPLOY_HOST" deploy
+          ssh -i ~/.ssh/deploy -o StrictHostKeyChecking=yes "root@$DEPLOY_HOST" "deploy $GITHUB_SHA"
 
       - name: Comprobar la web
         run: |

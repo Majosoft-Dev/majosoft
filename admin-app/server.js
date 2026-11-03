@@ -2,10 +2,15 @@
 // sesiones en servidor y almacenamiento de presupuestos y facturas.
 import express from "express";
 import path from "node:path";
+import crypto from "node:crypto";
 import { fileURLToPath } from "node:url";
 import QRCode from "qrcode";
 import { db, audit } from "./lib/db.js";
 import * as correo from "./lib/correo.js";
+import * as copias from "./lib/copias.js";
+import * as salud from "./lib/salud.js";
+import * as vigilancia from "./lib/vigilancia.js";
+import * as calendario from "./lib/calendario.js";
 import {
   verifyPassword, hashPassword, DUMMY_HASH, passwordProblems,
   newTotpSecret, verifyTotp, totpUri, newToken, sha256,
@@ -196,7 +201,31 @@ app.post("/api/contacto", (req, res) => {
 app.get("/admin/login", (req, res) => loadSession(req) ? res.redirect(302, "/admin/") : res.sendFile(path.join(PUBLIC, "login.html")));
 app.get("/admin/panel.css", (req, res) => res.sendFile(path.join(PUBLIC, "panel.css")));
 
+/* ===== Bonos de horas: vista del cliente (pública, solo lectura, por enlace secreto) ===== */
+const bonoPorToken = token => {
+  if (!/^[A-Za-z0-9_-]{20,64}$/.test(token)) return null;
+  for (const r of db.prepare("SELECT data FROM docs WHERE kind = 'bonos'").all()) {
+    const b = JSON.parse(r.data);
+    if (b.token && b.compartido !== false && b.token.length === token.length && crypto.timingSafeEqual(Buffer.from(b.token), Buffer.from(token))) return b;
+  }
+  return null;
+};
+app.get("/admin/bono/:token", (req, res) => bonoPorToken(req.params.token) ? res.sendFile(path.join(PUBLIC, "bono.html")) : res.status(404).send("Enlace no válido"));
+app.get("/admin/bono/:token/datos", (req, res) => {
+  const b = bonoPorToken(req.params.token); if (!b) return res.status(404).json({ error: "Enlace no válido" });
+  // Solo lo que el cliente debe ver (sin precios internos ni notas privadas)
+  res.json({ cliente: b.cliente, titulo: b.titulo, referencia: b.referencia, inicio: b.inicio, horas: Number(b.horas) || 0,
+    entradas: (b.entradas || []).map(e => ({ fecha: e.fecha, tarea: e.tarea, detalle: e.detalle, minutos: Number(e.minutos) || 0 })) });
+});
+
 /* ===== A partir de aquí, todo requiere sesión ===== */
+/* ===== Calendario de tareas (suscripción iCal privada, sin sesión) ===== */
+app.get("/admin/calendario/:token.ics", (req, res) => {
+  if (!calendario.tokenValido(req.params.token)) return res.status(404).send("Enlace no válido");
+  const persona = calendario.PERSONAS[req.query.persona] ? req.query.persona : "";
+  res.set({ "Content-Type": "text/calendar; charset=utf-8", "Cache-Control": "private, max-age=300" }).send(calendario.ics(persona));
+});
+
 app.use("/admin", requireAuth);
 
 app.get("/admin/api/me", (req, res) => {
@@ -258,7 +287,7 @@ app.post("/admin/api/password", (req, res) => {
 });
 
 /* ===== Documentos: presupuestos y facturas ===== */
-const KINDS = new Set(["presupuestos", "facturas", "ajustes"]);
+const KINDS = new Set(["presupuestos", "facturas", "ajustes", "bonos", "tareas", "renovaciones"]);
 const ID = /^[\w-]{1,64}$/;
 app.param("kind", (req, res, next, kind) => KINDS.has(kind) ? next() : res.status(404).json({ error: "No existe" }));
 
@@ -321,8 +350,33 @@ app.get("/admin/api/correo/mensajes/:uid/adjuntos/:i", wrap(async (req, res) => 
   res.send(a.contenido);
 }));
 
+/* ===== Servidores: webs y copias automáticas ===== */
+app.get("/admin/api/servidores", async (req, res) => res.json(await copias.estado()));
+// Estado en directo: cada web (HTTP, tiempo, SSL) y el servidor del panel
+app.get("/admin/api/servidores/estado", async (req, res) => {
+  const srvs = await copias.estado();
+  const webs = await Promise.all(srvs.flatMap(s => s.webs.filter(w => w.url).map(async w => ({ servidor: s.nombre, nombre: w.nombre, ...(await salud.web(w.url)) }))));
+  const servidores = await Promise.all(copias.SERVIDORES.map(async s => {
+    try { return { id: s.id, nombre: s.nombre, ...(await copias.salud(s, salud.servidor)) }; }
+    catch (e) { return { id: s.id, nombre: s.nombre, error: "No se pudo consultar: " + e.message }; }
+  }));
+  res.json({ comprobado: Date.now(), servidores, webs });
+});
+// Avisos por email: estado de la vigilancia y email de prueba
+app.get("/admin/api/servidores/vigilancia", (req, res) => res.json({ ...vigilancia.estado(), buzon: correo.estado() }));
+app.post("/admin/api/servidores/vigilancia/prueba", async (req, res) => {
+  try { await vigilancia.prueba(); res.json({ ok: true }); } catch (e) { res.status(502).json({ error: "No se pudo enviar: " + e.message }); }
+});
+app.post("/admin/api/servidores/copias", async (req, res) => {
+  const { servidor, web, activa } = req.body || {};
+  try { await copias.cambiar(String(servidor || ""), String(web || ""), !!activa); }
+  catch (e) { return res.status(400).json({ error: "No se pudo cambiar: " + e.message }); }
+  audit(activa ? "backup_enabled" : "backup_disabled", { user: req.session.user, ip: req.ip, detail: `${servidor}/${web}` });
+  res.json({ ok: true });
+});
+
 /* ===== Páginas privadas ===== */
-const PAGES = { "": "index.html", presupuestos: "presupuestos.html", facturas: "facturas.html", correo: "correo.html", mensajes: "mensajes.html", seguridad: "seguridad.html" };
+const PAGES = { "": "index.html", presupuestos: "presupuestos.html", facturas: "facturas.html", correo: "correo.html", mensajes: "mensajes.html", seguridad: "seguridad.html", servidores: "servidores.html", bonos: "bonos.html", tareas: "tareas.html" };
 app.get("/admin/panel.js", (req, res) => res.sendFile(path.join(PUBLIC, "panel.js")));
 app.get(["/admin", "/admin/:page"], (req, res, next) => {
   const f = PAGES[(req.params.page || "").replace(/\.html$/, "")];
@@ -338,3 +392,4 @@ setInterval(() => {
 }, 10 * 60e3).unref();
 
 app.listen(PORT, "127.0.0.1", () => console.log(`Panel Majosoft escuchando en 127.0.0.1:${PORT}`));
+vigilancia.arrancar();
