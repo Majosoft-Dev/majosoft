@@ -338,6 +338,7 @@ const migrar = d => {
   d.descuento ??= { activo: false, porcentaje: 0, etiqueta: "" };
   d.cuota ??= { activo: false, precio: "", nota: "", etiqueta: "", detalle: "", texto: "" };
   d.textos ??= {};
+  d.renov ??= { tipo: "", persona: "", inicio: "", hasta: "", nota: "" };
   if (d.totalConIva == null) { d.auto ??= true; d.totalConIva = Number(d.totalRedondeado) || Math.round(d.modulos.reduce((s, m) => s + Number(m.precio || 0), 0) * (1 + d.iva / 100)); }
   delete d.totalRedondeado; return d;
 };
@@ -610,6 +611,7 @@ const txt = (label, path, opts = {}) => {
   const t = opts.type || "text";
   if (t === "area") return `<label class="f">${label}<textarea data-p="${path}" data-t="text">${esc(v)}</textarea></label>`;
   if (t === "lines") return `<label class="f">${label}<textarea data-p="${path}" data-t="lines" style="min-height:${opts.h || 110}px">${esc((v || []).join("\n"))}</textarea><div class="hint">Un punto por línea</div></label>`;
+  if (t === "select") return `<label class="f">${label}<select data-p="${path}" data-t="text">${opts.options.map(([k, l]) => `<option value="${k}" ${String(v) === k ? "selected" : ""}>${esc(l)}</option>`).join("")}</select></label>`;
   if (t === "check") return `<label class="chk"><input type="checkbox" data-p="${path}" data-t="bool" ${v ? "checked" : ""}/> ${label}</label>`;
   return `<label class="f">${label}<input type="${t}" data-p="${path}" data-t="${t === "number" ? "num" : "text"}" value="${esc(v)}" ${opts.ph ? `placeholder="${esc(opts.ph)}"` : ""} ${opts.list ? `list="${opts.list}" autocomplete="off"` : ""}/></label>`;
 };
@@ -670,6 +672,11 @@ function buildEditor() {
       ${D.requisitos.map((r, i) => `<div class="item">${head("Grupo " + (i + 1), "requisitos", i)}
         ${txt("Título", `requisitos.${i}.titulo`)}${txt("Requisitos", `requisitos.${i}.items`, { type: "lines" })}</div>`).join("")}
       <button class="add" data-add="requisitos">+ Añadir grupo</button>`, o("Garantía y requisitos")) +
+    sec("Renovación", `
+      <div class="row">${txt("Periodicidad", "renov.tipo", { type: "select", options: [["", "Sin renovación"], ["mensual", "Mensual"], ["anual", "Anual"]] })}${txt("Responsable", "renov.persona", { type: "select", options: [["", "Sin asignar"], ["jose", "Jose"], ["maria", "María"]] })}</div>
+      <div class="row">${txt("Inicio del servicio", "renov.inicio", { type: "date" })}${txt("Hasta (opcional)", "renov.hasta", { type: "date" })}</div>
+      ${txt("Nota para la renovación", "renov.nota", { ph: "Revisar precio, avisar al cliente…" })}
+      <div class="hint">Cada renovación aparece en Tareas y en el calendario de Google.</div>`, o("Renovación")) +
     sec("Contacto", `
       ${txt("Nombre", "contacto.nombre")}
       <div class="row">${txt("Teléfono", "contacto.telefono")}${txt("Email", "contacto.email")}</div>
@@ -778,6 +785,7 @@ const file = document.getElementById("file");
 const nuevoId = () => "p" + Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
 async function crear(base) {
   const d = migrar({ ...structuredClone(VACIO), ...structuredClone(base), id: nuevoId(), fecha: isoLocal() });
+  d.renov = { tipo: "", persona: "", inicio: "", hasta: "", nota: "" }; // una copia no hereda la renovación
   await api(`docs/presupuestos/${d.id}`, { method: "PUT", body: d });
   location.href = "/admin/presupuestos?id=" + d.id;
 }

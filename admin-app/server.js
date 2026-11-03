@@ -10,6 +10,7 @@ import * as correo from "./lib/correo.js";
 import * as copias from "./lib/copias.js";
 import * as salud from "./lib/salud.js";
 import * as vigilancia from "./lib/vigilancia.js";
+import * as calendario from "./lib/calendario.js";
 import {
   verifyPassword, hashPassword, DUMMY_HASH, passwordProblems,
   newTotpSecret, verifyTotp, totpUri, newToken, sha256,
@@ -218,6 +219,13 @@ app.get("/admin/bono/:token/datos", (req, res) => {
 });
 
 /* ===== A partir de aquí, todo requiere sesión ===== */
+/* ===== Calendario de tareas (suscripción iCal privada, sin sesión) ===== */
+app.get("/admin/calendario/:token.ics", (req, res) => {
+  if (!calendario.tokenValido(req.params.token)) return res.status(404).send("Enlace no válido");
+  const persona = calendario.PERSONAS[req.query.persona] ? req.query.persona : "";
+  res.set({ "Content-Type": "text/calendar; charset=utf-8", "Cache-Control": "private, max-age=300" }).send(calendario.ics(persona));
+});
+
 app.use("/admin", requireAuth);
 
 app.get("/admin/api/me", (req, res) => {
@@ -279,7 +287,7 @@ app.post("/admin/api/password", (req, res) => {
 });
 
 /* ===== Documentos: presupuestos y facturas ===== */
-const KINDS = new Set(["presupuestos", "facturas", "ajustes", "bonos"]);
+const KINDS = new Set(["presupuestos", "facturas", "ajustes", "bonos", "tareas"]);
 const ID = /^[\w-]{1,64}$/;
 app.param("kind", (req, res, next, kind) => KINDS.has(kind) ? next() : res.status(404).json({ error: "No existe" }));
 
@@ -368,7 +376,7 @@ app.post("/admin/api/servidores/copias", async (req, res) => {
 });
 
 /* ===== Páginas privadas ===== */
-const PAGES = { "": "index.html", presupuestos: "presupuestos.html", facturas: "facturas.html", correo: "correo.html", mensajes: "mensajes.html", seguridad: "seguridad.html", servidores: "servidores.html", bonos: "bonos.html" };
+const PAGES = { "": "index.html", presupuestos: "presupuestos.html", facturas: "facturas.html", correo: "correo.html", mensajes: "mensajes.html", seguridad: "seguridad.html", servidores: "servidores.html", bonos: "bonos.html", tareas: "tareas.html" };
 app.get("/admin/panel.js", (req, res) => res.sendFile(path.join(PUBLIC, "panel.js")));
 app.get(["/admin", "/admin/:page"], (req, res, next) => {
   const f = PAGES[(req.params.page || "").replace(/\.html$/, "")];

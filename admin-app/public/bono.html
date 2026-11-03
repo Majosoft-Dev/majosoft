@@ -87,7 +87,7 @@ fetch(location.pathname.replace(/\/$/, "") + "/datos").then(r => r.ok ? r.json()
     <div class="card"><h2>Detalle de intervenciones</h2>
       ${ents.length ? `<table><thead><tr><th>Fecha</th><th>Tarea</th><th class="r">Tiempo</th></tr></thead><tbody>${filas}</tbody></table>` : `<p class="empty">Todavía no se ha consumido ninguna hora del bono.</p>`}
     </div>
-    <p class="pie">El tiempo se descuenta en fracciones de 15 minutos según el trabajo real dedicado. Para cualquier duda: dev@majosoft.es · 648 867 950</p>`;
+    <p class="pie">Para cualquier duda: dev@majosoft.es · 648 867 950</p>`;
   document.title = `${b.titulo || "Bono de horas"} · ${b.cliente || "Majosoft"}`;
 }).catch(() => { document.getElementById("main").innerHTML = '<p class="empty">No se pudo cargar el bono.</p>'; });
 </script>

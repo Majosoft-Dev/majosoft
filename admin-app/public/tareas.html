@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Tareas · Panel Majosoft</title>
+  <meta name="robots" content="noindex, nofollow" />
+  <link rel="icon" type="image/svg+xml" href="/assets/favicon.svg" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/admin/panel.css" />
+  <style>
+    * { box-sizing: border-box; }
+    body { margin: 0; font-family: Inter, system-ui, sans-serif; background: var(--cream); color: var(--ink); font-size: 14px; }
+    main { max-width: 1180px; padding: 34px 32px 60px; }
+    .btn { display: inline-flex; align-items: center; gap: 6px; padding: 9px 15px; border-radius: 10px; border: 1px solid var(--line); background: #fff; color: var(--ink); font: inherit; font-weight: 700; font-size: 13px; cursor: pointer; text-decoration: none; }
+    .btn:hover { border-color: var(--ink); }
+    .btn--ink { background: var(--ink); color: var(--cream); border-color: var(--ink); }
+    .btn--danger:hover { border-color: var(--bad); color: var(--bad); }
+    .tools { display: flex; gap: 8px; flex-wrap: wrap; }
+    .card { background: #fff; border: 1px solid var(--line); border-radius: 16px; overflow: hidden; }
+    .cols { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; align-items: start; }
+    .col-head { display: flex; align-items: center; gap: 10px; padding: 14px 16px; border-bottom: 1px solid var(--line); }
+    .col-head .av { width: 30px; height: 30px; border-radius: 50%; background: var(--ink); color: var(--cream); display: grid; place-items: center; font-weight: 800; font-size: 12px; }
+    .col-head h2 { font-size: 16px; margin: 0; flex: 1; }
+    .col-head small { color: var(--muted); font-weight: 600; }
+    .grp { padding: 4px 0 8px; border-bottom: 1px solid #eeede5; }
+    .grp:last-child { border-bottom: 0; }
+    .grp h3, .grp summary { font-size: 11.5px; color: var(--muted); text-transform: uppercase; letter-spacing: .05em; margin: 0; padding: 12px 16px 6px; font-weight: 700; cursor: default; }
+    .grp summary { cursor: pointer; }
+    .t { display: grid; grid-template-columns: 22px 1fr auto; gap: 10px; align-items: start; padding: 8px 16px; cursor: pointer; }
+    .t:hover { background: #fafaf5; }
+    .t input { margin: 2px 0 0; width: 16px; height: 16px; accent-color: var(--ink); cursor: pointer; }
+    .t b { display: block; font-weight: 600; }
+    .t small { display: block; color: var(--muted); margin-top: 2px; white-space: pre-line; }
+    .t.hecha b { text-decoration: line-through; color: var(--muted); }
+    .t.renov { cursor: default; }
+    .t.renov .ic { font-size: 14px; line-height: 18px; text-align: center; }
+    .t.renov a { color: inherit; }
+    .tag { font-size: 11.5px; font-weight: 700; padding: 3px 8px; border-radius: 99px; background: var(--cream); white-space: nowrap; }
+    .tag.curso { background: #f3f4dc; }
+    .tag.tarde { background: #fde7e5; color: var(--bad); }
+    .tag.hoy { background: #fff1d6; color: var(--warn); }
+    .empty { padding: 10px 16px 14px; color: var(--muted); font-size: 13px; }
+    .cal { padding: 16px 18px; margin-bottom: 14px; }
+    .cal h2 { font-size: 15px; margin: 0 0 4px; }
+    .cal p { margin: 0 0 12px; color: var(--muted); font-size: 13px; }
+    .cal .url { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; background: #f3f4dc; border-radius: 10px; padding: 9px 12px; margin-bottom: 8px; }
+    .cal .url b { width: 70px; font-size: 12.5px; }
+    .cal .url code { flex: 1; min-width: 200px; font-size: 12px; word-break: break-all; }
+    .cal ol { margin: 10px 0 0; padding-left: 20px; color: var(--muted); font-size: 13px; line-height: 1.6; }
+    dialog { border: 0; border-radius: 16px; padding: 0; width: min(520px, 94vw); box-shadow: 0 20px 60px rgba(0,0,0,.25); }
+    dialog::backdrop { background: rgba(21,22,26,.4); }
+    dialog form { padding: 22px 24px; display: grid; gap: 12px; }
+    dialog h2 { margin: 0; font-size: 18px; }
+    .row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    label.f { display: flex; flex-direction: column; gap: 5px; font-size: 12px; font-weight: 700; color: var(--muted); }
+    label.f input, label.f textarea, label.f select { font: inherit; font-size: 14px; color: var(--ink); padding: 9px 11px; border: 1px solid var(--line); border-radius: 10px; background: #fcfcf8; font-weight: 500; }
+    label.f textarea { min-height: 80px; resize: vertical; }
+    .acts { display: flex; gap: 8px; justify-content: flex-end; margin-top: 4px; }
+    .acts .btn--danger { margin-right: auto; }
+    @media (max-width: 900px) { .cols { grid-template-columns: 1fr; } main { padding: 24px 16px 40px; } }
+  </style>
+</head>
+<body>
+  <main>
+    <div class="page-head">
+      <div><div class="crumbs">General</div><h1>Tareas</h1><p>Lo que tenemos pendiente y en curso, repartido entre Jose y María, con las renovaciones de los presupuestos.</p></div>
+      <div class="tools"><button class="btn" id="bCal">📅 Google Calendar</button><button class="btn btn--ink" id="bNew">+ Nueva tarea</button></div>
+    </div>
+    <div class="card cal" id="cal" hidden></div>
+    <div class="cols" id="cols"></div>
+  </main>
+  <dialog id="dlg"><form method="dialog" id="frm"></form></dialog>
+<script type="module">
+import { mountShell, api, toast } from "/admin/panel.js";
+const me = await mountShell("tareas");
+const $ = id => document.getElementById(id);
+const esc = s => String(s ?? "").replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+const iso = d => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+const hoy = () => iso(new Date());
+const fecha = s => new Date(s + "T12:00").toLocaleDateString("es-ES", { weekday: "short", day: "numeric", month: "short" });
+const token = () => btoa(String.fromCharCode(...crypto.getRandomValues(new Uint8Array(24)))).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
+const PERSONAS = { jose: "Jose", maria: "María" };
+const ESTADOS = { pendiente: "Pendiente", curso: "En curso", hecha: "Hecha" };
+const yo = /jos[eé]/i.test(`${me?.name} ${me?.email}`) ? "jose" : "maria"; // persona por defecto de las tareas nuevas
+
+let tareas = await api("docs/tareas");
+const presupuestos = await api("docs/presupuestos");
+let ajustes = (await api("docs/ajustes")).find(a => a.id === "calendario") || { id: "calendario" };
+const put = t => api(`docs/tareas/${t.id}`, { method: "PUT", body: t });
+
+// Misma cuenta que el servidor: inicio + n periodos, ajustando al último día de los meses cortos
+const sumar = (f, tipo, n) => { const [y, m, d] = f.split("-").map(Number), k = (tipo === "anual" ? 12 : 1) * n; return iso(new Date(y, m - 1 + k, Math.min(d, new Date(y, m + k, 0).getDate()))); };
+function proximas(dias = 60) {
+  const out = [], tope = iso(new Date(Date.now() + dias * 864e5)), h = hoy();
+  for (const p of presupuestos) {
+    const r = p.renov || {};
+    if (!["mensual", "anual"].includes(r.tipo) || !/^\d{4}-\d{2}-\d{2}$/.test(r.inicio || "")) continue;
+    for (let n = 1; n < 2000; n++) {
+      const f = sumar(r.inicio, r.tipo, n);
+      if (f > tope || (r.hasta && f > r.hasta)) break;
+      if (f >= h) { out.push({ p, r, fecha: f }); break; }
+    }
+  }
+  return out.sort((a, b) => a.fecha.localeCompare(b.fecha));
+}
+
+const etiquetaFecha = (f, hecha) => {
+  if (!f) return "";
+  const cls = hecha ? "" : f < hoy() ? "tarde" : f === hoy() ? "hoy" : "";
+  return `<span class="tag ${cls}">${f === hoy() ? "Hoy" : fecha(f)}</span>`;
+};
+const fila = t => `<div class="t ${t.estado === "hecha" ? "hecha" : ""}" data-id="${t.id}">
+  <input type="checkbox" data-done="${t.id}" ${t.estado === "hecha" ? "checked" : ""} title="Marcar como hecha" />
+  <div><b>${esc(t.titulo)}</b>${t.detalle ? `<small>${esc(t.detalle)}</small>` : ""}</div>
+  <div>${etiquetaFecha(t.fecha, t.estado === "hecha")}</div></div>`;
+const orden = (a, b) => (a.fecha || "9999").localeCompare(b.fecha || "9999") || (b.creada || 0) - (a.creada || 0);
+
+function pintar() {
+  const renov = proximas();
+  $("cols").innerHTML = Object.entries(PERSONAS).map(([k, nombre]) => {
+    const mias = tareas.filter(t => (t.persona || "maria") === k);
+    const de = e => mias.filter(t => (t.estado || "pendiente") === e).sort(orden);
+    const hechas = de("hecha").sort((a, b) => (b.hechaEn || 0) - (a.hechaEn || 0));
+    const rs = renov.filter(x => x.r.persona === k || !x.r.persona);
+    const grp = (titulo, lista, vacio) => `<div class="grp"><h3>${titulo} · ${lista.length}</h3>${lista.length ? lista.map(fila).join("") : `<div class="empty">${vacio}</div>`}</div>`;
+    return `<div class="card">
+      <div class="col-head"><div class="av">${nombre[0]}</div><h2>${nombre}</h2><small>${de("curso").length + de("pendiente").length} abiertas</small></div>
+      ${grp("En curso", de("curso"), "Nada en curso.")}
+      ${grp("Pendientes", de("pendiente"), "Sin tareas pendientes.")}
+      ${rs.length ? `<div class="grp"><h3>Renovaciones próximas · ${rs.length}</h3>${rs.map(x => `<div class="t renov"><span class="ic">🔁</span>
+        <div><b>${x.r.persona ? "" : "(sin asignar) "}<a href="/admin/presupuestos?id=${encodeURIComponent(x.p.id)}">Renovar ${x.r.tipo}: ${esc(x.p.cliente || x.p.titulo)}</a></b>${x.r.nota ? `<small>${esc(x.r.nota)}</small>` : ""}</div>
+        <div>${etiquetaFecha(x.fecha)}</div></div>`).join("")}</div>` : ""}
+      ${hechas.length ? `<details class="grp"><summary>Hechas · ${hechas.length}</summary>${hechas.slice(0, 30).map(fila).join("")}</details>` : ""}
+    </div>`;
+  }).join("");
+}
+
+function editar(t) {
+  const nueva = !t;
+  t ??= { id: "t" + Date.now().toString(36) + Math.random().toString(36).slice(2, 5), titulo: "", detalle: "", persona: yo, estado: "pendiente", fecha: "", creada: Date.now() };
+  const opts = (obj, v) => Object.entries(obj).map(([k, l]) => `<option value="${k}" ${v === k ? "selected" : ""}>${l}</option>`).join("");
+  $("frm").innerHTML = `<h2>${nueva ? "Nueva tarea" : "Editar tarea"}</h2>
+    <label class="f">Tarea<input name="titulo" required value="${esc(t.titulo)}" placeholder="Qué hay que hacer" /></label>
+    <label class="f">Detalle (opcional)<textarea name="detalle">${esc(t.detalle)}</textarea></label>
+    <div class="row"><label class="f">Persona<select name="persona">${opts(PERSONAS, t.persona)}</select></label>
+      <label class="f">Estado<select name="estado">${opts(ESTADOS, t.estado)}</select></label></div>
+    <label class="f">Fecha (opcional, sale en el calendario)<input type="date" name="fecha" value="${esc(t.fecha)}" /></label>
+    <div class="acts">${nueva ? "" : `<button type="button" class="btn btn--danger" id="bDel">Eliminar</button>`}
+      <button type="button" class="btn" id="bCancel">Cancelar</button><button class="btn btn--ink" value="ok">${nueva ? "Crear" : "Guardar"}</button></div>`;
+  $("bCancel").onclick = () => $("dlg").close();
+  if (!nueva) $("bDel").onclick = async () => {
+    if (!confirm("¿Eliminar esta tarea?")) return;
+    await api(`docs/tareas/${t.id}`, { method: "DELETE" });
+    tareas = tareas.filter(x => x.id !== t.id); $("dlg").close(); pintar();
+  };
+  $("frm").onsubmit = async () => {
+    const f = Object.fromEntries(new FormData($("frm")));
+    if (f.estado === "hecha" && t.estado !== "hecha") t.hechaEn = Date.now();
+    Object.assign(t, { titulo: f.titulo.trim(), detalle: f.detalle.trim(), persona: f.persona, estado: f.estado, fecha: f.fecha });
+    try { await put(t); } catch (e) { return toast(e.message, true); }
+    if (nueva) tareas.push(t);
+    pintar(); toast(nueva ? "Tarea creada" : "Guardado");
+  };
+  $("dlg").showModal();
+  $("frm").titulo.focus();
+}
+
+$("bNew").onclick = () => editar();
+$("cols").addEventListener("click", async e => {
+  const done = e.target.dataset.done;
+  if (done) {
+    const t = tareas.find(x => x.id === done);
+    t.estado = e.target.checked ? "hecha" : "pendiente";
+    t.hechaEn = e.target.checked ? Date.now() : undefined;
+    try { await put(t); } catch (err) { toast(err.message, true); }
+    return pintar();
+  }
+  const fila = e.target.closest(".t[data-id]");
+  if (fila) editar(tareas.find(x => x.id === fila.dataset.id));
+});
+
+/* ===== Conexión con Google Calendar (suscripción iCal) ===== */
+const url = p => `${location.origin}/admin/calendario/${ajustes.token}.ics${p ? "?persona=" + p : ""}`;
+function pintarCal() {
+  $("cal").innerHTML = `<h2>Conectar con Google Calendar</h2>
+    <p>Google Calendar se suscribe a un enlace privado y muestra las tareas con fecha y las renovaciones. Las actualizaciones pueden tardar unas horas en aparecer en Google.</p>
+    ${ajustes.token ? [["", "Todo"], ["jose", "Jose"], ["maria", "María"]].map(([k, l]) => `<div class="url"><b>${l}</b><code>${esc(url(k))}</code><button class="btn" data-copy="${k}">Copiar</button></div>`).join("") + `
+    <ol><li>En Google Calendar (en el ordenador), junto a «Otros calendarios», pulsa <b>+</b> y luego <b>Desde URL</b>.</li>
+      <li>Pega el enlace (el de «Todo» o solo el tuyo) y pulsa <b>Añadir calendario</b>.</li>
+      <li>No compartáis el enlace: quien lo tenga ve las tareas.</li></ol>
+    <p style="margin:12px 0 0"><button class="btn btn--danger" id="bTok">Cambiar enlace</button></p>`
+    : `<button class="btn btn--ink" id="bTok">Crear enlace del calendario</button>`}`;
+}
+$("bCal").onclick = () => { $("cal").hidden = !$("cal").hidden; pintarCal(); };
+$("cal").addEventListener("click", async e => {
+  if (e.target.dataset.copy != null) { await navigator.clipboard.writeText(url(e.target.dataset.copy)); return toast("Enlace copiado"); }
+  if (e.target.id === "bTok") {
+    if (ajustes.token && !confirm("El enlace anterior dejará de funcionar y habrá que volver a añadirlo en Google Calendar. ¿Continuar?")) return;
+    ajustes.token = token();
+    try { await api("docs/ajustes/calendario", { method: "PUT", body: ajustes }); } catch (err) { return toast(err.message, true); }
+    pintarCal(); toast("Enlace listo");
+  }
+});
+
+pintar();
+</script>
+</body>
+</html>
