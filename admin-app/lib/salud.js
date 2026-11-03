@@ -38,7 +38,17 @@ export async function web(url) {
   return { url, codigo, ms, ssl, error };
 }
 
-const RUIDO = /xmlrpc\.php|wp-config-sample\.php|wp-signup\.php|\/wp-admin\/includes\/|\/wp-includes\//i;
+// Rutas que solo piden los bots buscando fallos: sus 5xx no son errores de nuestras webs
+const RUIDO = /xmlrpc\.php|wp-config-sample\.php|wp-signup\.php|\/wp-admin\/includes\/|\/wp-includes\/|\/wp-content\/(themes|plugins)\/[^ ]*\.php|\/tmui\/|cve-\d{4}-\d+|\/cgi-bin\/|\.(env|git|aws)(\/|$)|\/vendor\/phpunit\//i;
+// 501 = método o petición que nginx no entiende (siempre escáneres); 503 en wp-login = el límite de intentos frenando a alguien
+export const esRuido = ruta => { const [cod, , url = ""] = ruta.split(" "); return cod === "501" || RUIDO.test(url) || (cod === "503" && /\/wp-login\.php$/.test(url))
+  || (cod === "502" && url.startsWith("/admin/api/correo/")); }; // 502 del correo = el buzón no respondió (se ve en Correo)
+// Quita el ruido de los datos que mandan los servidores remotos (su script no lo filtra)
+export function sinRuido(d) {
+  if (!d?.nginx) return d;
+  const fuera = d.nginx.rutas.filter(r => esRuido(r.ruta));
+  return { ...d, nginx: { ...d.nginx, total: Math.max(0, d.nginx.total - fuera.reduce((n, r) => n + r.veces, 0)), rutas: d.nginx.rutas.filter(r => !esRuido(r.ruta)) } };
+}
 
 // Errores 5xx de nginx en las últimas 24 h, agrupados por ruta
 function errores5xx() {
@@ -54,7 +64,7 @@ function errores5xx() {
       if (!(t >= desde)) continue;
       peticiones++;
       if (m[7][0] !== "5") continue;
-      if (RUIDO.test(m[6])) continue; // bots que piden ficheros internos de WordPress: no es un fallo real
+      if (esRuido(`${m[7]} ${m[5]} ${m[6]}`)) continue; // bots buscando fallos: no es un error real
       total++;
       const k = `${m[7]} ${m[5]} ${m[6]}`, v = rutas.get(k) || { ruta: k, veces: 0, ultima: 0 };
       v.veces++; v.ultima = Math.max(v.ultima, t); rutas.set(k, v);

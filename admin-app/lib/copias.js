@@ -2,6 +2,7 @@
 // El panel corre en el servidor Majosoft («apartamentos» en IONOS): ahí se llama al script directamente; en los otros dos, por SSH
 // con una clave que solo puede lanzar copias-web-remoto (estado / activar / desactivar).
 import { execFile } from "node:child_process";
+import { sinRuido } from "./salud.js";
 
 const CLAVE = process.env.COPIAS_CLAVE || "/root/.ssh/copias_panel";
 
@@ -48,5 +49,5 @@ export async function cambiar(servidorId, web, activa) {
 // Estado del servidor (disco, memoria, carga, servicios, certbot, 5xx). Local: directo; remotos: orden «salud».
 export async function salud(s, local) {
   if (s.local) return local();
-  return JSON.parse(await lanzar(s, ["salud"]));
+  return sinRuido(JSON.parse(await lanzar(s, ["salud"])));
 }
