@@ -57,7 +57,7 @@ window.addEventListener('DOMContentLoaded', () => {
     });
 
     /* Reveal por scroll genérico */
-    const grupos = '.svc, .band-dark__item';
+    const grupos = '.svc, .faq__item';
     gsap.utils.toArray('.reveal').forEach((el) => {
       if (el.closest('#inicio') || el.matches(grupos) || el.matches('.project')) return;
       gsap.to(el, { opacity: 1, y: 0, duration: 0.9, ease: 'power3.out',
@@ -430,3 +430,23 @@ document.querySelectorAll('a[href^="#"]').forEach((enlace) => {
     });
   });
 });
+
+/* ===== Preguntas frecuentes: abrir y cerrar con animación, una cada vez ===== */
+(() => {
+  const items = document.querySelectorAll('.faq__item');
+  const suave = typeof gsap !== 'undefined' && !window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const cerrar = (d) => {
+    const a = d.querySelector('.faq__a');
+    if (!suave) { d.open = false; return; }
+    gsap.to(a, { height: 0, opacity: 0, duration: 0.4, ease: 'power2.inOut', onComplete: () => { d.open = false; gsap.set(a, { clearProps: 'height,opacity' }); } });
+  };
+  items.forEach((d) => {
+    d.querySelector('summary').addEventListener('click', (e) => {
+      e.preventDefault();
+      if (d.open) { cerrar(d); return; }
+      items.forEach((o) => { if (o !== d && o.open) cerrar(o); });
+      d.open = true;
+      if (suave) gsap.fromTo(d.querySelector('.faq__a'), { height: 0, opacity: 0 }, { height: 'auto', opacity: 1, duration: 0.5, ease: 'power3.out', onComplete: () => ScrollTrigger.refresh() });
+    });
+  });
+})();
