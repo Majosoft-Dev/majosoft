@@ -673,7 +673,7 @@ function buildEditor() {
         ${txt("Título", `requisitos.${i}.titulo`)}${txt("Requisitos", `requisitos.${i}.items`, { type: "lines" })}</div>`).join("")}
       <button class="add" data-add="requisitos">+ Añadir grupo</button>`, o("Garantía y requisitos")) +
     sec("Renovación", `
-      <div class="row">${txt("Periodicidad", "renov.tipo", { type: "select", options: [["", "Sin renovación"], ["mensual", "Mensual"], ["anual", "Anual"]] })}${txt("Responsable", "renov.persona", { type: "select", options: [["", "Sin asignar"], ["jose", "Jose"], ["maria", "María"]] })}</div>
+      <div class="row">${txt("Periodicidad", "renov.tipo", { type: "select", options: [["", "Sin renovación"], ["mensual", "Mensual"], ["trimestral", "Trimestral"], ["semestral", "Semestral"], ["anual", "Anual"]] })}${txt("Responsable", "renov.persona", { type: "select", options: [["", "Sin asignar"], ["jose", "Jose"], ["maria", "María"]] })}</div>
       <div class="row">${txt("Inicio del servicio", "renov.inicio", { type: "date" })}${txt("Hasta (opcional)", "renov.hasta", { type: "date" })}</div>
       ${txt("Nota para la renovación", "renov.nota", { ph: "Revisar precio, avisar al cliente…" })}
       <div class="hint">Cada renovación aparece en Tareas y en el calendario de Google.</div>`, o("Renovación")) +

@@ -11,6 +11,12 @@ export const SERVIDORES = [
   { id: "apartamentos", nombre: "Majosoft", ip: "31.70.154.16", uso: "Webs de Majosoft y clientes: panel, Fichaje, Arbitraje, Bambina, María Sánchez y Apartamentos Mar de Dunas", local: true },
 ];
 
+// Datos que el script de cada servidor no guarda: dominio pendiente de poner en su .conf y acceso al WordPress
+const EXTRA = {
+  "guiadelbombero-wp": { url: "https://guiadelbombero.com", acceso: "https://guiadelbombero.com/gm-acceso" },
+  "objetivobaeza-wp": { acceso: "https://objetivobaeza.com/gm-acceso" },
+};
+
 function lanzar(servidor, args) {
   const [cmd, argv] = servidor.local
     ? ["/usr/local/bin/copias-web", args]
@@ -24,7 +30,8 @@ function lanzar(servidor, args) {
 export async function estado() {
   return Promise.all(SERVIDORES.map(async ({ local, ...s }) => {
     try {
-      const webs = (await lanzar({ local, ...s }, ["estado"])).trim().split("\n").filter(Boolean).map(l => JSON.parse(l));
+      const webs = (await lanzar({ local, ...s }, ["estado"])).trim().split("\n").filter(Boolean).map(l => JSON.parse(l))
+        .map(w => ({ ...w, url: w.url || EXTRA[w.web]?.url || "", acceso: EXTRA[w.web]?.acceso || "" }));
       return { ...s, webs };
     } catch (e) {
       return { ...s, webs: [], error: "No se pudo consultar: " + e.message };

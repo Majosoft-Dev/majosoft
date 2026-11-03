@@ -60,17 +60,49 @@
     label.f textarea { min-height: 80px; resize: vertical; }
     .acts { display: flex; gap: 8px; justify-content: flex-end; margin-top: 4px; }
     .acts .btn--danger { margin-right: auto; }
+    .vista { display: inline-flex; background: #fff; border: 1px solid var(--line); border-radius: 10px; padding: 3px; margin-bottom: 14px; }
+    .vista button { border: 0; background: none; font: inherit; font-weight: 700; font-size: 13px; padding: 6px 14px; border-radius: 8px; cursor: pointer; color: var(--muted); }
+    .vista button.on { background: var(--ink); color: var(--cream); }
+    .mes-head { display: flex; align-items: center; gap: 8px; padding: 12px 16px; border-bottom: 1px solid var(--line); }
+    .mes-head h2 { font-size: 16px; margin: 0 auto 0 0; text-transform: capitalize; }
+    .leyenda { display: flex; gap: 12px; font-size: 12px; color: var(--muted); font-weight: 600; margin-right: 8px; }
+    .leyenda i { display: inline-block; width: 9px; height: 9px; border-radius: 3px; margin-right: 4px; }
+    .mes { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); }
+    .mes .dsem { font-size: 11px; font-weight: 700; color: var(--muted); text-transform: uppercase; padding: 8px; border-bottom: 1px solid var(--line); }
+    .dia { min-height: 104px; border-right: 1px solid #eeede5; border-bottom: 1px solid #eeede5; padding: 6px; cursor: pointer; }
+    .dia:nth-child(7n) { border-right: 0; }
+    .dia:hover { background: #fafaf5; }
+    .dia.fuera { background: #fbfbf7; color: #b3b2a8; }
+    .dia .n { font-size: 12px; font-weight: 700; margin-bottom: 4px; }
+    .dia.hoy .n { background: var(--ink); color: var(--cream); border-radius: 99px; display: inline-block; padding: 1px 7px; }
+    .ev { display: block; font-size: 11.5px; font-weight: 600; padding: 2px 6px; border-radius: 5px; margin-bottom: 3px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; background: var(--cream); }
+    .ev.jose, .leyenda .jose { background: #dde9fb; }
+    .ev.maria, .leyenda .maria { background: #f3f4dc; }
+    .ev.renov, .leyenda .renov { background: #fff1d6; }
+    .ev.hecha { text-decoration: line-through; opacity: .55; }
+    .renovs { margin-top: 14px; }
+    .renovs .mes-head h2 { text-transform: none; }
+    .renovs table { width: 100%; border-collapse: collapse; }
+    .renovs td, .renovs th { padding: 10px 16px; text-align: left; border-bottom: 1px solid #eeede5; vertical-align: top; }
+    .renovs th { font-size: 11.5px; color: var(--muted); text-transform: uppercase; letter-spacing: .05em; }
+    .renovs tbody tr { cursor: pointer; }
+    .renovs tbody tr:hover { background: #fafaf5; }
+    .renovs td small { display: block; color: var(--muted); }
+    @media (max-width: 900px) { .dia { min-height: 70px; } .ev { font-size: 10px; } .renovs .opc { display: none; } }
     @media (max-width: 900px) { .cols { grid-template-columns: 1fr; } main { padding: 24px 16px 40px; } }
   </style>
 </head>
 <body>
   <main>
     <div class="page-head">
-      <div><div class="crumbs">General</div><h1>Tareas</h1><p>Lo que tenemos pendiente y en curso, repartido entre Jose y María, con las renovaciones de los presupuestos.</p></div>
+      <div><div class="crumbs">General</div><h1>Tareas</h1><p>Lo que tenemos pendiente y en curso, repartido entre Jose y María, con las renovaciones de los clientes.</p></div>
       <div class="tools"><button class="btn" id="bCal">📅 Google Calendar</button><button class="btn btn--ink" id="bNew">+ Nueva tarea</button></div>
     </div>
     <div class="card cal" id="cal" hidden></div>
+    <div class="vista"><button data-v="tablero" class="on">Tablero</button><button data-v="calendario">Calendario</button></div>
     <div class="cols" id="cols"></div>
+    <div class="card" id="mes" hidden></div>
+    <div class="card renovs" id="renovs"></div>
   </main>
   <dialog id="dlg"><form method="dialog" id="frm"></form></dialog>
 <script type="module">
@@ -87,24 +119,33 @@ const ESTADOS = { pendiente: "Pendiente", curso: "En curso", hecha: "Hecha" };
 const yo = /jos[eé]/i.test(`${me?.name} ${me?.email}`) ? "jose" : "maria"; // persona por defecto de las tareas nuevas
 
 let tareas = await api("docs/tareas");
+let fichas = await api("docs/renovaciones");
 const presupuestos = await api("docs/presupuestos");
 let ajustes = (await api("docs/ajustes")).find(a => a.id === "calendario") || { id: "calendario" };
 const put = t => api(`docs/tareas/${t.id}`, { method: "PUT", body: t });
+const PERIODOS = { mensual: ["Mensual", 1], trimestral: ["Trimestral", 3], semestral: ["Semestral", 6], anual: ["Anual", 12] };
+const FECHA = /^\d{4}-\d{2}-\d{2}$/;
 
+// Todo lo que se renueva: fichas propias y presupuestos con renovación
+const fuentes = () => [
+  ...fichas.map(r => ({ ...r, titulo: [r.cliente, r.concepto].filter(Boolean).join(" · ") || "Renovación", ficha: r })),
+  ...presupuestos.filter(p => PERIODOS[p.renov?.tipo]).map(p => ({ ...p.renov, titulo: p.cliente || p.titulo, presupuesto: p })),
+].filter(r => PERIODOS[r.tipo] && FECHA.test(r.inicio || ""));
 // Misma cuenta que el servidor: inicio + n periodos, ajustando al último día de los meses cortos
-const sumar = (f, tipo, n) => { const [y, m, d] = f.split("-").map(Number), k = (tipo === "anual" ? 12 : 1) * n; return iso(new Date(y, m - 1 + k, Math.min(d, new Date(y, m + k, 0).getDate()))); };
-function proximas(dias = 60) {
-  const out = [], tope = iso(new Date(Date.now() + dias * 864e5)), h = hoy();
-  for (const p of presupuestos) {
-    const r = p.renov || {};
-    if (!["mensual", "anual"].includes(r.tipo) || !/^\d{4}-\d{2}-\d{2}$/.test(r.inicio || "")) continue;
-    for (let n = 1; n < 2000; n++) {
-      const f = sumar(r.inicio, r.tipo, n);
-      if (f > tope || (r.hasta && f > r.hasta)) break;
-      if (f >= h) { out.push({ p, r, fecha: f }); break; }
-    }
+const sumar = (f, tipo, n) => { const [y, m, d] = f.split("-").map(Number), k = PERIODOS[tipo][1] * n; return iso(new Date(y, m - 1 + k, Math.min(d, new Date(y, m + k, 0).getDate()))); };
+function ocurrencias(r, desde, hasta) {
+  const out = [];
+  for (let n = 1; n < 2000; n++) {
+    const f = sumar(r.inicio, r.tipo, n);
+    if (f > hasta || (r.hasta && f > r.hasta)) break;
+    if (f >= desde) out.push(f);
   }
-  return out.sort((a, b) => a.fecha.localeCompare(b.fecha));
+  return out;
+}
+const siguiente = r => ocurrencias(r, hoy(), "9999-12-31")[0] || "";
+function proximas(dias = 60) {
+  const tope = iso(new Date(Date.now() + dias * 864e5));
+  return fuentes().map(r => ({ r, fecha: siguiente(r) })).filter(x => x.fecha && x.fecha <= tope).sort((a, b) => a.fecha.localeCompare(b.fecha));
 }
 
 const etiquetaFecha = (f, hecha) => {
@@ -131,17 +172,99 @@ function pintar() {
       ${grp("En curso", de("curso"), "Nada en curso.")}
       ${grp("Pendientes", de("pendiente"), "Sin tareas pendientes.")}
       ${rs.length ? `<div class="grp"><h3>Renovaciones próximas · ${rs.length}</h3>${rs.map(x => `<div class="t renov"><span class="ic">🔁</span>
-        <div><b>${x.r.persona ? "" : "(sin asignar) "}<a href="/admin/presupuestos?id=${encodeURIComponent(x.p.id)}">Renovar ${x.r.tipo}: ${esc(x.p.cliente || x.p.titulo)}</a></b>${x.r.nota ? `<small>${esc(x.r.nota)}</small>` : ""}</div>
+        <div><b>${x.r.persona ? "" : "(sin asignar) "}Renovar ${x.r.tipo}: ${esc(x.r.titulo)}</b>${x.r.importe || x.r.nota ? `<small>${esc([x.r.importe, x.r.nota].filter(Boolean).join(" · "))}</small>` : ""}</div>
         <div>${etiquetaFecha(x.fecha)}</div></div>`).join("")}</div>` : ""}
       ${hechas.length ? `<details class="grp"><summary>Hechas · ${hechas.length}</summary>${hechas.slice(0, 30).map(fila).join("")}</details>` : ""}
     </div>`;
   }).join("");
+  pintarMes(); pintarRenovs();
 }
 
-function editar(t) {
+/* ===== Calendario del mes ===== */
+let mesVisto = new Date(); mesVisto.setDate(1);
+function pintarMes() {
+  const y = mesVisto.getFullYear(), m = mesVisto.getMonth();
+  const ini = new Date(y, m, 1 - (new Date(y, m, 1).getDay() + 6) % 7); // lunes de la primera semana
+  const dias = Array.from({ length: 42 }, (_, i) => new Date(ini.getFullYear(), ini.getMonth(), ini.getDate() + i));
+  const desde = iso(dias[0]), hasta = iso(dias[41]), por = {};
+  const add = (f, html) => (por[f] ||= []).push(html);
+  for (const t of tareas) if (t.fecha >= desde && t.fecha <= hasta)
+    add(t.fecha, `<span class="ev ${t.persona} ${t.estado === "hecha" ? "hecha" : ""}" data-id="${t.id}" title="${esc(PERSONAS[t.persona] + ": " + t.titulo)}">${esc(t.titulo)}</span>`);
+  for (const r of fuentes()) for (const f of ocurrencias(r, desde, hasta))
+    add(f, `<span class="ev renov" ${r.ficha ? `data-ren="${r.ficha.id}"` : `data-pre="${r.presupuesto.id}"`} title="${esc("Renovar " + r.tipo + ": " + r.titulo)}">🔁 ${esc(r.titulo)}</span>`);
+  $("mes").innerHTML = `<div class="mes-head"><h2>${mesVisto.toLocaleDateString("es-ES", { month: "long", year: "numeric" })}</h2>
+      <div class="leyenda"><span><i class="jose"></i>Jose</span><span><i class="maria"></i>María</span><span><i class="renov"></i>Renovación</span></div>
+      <button class="btn" data-mes="-1">‹</button><button class="btn" data-mes="0">Hoy</button><button class="btn" data-mes="1">›</button></div>
+    <div class="mes">${["lun", "mar", "mié", "jue", "vie", "sáb", "dom"].map(d => `<div class="dsem">${d}</div>`).join("")}
+    ${dias.map(d => { const f = iso(d); return `<div class="dia ${d.getMonth() !== m ? "fuera" : ""} ${f === hoy() ? "hoy" : ""}" data-dia="${f}"><div class="n">${d.getDate()}</div>${(por[f] || []).join("")}</div>`; }).join("")}</div>`;
+}
+$("mes").addEventListener("click", e => {
+  const b = e.target.closest("[data-mes]");
+  if (b) { const k = +b.dataset.mes; mesVisto = k ? new Date(mesVisto.getFullYear(), mesVisto.getMonth() + k, 1) : (d => (d.setDate(1), d))(new Date()); return pintarMes(); }
+  const ev = e.target.closest(".ev");
+  if (ev?.dataset.id) return editar(tareas.find(t => t.id === ev.dataset.id));
+  if (ev?.dataset.ren) return editarRenov(fichas.find(r => r.id === ev.dataset.ren));
+  if (ev?.dataset.pre) return location.href = "/admin/presupuestos?id=" + encodeURIComponent(ev.dataset.pre);
+  const dia = e.target.closest("[data-dia]");
+  if (dia) editar(null, dia.dataset.dia);
+});
+document.querySelector(".vista").addEventListener("click", e => {
+  const v = e.target.dataset.v; if (!v) return;
+  document.querySelectorAll(".vista button").forEach(b => b.classList.toggle("on", b.dataset.v === v));
+  $("cols").hidden = v !== "tablero"; $("mes").hidden = v !== "calendario";
+});
+
+/* ===== Renovaciones de clientes ===== */
+function pintarRenovs() {
+  const lista = fuentes().map(r => ({ r, prox: siguiente(r) })).sort((a, b) => (a.prox || "9999").localeCompare(b.prox || "9999"));
+  $("renovs").innerHTML = `<div class="mes-head"><h2>Renovaciones de clientes · ${lista.length}</h2><button class="btn btn--ink" id="bNewRen">+ Nueva renovación</button></div>
+    ${lista.length ? `<table><thead><tr><th>Cliente y servicio</th><th>Periodicidad</th><th>Próxima</th><th class="opc">Importe</th><th class="opc">Responsable</th></tr></thead><tbody>
+    ${lista.map(({ r, prox }) => `<tr ${r.ficha ? `data-ren="${r.ficha.id}"` : `data-pre="${r.presupuesto.id}"`}>
+      <td><b>${esc(r.titulo)}</b>${r.nota ? `<small>${esc(r.nota)}</small>` : ""}${r.presupuesto ? "<small>Desde el presupuesto</small>" : ""}</td>
+      <td>${PERIODOS[r.tipo][0]}</td><td>${prox ? etiquetaFecha(prox) : "Terminada"}</td>
+      <td class="opc">${esc(r.importe || "")}</td><td class="opc">${PERSONAS[r.persona] || "Sin asignar"}</td></tr>`).join("")}</tbody></table>`
+    : `<div class="empty">Todavía no hay renovaciones.</div>`}`;
+}
+$("renovs").addEventListener("click", e => {
+  if (e.target.id === "bNewRen") return editarRenov();
+  const tr = e.target.closest("tr");
+  if (tr?.dataset.ren) editarRenov(fichas.find(r => r.id === tr.dataset.ren));
+  if (tr?.dataset.pre) location.href = "/admin/presupuestos?id=" + encodeURIComponent(tr.dataset.pre);
+});
+const opts = (obj, v) => Object.entries(obj).map(([k, l]) => `<option value="${k}" ${v === k ? "selected" : ""}>${Array.isArray(l) ? l[0] : l}</option>`).join("");
+function editarRenov(r) {
+  const nueva = !r;
+  r ??= { id: "r" + Date.now().toString(36) + Math.random().toString(36).slice(2, 5), cliente: "", concepto: "", tipo: "mensual", inicio: hoy(), hasta: "", importe: "", persona: "", nota: "" };
+  $("frm").innerHTML = `<h2>${nueva ? "Nueva renovación" : "Editar renovación"}</h2>
+    <div class="row"><label class="f">Cliente<input name="cliente" required value="${esc(r.cliente)}" /></label>
+      <label class="f">Servicio<input name="concepto" value="${esc(r.concepto)}" placeholder="Mantenimiento, dominio, licencia…" /></label></div>
+    <div class="row"><label class="f">Periodicidad<select name="tipo">${opts(PERIODOS, r.tipo)}</select></label>
+      <label class="f">Importe (opcional)<input name="importe" value="${esc(r.importe)}" placeholder="75 €/mes" /></label></div>
+    <div class="row"><label class="f">Inicio del periodo actual o del servicio<input type="date" name="inicio" required value="${esc(r.inicio)}" /></label>
+      <label class="f">Hasta (opcional)<input type="date" name="hasta" value="${esc(r.hasta)}" /></label></div>
+    <label class="f">Responsable<select name="persona"><option value="">Sin asignar</option>${opts(PERSONAS, r.persona)}</select></label>
+    <label class="f">Nota (opcional)<textarea name="nota">${esc(r.nota)}</textarea></label>
+    <div class="acts">${nueva ? "" : `<button type="button" class="btn btn--danger" id="bDel">Eliminar</button>`}
+      <button type="button" class="btn" id="bCancel">Cancelar</button><button class="btn btn--ink" value="ok">${nueva ? "Crear" : "Guardar"}</button></div>`;
+  $("bCancel").onclick = () => $("dlg").close();
+  if (!nueva) $("bDel").onclick = async () => {
+    if (!confirm("¿Eliminar esta renovación?")) return;
+    await api(`docs/renovaciones/${r.id}`, { method: "DELETE" });
+    fichas = fichas.filter(x => x.id !== r.id); $("dlg").close(); pintar();
+  };
+  $("frm").onsubmit = async () => {
+    const f = Object.fromEntries(new FormData($("frm")));
+    Object.assign(r, { cliente: f.cliente.trim(), concepto: f.concepto.trim(), tipo: f.tipo, inicio: f.inicio, hasta: f.hasta, importe: f.importe.trim(), persona: f.persona, nota: f.nota.trim() });
+    try { await api(`docs/renovaciones/${r.id}`, { method: "PUT", body: r }); } catch (e) { return toast(e.message, true); }
+    if (nueva) fichas.push(r);
+    pintar(); toast(nueva ? "Renovación creada" : "Guardado");
+  };
+  $("dlg").showModal();
+}
+
+function editar(t, dia = "") {
   const nueva = !t;
-  t ??= { id: "t" + Date.now().toString(36) + Math.random().toString(36).slice(2, 5), titulo: "", detalle: "", persona: yo, estado: "pendiente", fecha: "", creada: Date.now() };
-  const opts = (obj, v) => Object.entries(obj).map(([k, l]) => `<option value="${k}" ${v === k ? "selected" : ""}>${l}</option>`).join("");
+  t ??= { id: "t" + Date.now().toString(36) + Math.random().toString(36).slice(2, 5), titulo: "", detalle: "", persona: yo, estado: "pendiente", fecha: dia, creada: Date.now() };
   $("frm").innerHTML = `<h2>${nueva ? "Nueva tarea" : "Editar tarea"}</h2>
     <label class="f">Tarea<input name="titulo" required value="${esc(t.titulo)}" placeholder="Qué hay que hacer" /></label>
     <label class="f">Detalle (opcional)<textarea name="detalle">${esc(t.detalle)}</textarea></label>
@@ -168,7 +291,7 @@ function editar(t) {
   $("frm").titulo.focus();
 }
 
-$("bNew").onclick = () => editar();
+$("bNew").onclick = () => editar(null);
 $("cols").addEventListener("click", async e => {
   const done = e.target.dataset.done;
   if (done) {

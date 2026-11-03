@@ -4,6 +4,7 @@ import { db } from "./db.js";
 
 export const PERSONAS = { jose: "Jose", maria: "María" };
 const FECHA = /^\d{4}-\d{2}-\d{2}$/;
+export const PERIODOS = { mensual: 1, trimestral: 3, semestral: 6, anual: 12 };
 
 const docs = kind => db.prepare("SELECT data FROM docs WHERE kind = ?").all(kind).map(r => JSON.parse(r.data));
 const ajustes = () => JSON.parse(db.prepare("SELECT data FROM docs WHERE kind = 'ajustes' AND id = 'calendario'").get()?.data || "{}");
@@ -17,7 +18,7 @@ export function tokenValido(token) {
 // Primera renovación: inicio + un periodo (si el día no existe en el mes, el último día del mes)
 export function sumarPeriodo(fecha, tipo, n = 1) {
   const [y, m, d] = fecha.split("-").map(Number);
-  const meses = (tipo === "anual" ? 12 : 1) * n;
+  const meses = (PERIODOS[tipo] || 1) * n;
   const ultimo = new Date(Date.UTC(y, m - 1 + meses + 1, 0)).getUTCDate();
   const r = new Date(Date.UTC(y, m - 1 + meses, Math.min(d, ultimo)));
   return r.toISOString().slice(0, 10);
@@ -25,8 +26,8 @@ export function sumarPeriodo(fecha, tipo, n = 1) {
 
 // Renovaciones de los últimos 2 meses y de los próximos 2 años (mensual) o 5 años (anual)
 export function renovaciones(r, hoy = new Date().toISOString().slice(0, 10)) {
-  if (!["mensual", "anual"].includes(r.tipo) || !FECHA.test(r.inicio || "")) return [];
-  const desde = sumarPeriodo(hoy, "mensual", -2), tope = sumarPeriodo(hoy, r.tipo === "anual" ? "anual" : "mensual", r.tipo === "anual" ? 5 : 24);
+  if (!PERIODOS[r.tipo] || !FECHA.test(r.inicio || "")) return [];
+  const desde = sumarPeriodo(hoy, "mensual", -2), tope = sumarPeriodo(hoy, "mensual", r.tipo === "mensual" ? 24 : 60);
   const hasta = FECHA.test(r.hasta || "") && r.hasta < tope ? r.hasta : tope, out = [];
   for (let n = 1; n < 2000; n++) {
     const fecha = sumarPeriodo(r.inicio, r.tipo, n);
@@ -59,6 +60,20 @@ function evento({ uid, fecha, titulo, descripcion, sello }) {
   ];
 }
 
+// Todo lo que se renueva: fichas de renovación y presupuestos con renovación
+export function fuentes() {
+  const out = [];
+  for (const r of docs("renovaciones")) out.push({ ...r, id: "r-" + r.id,
+    titulo: [r.cliente, r.concepto].filter(Boolean).join(" · ") || "Renovación",
+    nota: [r.importe && `Importe: ${r.importe}`, r.nota].filter(Boolean).join("\n") });
+  for (const p of docs("presupuestos")) {
+    const r = p.renov || {};
+    if (PERIODOS[r.tipo]) out.push({ ...r, id: p.id, titulo: p.cliente || p.titulo || "presupuesto",
+      nota: [p.titulo, p.referencia && "Referencia: " + p.referencia, r.nota].filter(Boolean).join("\n") });
+  }
+  return out;
+}
+
 // persona: "jose", "maria" o vacío para todas
 export function ics(persona) {
   const sello = new Date().toISOString().replace(/[-:]/g, "").replace(/\.\d+/, "");
@@ -73,15 +88,14 @@ export function ics(persona) {
       descripcion: [t.detalle, t.estado === "curso" ? "Estado: en curso" : hecha ? "Estado: hecha" : "Estado: pendiente"].filter(Boolean).join("\n\n"),
     }));
   }
-  for (const p of docs("presupuestos")) {
-    const r = p.renov || {};
-    if (!de(r.persona)) continue;
-    const quien = PERSONAS[r.persona] ? `[${PERSONAS[r.persona]}] ` : "";
+  for (const x of fuentes()) {
+    if (!de(x.persona)) continue;
+    const quien = PERSONAS[x.persona] ? `[${PERSONAS[x.persona]}] ` : "";
     // Fechas concretas (no RRULE): así un inicio el día 31 cae el último día de los meses cortos
-    for (const { n, fecha } of renovaciones(r)) ev.push(...evento({
-      uid: `renov-${p.id}-${n}`, fecha, sello,
-      titulo: `${quien}Renovar ${r.tipo}: ${p.cliente || p.titulo || "presupuesto"}`,
-      descripcion: [p.titulo, p.referencia && "Referencia: " + p.referencia, r.nota].filter(Boolean).join("\n"),
+    for (const { n, fecha } of renovaciones(x)) ev.push(...evento({
+      uid: `renov-${x.id}-${n}`, fecha, sello,
+      titulo: `${quien}Renovar ${x.tipo}: ${x.titulo}`,
+      descripcion: x.nota,
     }));
   }
   const nombre = persona ? `Majosoft · ${PERSONAS[persona]}` : "Majosoft · Tareas";
