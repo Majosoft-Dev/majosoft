@@ -93,6 +93,31 @@
     .tip .m { font-size: 12.5px; color: var(--ink2); }
     .tip p { font-size: 12.5px; color: var(--muted); margin: 7px 0 0; white-space: pre-line; max-height: 120px; overflow: hidden; }
     .tip .majosoft { --c-bar: #6b55c9; } .tip .jose { --c-bar: #3b74d4; } .tip .maria { --c-bar: #9aa60a; } .tip .renov { --c-bar: #e09a1b; }
+    .lista { margin-top: 14px; }
+    .lista .mes-head h2 { text-transform: none; }
+    .lista .resumen { font-size: 12.5px; color: var(--muted); font-weight: 600; margin-right: 8px; }
+    .gr { border-bottom: 1px solid #eeede5; }
+    .gr:last-child { border-bottom: 0; }
+    .gr > h3, .gr > summary { display: flex; align-items: center; gap: 8px; margin: 0; padding: 12px 16px 6px; font-size: 11.5px; font-weight: 800; letter-spacing: .05em; text-transform: uppercase; color: var(--muted); list-style: none; }
+    .gr > summary { cursor: pointer; padding-bottom: 12px; }
+    .gr > summary::-webkit-details-marker { display: none; }
+    .gr > summary::before { content: "▸"; transition: transform .15s; }
+    .gr[open] > summary::before { transform: rotate(90deg); }
+    .gr h3 .c, .gr summary .c { background: var(--cream); color: var(--ink); border-radius: 99px; padding: 1px 8px; font-size: 11px; letter-spacing: 0; }
+    .gr.tarde h3 { color: var(--bad); } .gr.tarde h3 .c { background: #fde7e5; color: var(--bad); }
+    .gr.hoy h3 { color: var(--warn); } .gr.hoy h3 .c { background: #fff1d6; color: var(--warn); }
+    .ti { display: grid; grid-template-columns: 20px 1fr auto; gap: 12px; align-items: center; padding: 9px 16px 9px 13px; border-left: 3px solid transparent; cursor: pointer; transition: background .12s, border-color .12s; }
+    .ti:hover { background: #fafaf5; border-left-color: var(--c-bar); }
+    .ti.jose { --c-bar: #3b74d4; } .ti.maria { --c-bar: #9aa60a; } .ti.majosoft { --c-bar: #6b55c9; }
+    .ti input { width: 17px; height: 17px; margin: 0; accent-color: var(--ink); cursor: pointer; }
+    .ti b { display: block; font-weight: 600; font-size: 14px; }
+    .ti small { display: block; color: var(--muted); font-size: 12.5px; margin-top: 1px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .ti.hecha b { text-decoration: line-through; color: var(--muted); }
+    .ti .meta { display: flex; align-items: center; gap: 6px; }
+    .quien { display: inline-flex; align-items: center; gap: 5px; font-size: 11.5px; font-weight: 700; padding: 3px 8px; border-radius: 99px; background: var(--cream); white-space: nowrap; }
+    .quien i { width: 7px; height: 7px; border-radius: 2px; background: var(--c-bar); }
+    .est { font-size: 11px; font-weight: 800; padding: 3px 7px; border-radius: 6px; background: #f3f4dc; color: #474d07; text-transform: uppercase; letter-spacing: .04em; }
+    .lista .vacio { padding: 28px 16px; text-align: center; color: var(--muted); }
     .renovs { margin-top: 14px; }
     .renovs .mes-head h2 { text-transform: none; }
     .renovs table { width: 100%; border-collapse: collapse; }
@@ -113,6 +138,7 @@
     </div>
     <div class="card cal" id="cal" hidden></div>
     <div class="card" id="mes"></div>
+    <div class="card lista" id="lista"></div>
     <div class="card renovs" id="renovs"></div>
   </main>
   <dialog id="dlg"><form method="dialog" id="frm"></form></dialog>
@@ -162,7 +188,50 @@ const etiquetaFecha = (f, hecha) => {
   return `<span class="tag ${cls}">${f === hoy() ? "Hoy" : fecha(f)}</span>`;
 };
 
-function pintar() { pintarMes(); pintarRenovs(); }
+function pintar() { pintarMes(); pintarLista(); pintarRenovs(); }
+
+/* ===== Panel de tareas, agrupadas por cuándo toca ===== */
+function pintarLista() {
+  const h = hoy(), d = new Date(), finSemana = iso(new Date(d.getFullYear(), d.getMonth(), d.getDate() + (7 - (d.getDay() || 7))));
+  const finMes = iso(new Date(d.getFullYear(), d.getMonth() + 1, 0));
+  const mias = tareas.filter(t => visible(t.persona));
+  const abiertas = mias.filter(t => t.estado !== "hecha").sort((a, b) => (a.fecha || "9999").localeCompare(b.fecha || "9999") || (a.hora || "99").localeCompare(b.hora || "99"));
+  const grupos = [
+    ["tarde", "Atrasadas", t => t.fecha && t.fecha < h],
+    ["hoy", "Hoy", t => t.fecha === h],
+    ["", "Esta semana", t => t.fecha > h && t.fecha <= finSemana],
+    ["", "Este mes", t => t.fecha > finSemana && t.fecha <= finMes],
+    ["", "Más adelante", t => t.fecha > finMes],
+    ["", "Sin fecha", t => !t.fecha],
+  ];
+  const fila = t => `<div class="ti ${persona(t.persona)} ${t.estado === "hecha" ? "hecha" : ""}" data-id="${t.id}">
+    <input type="checkbox" data-done="${t.id}" ${t.estado === "hecha" ? "checked" : ""} title="Marcar como hecha" />
+    <div><b>${esc(t.titulo)}</b>${t.fecha || t.detalle ? `<small>${[t.fecha && fLarga(t.fecha) + (t.hora ? " · " + t.hora : ""), t.detalle].filter(Boolean).map(esc).join(" — ")}</small>` : ""}</div>
+    <div class="meta">${t.estado === "curso" ? `<span class="est">En curso</span>` : ""}<span class="quien"><i></i>${PERSONAS[persona(t.persona)].replace(" (ambos)", "")}</span></div></div>`;
+  const hechas = mias.filter(t => t.estado === "hecha").sort((a, b) => (b.hechaEn || 0) - (a.hechaEn || 0));
+  const usados = new Set();
+  const html = grupos.map(([cls, titulo, f]) => {
+    const l = abiertas.filter(t => !usados.has(t) && f(t)); l.forEach(t => usados.add(t));
+    return l.length ? `<div class="gr ${cls}"><h3>${titulo} <span class="c">${l.length}</span></h3>${l.map(fila).join("")}</div>` : "";
+  }).join("");
+  const curso = abiertas.filter(t => t.estado === "curso").length;
+  $("lista").innerHTML = `<div class="mes-head"><h2>Tareas</h2><span class="resumen">${abiertas.length} abiertas${curso ? ` · ${curso} en curso` : ""}</span><button class="btn btn--ink" data-nueva>+ Nueva tarea</button></div>
+    ${html || `<div class="vacio">No hay tareas pendientes 🎉</div>`}
+    ${hechas.length ? `<details class="gr"><summary>Hechas <span class="c">${hechas.length}</span></summary>${hechas.slice(0, 40).map(fila).join("")}</details>` : ""}`;
+}
+$("lista").addEventListener("click", async e => {
+  if (e.target.closest("[data-nueva]")) return editar(null);
+  const done = e.target.dataset.done;
+  if (done) {
+    const t = tareas.find(x => x.id === done);
+    t.estado = e.target.checked ? "hecha" : "pendiente";
+    if (e.target.checked) t.hechaEn = Date.now(); else delete t.hechaEn;
+    try { await put(t); } catch (err) { toast(err.message, true); }
+    return pintar();
+  }
+  const f = e.target.closest(".ti[data-id]");
+  if (f) editar(tareas.find(x => x.id === f.dataset.id));
+});
 
 /* ===== Calendario del mes ===== */
 let mesVisto = new Date(); mesVisto.setDate(1);
