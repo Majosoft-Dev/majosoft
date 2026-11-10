@@ -83,11 +83,41 @@
     .detalle .err { color: #B03A2E; font-size: 12.5px; margin-top: 6px; }
     details summary { cursor: pointer; color: var(--muted); font-weight: 600; margin: 18px 4px 8px; }
     pre { background: var(--ink); color: var(--cream); padding: 12px 14px; border-radius: 10px; font-size: 12px; overflow-x: auto; white-space: pre-wrap; }
-    @media (max-width: 900px) {
-      main { padding: 22px 12px 40px; }
-      .dia { min-height: 96px; padding: 5px; } .ev .l3, .ev .l1 .est-t { display: none; } .ev .t { font-size: 11px; }
-      .lista .fila { grid-template-columns: 1fr; gap: 4px; }
+    .n .ds { display: none; }
+    @media (max-width: 1050px) and (min-width: 761px) {
+      .dia { min-height: 104px; padding: 6px; } .ev .l3 { display: none; } .ev .t { font-size: 11.5px; }
     }
+    /* móvil (10/11, «adáptalo para responsive»): el mes pasa a agenda, solo los días con algo, uno debajo de otro */
+    @media (max-width: 760px) {
+      main { padding: 18px 12px 40px; }
+      h1 { font-size: 22px; }
+      .top { margin-bottom: 12px; }
+      .kpis { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); width: 100%; }
+      .kpi { min-width: 0; }
+      .barra { flex-direction: column; align-items: stretch; }
+      .nav { justify-content: space-between; } .nav h2 { min-width: 0; font-size: 17px; flex: 1; }
+      .leyenda { gap: 10px; }
+      .vistas { align-self: flex-start; }
+      .cal { background: transparent; border: 0; border-radius: 0; overflow: visible; }
+      .cab { display: none; }
+      .rej { display: flex; flex-direction: column; gap: 10px; }
+      .dia { min-height: 0; border: 1px solid var(--line); border-radius: 14px; background: #fff; padding: 10px; }
+      .dia.vacio, .dia.otro, .dia.antes { display: none; }
+      .n { width: auto; height: auto; display: block; text-align: left; font-size: 13px; color: var(--ink); padding: 2px 2px 4px; border-radius: 0; }
+      .n .ds { display: inline; text-transform: capitalize; }
+      .dia.hoy .n { background: none; color: var(--ink); }
+      .dia.hoy { border-color: var(--ink); }
+      .dia.hoy .n::after { content: " · hoy"; color: var(--muted); font-weight: 600; }
+      .ev { padding: 9px 10px 9px 12px; }
+      .ev .t { font-size: 13.5px; -webkit-line-clamp: 3; }
+      .ev .l3 { display: block; font-size: 11.5px; }
+      .lista .fila { grid-template-columns: 1fr auto; gap: 4px 10px; padding: 12px 14px; }
+      .lista .fila > div:nth-child(2) { grid-column: 1 / -1; order: 3; }
+      .lista .fila .cuenta { display: none; }
+      .detalle { width: 100%; padding: 22px 18px; }
+      .vacio-mes { display: block !important; }
+    }
+    .vacio-mes { display: none; color: var(--muted); padding: 18px; background: #fff; border: 1px solid var(--line); border-radius: 14px; }
   </style>
 </head>
 <body>
@@ -169,10 +199,11 @@ function pintarMes() {
     const d = new Date(ini.getFullYear(), ini.getMonth(), ini.getDate() + i);
     if (i >= 35 && d.getMonth() !== m.getMonth()) break;
     const evs = porDia[clave(d)] || [], vis = evs.slice(0, 4);
-    const cls = [d.getMonth() !== m.getMonth() ? "otro" : "", d.toDateString() === hoy.toDateString() ? "hoy" : "", d < new Date(hoy.toDateString()) ? "pasado" : ""].join(" ");
-    html += `<div class="dia ${cls}"><div class="n">${d.getDate()}</div>${vis.map(tarjeta).join("")}${evs.length > 4 ? `<div class="mas">+${evs.length - 4} más</div>` : ""}</div>`;
+    const cls = [d.getMonth() !== m.getMonth() ? "otro" : "", d.toDateString() === hoy.toDateString() ? "hoy" : "", d < new Date(hoy.toDateString()) ? "pasado" : "", d < new Date(hoy.toDateString()) && m.getMonth() === hoy.getMonth() && m.getFullYear() === hoy.getFullYear() ? "antes" : "", evs.length ? "" : "vacio"].join(" ");
+    html += `<div class="dia ${cls}"><div class="n"><span class="ds">${d.toLocaleDateString("es-ES", { weekday: "long" })} </span>${d.getDate()}</div>${vis.map(tarjeta).join("")}${evs.length > 4 ? `<div class="mas">+${evs.length - 4} más</div>` : ""}</div>`;
   }
-  document.getElementById("cal").innerHTML = html + "</div>";
+  const hayAlgo = datos.eventos.some(e => { const x = new Date(e.cuando); return x.getMonth() === m.getMonth() && x.getFullYear() === m.getFullYear(); });
+  document.getElementById("cal").innerHTML = html + "</div>" + (hayAlgo ? "" : '<div class="vacio-mes">Nada este mes.</div>');
 }
 function pintarLista() {
   const desde = clave(new Date(new Date().getFullYear(), new Date().getMonth(), new Date().getDate() - 7));
