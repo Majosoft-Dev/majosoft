@@ -189,7 +189,8 @@ let [facturas, bonos] = await Promise.all([api("docs/facturas"), api("docs/bonos
 const clientes = () => [...new Set([...facturas.map(f => f.cliente?.nombre || f.cliente), ...presupuestos.map(p => p.cliente), ...bonos.map(b => b.cliente),
   ...fichas.map(r => r.cliente), ...tareas.map(t => t.cliente)].filter(x => typeof x === "string" && x.trim()).map(x => x.trim()))].sort((a, b) => a.localeCompare(b, "es"));
 let ajustes = (await api("docs/ajustes")).find(a => a.id === "calendario") || { id: "calendario" };
-const put = t => api(`docs/tareas/${t.id}`, { method: "PUT", body: t });
+// Una tarea hecha tiene todas sus subtareas hechas
+const put = t => { if (t.estado === "hecha") (t.sub || []).forEach(x => { x.hecha = true; }); return api(`docs/tareas/${t.id}`, { method: "PUT", body: t }); };
 const PERIODOS = { mensual: ["Mensual", 1], trimestral: ["Trimestral", 3], semestral: ["Semestral", 6], anual: ["Anual", 12] };
 const FECHA = /^\d{4}-\d{2}-\d{2}$/;
 
