@@ -62,7 +62,8 @@ async function revisar() {
       return;
     }
     const nuevos = d.nginx.rutas.filter(r => r.ultima > desde);
-    if (nuevos.length) sucesos.push(`Errores 5xx en ${s.nombre}:\n` + nuevos.map(r => `  · ${r.ruta} (${r.veces} ${r.veces === 1 ? "vez" : "veces"} en 24 h)`).join("\n"));
+    // Errores sueltos (un reinicio, un bot) no avisan: solo si el servidor acumula 5 o más en 24 h
+    if (nuevos.length && d.nginx.total >= 5) sucesos.push(`Errores 5xx en ${s.nombre}:\n` + nuevos.map(r => `  · ${r.ruta} (${r.veces} ${r.veces === 1 ? "vez" : "veces"} en 24 h)`).join("\n"));
     for (const c of d.certbot) problemas[`certbot:${c}`] = `${s.nombre}: certbot no consigue renovar ${c}`;
     for (const x of d.servicios) if (!(x === "certbot.service" && d.certbot.length)) problemas[`svc:${s.id}:${x}`] = `${s.nombre}: servicio caído ${x}`;
     const pd = d.disco.total ? Math.round(d.disco.usado / d.disco.total * 100) : 0;
