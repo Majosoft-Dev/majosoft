@@ -55,7 +55,10 @@ export function autosaver(fn, delay = 700) {
   return save;
 }
 
-export async function mountShell(active) {
+// Se pinta una sola vez: menu.js lo lanza antes del primer pintado y la página reutiliza la misma promesa
+let shell;
+export function mountShell(active) { return shell ??= pintarShell(active); }
+async function pintarShell(active) {
   // El menú se pinta al instante con el último usuario conocido; luego se confirma con el servidor
   let me;
   try { me = JSON.parse(sessionStorage.getItem("mj-me")); } catch {}

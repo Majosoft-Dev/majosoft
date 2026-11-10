@@ -404,6 +404,7 @@ app.post("/admin/api/consultas", async (req, res) => {
 });
 
 const PAGES = { "": "index.html", presupuestos: "presupuestos.html", facturas: "facturas.html", correo: "correo.html", mensajes: "mensajes.html", seguridad: "seguridad.html", servidores: "servidores.html", consultas: "consultas.html", bonos: "bonos.html", tareas: "tareas.html" };
+app.get("/admin/menu.js", (req, res) => res.sendFile(path.join(PUBLIC, "menu.js")));
 app.get("/admin/panel.js", (req, res) => res.sendFile(path.join(PUBLIC, "panel.js")));
 app.get(["/admin", "/admin/:page"], (req, res, next) => {
   const f = PAGES[(req.params.page || "").replace(/\.html$/, "")];
