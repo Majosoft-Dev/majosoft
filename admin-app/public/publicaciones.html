@@ -11,133 +11,228 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="/admin/panel.css" />
   <script type="module" src="/admin/menu.js" blocking="render"></script>
-  <!-- Publicaciones programadas de UMME y Cursos Umme (10/11/2026): lo que el publicador (/var/www/publicar-umme) va a sacar
-       en Instagram y Facebook, lo que ya ha salido y lo que ha fallado. Se recarga sola cada minuto. -->
+  <!-- Publicaciones de UMME y Cursos Umme (10/11/2026, rehecho el mismo día: «no me gusta el calendario, qué feo»).
+       Un mes cada vez; una tarjeta por publicación (sus historias van dentro); al pulsarla, el detalle a la derecha.
+       Datos: /admin/api/publicador → la cola del publicador (/var/www/publicar-umme) + lo de Meta y lo pendiente (docs/18). -->
   <style>
     * { box-sizing: border-box; }
     body { margin: 0; font-family: Inter, system-ui, sans-serif; background: var(--cream); color: var(--ink); font-size: 14px; }
-    main { max-width: 1180px; padding: 34px 32px 60px; }
-    h1 { font-size: 26px; margin: 0 0 4px; }
-    .sub { color: var(--muted); margin: 0 0 22px; }
-    .kpis { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; margin-bottom: 16px; }
-    .kpi { background: #fff; border: 1px solid var(--line); border-radius: 16px; padding: 16px 18px; }
-    .kpi b { display: block; font-size: 26px; margin-bottom: 2px; }
-    .kpi span { color: var(--muted); font-size: 12.5px; }
-    .card { background: #fff; border: 1px solid var(--line); border-radius: 16px; padding: 8px 8px 4px; margin-bottom: 16px; overflow-x: auto; }
-    table { width: 100%; border-collapse: collapse; }
-    th { text-align: left; font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); padding: 10px 12px; border-bottom: 1px solid var(--line); }
-    td { padding: 12px; border-bottom: 1px solid #eeede5; font-size: 13px; vertical-align: top; }
-    tr:last-child td { border-bottom: 0; }
-    .est { display: inline-flex; align-items: center; gap: 6px; font-weight: 700; border-radius: 999px; padding: 4px 10px; font-size: 12px; white-space: nowrap; }
-    .ok { background: #E7F6F0; color: #2E9E6B; } .prog { background: #F1F4F3; color: #555; } .reint { background: #FFF3D6; color: #A86A00; } .mal { background: #FDE8E6; color: #C0392B; }
-    .err { color: #C0392B; font-size: 12px; margin-top: 6px; max-width: 300px; overflow-wrap: anywhere; }
-    .cuenta { color: var(--muted); font-size: 12px; }
-    .hoy td { background: #FFFBEA; }
-    .pasado td:first-child { color: var(--muted); }
-    pre { background: var(--ink); color: var(--cream); padding: 12px 14px; border-radius: 10px; font-size: 12px; overflow-x: auto; white-space: pre-wrap; }
-    details summary { cursor: pointer; color: var(--muted); font-weight: 600; margin: 8px 4px; }
-    .vistas { display: inline-flex; gap: 6px; background: #fff; border: 1px solid var(--line); border-radius: 999px; padding: 4px; margin-bottom: 14px; }
-    .vistas button { border: 0; background: transparent; padding: 7px 16px; border-radius: 999px; font: inherit; font-weight: 700; cursor: pointer; color: var(--muted); }
+    main { max-width: 1240px; padding: 34px 32px 60px; }
+    .top { display: flex; align-items: flex-end; justify-content: space-between; gap: 16px; flex-wrap: wrap; margin-bottom: 18px; }
+    h1 { font-size: 26px; margin: 0 0 4px; letter-spacing: -.01em; }
+    .sub { color: var(--muted); margin: 0; }
+    .kpis { display: flex; gap: 10px; flex-wrap: wrap; }
+    .kpi { background: #fff; border: 1px solid var(--line); border-radius: 14px; padding: 10px 16px; min-width: 120px; }
+    .kpi b { display: block; font-size: 20px; }
+    .kpi span { color: var(--muted); font-size: 12px; }
+
+    .barra { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; margin: 6px 0 12px; }
+    .nav { display: flex; align-items: center; gap: 8px; }
+    .nav h2 { font-size: 19px; margin: 0 6px; min-width: 180px; text-align: center; }
+    .nav button, .vistas button { border: 1px solid var(--line); background: #fff; border-radius: 999px; height: 34px; padding: 0 14px; font: inherit; font-weight: 600; cursor: pointer; color: var(--ink); }
+    .nav button.icono { width: 34px; padding: 0; font-size: 16px; }
+    .vistas { display: inline-flex; background: #fff; border: 1px solid var(--line); border-radius: 999px; padding: 3px; }
+    .vistas button { border: 0; height: 28px; }
     .vistas button.on { background: var(--ink); color: #fff; }
-    .mes { background: #fff; border: 1px solid var(--line); border-radius: 16px; padding: 14px; margin-bottom: 16px; }
-    .mes h2 { font-size: 16px; margin: 2px 4px 12px; }
-    .rej { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 6px; }
-    .rej .dn { font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); padding: 0 4px; }
-    .dia { min-height: 92px; border: 1px solid #eeede5; border-radius: 10px; padding: 6px; background: #FCFCFA; }
-    .dia.fuera { background: transparent; border-color: transparent; }
-    .dia.hoy { border-color: #E8C547; background: #FFFBEA; }
-    .dia .n { font-size: 12px; font-weight: 700; color: var(--muted); margin-bottom: 4px; }
-    .pz { display: block; font-size: 11.5px; line-height: 1.3; border-radius: 7px; padding: 4px 6px; margin-bottom: 4px; text-decoration: none; color: #111; border-left: 4px solid; }
-    .pz.cu { background: #E4F5EF; border-color: #5FBFA5; } .pz.umme { background: #FBE7EE; border-color: #CF5F7C; }
-    .pz.meta { background: #EAF1FB; border-color: #4A7BD0; }
-    .pz.hacer { background: #fff; border: 1.5px dashed #B9B6AA; border-left-width: 4px; color: #666; }
-    .pz.hecho { opacity: .7; } .pz.mal { outline: 2px solid #C0392B; }
-    .pz .h { font-weight: 800; }
-    .leyenda { display: flex; gap: 14px; flex-wrap: wrap; font-size: 12px; color: var(--muted); margin: 0 4px 14px; }
-    .leyenda i { display: inline-block; width: 12px; height: 12px; border-radius: 3px; vertical-align: -2px; margin-right: 5px; }
-    @media (max-width: 760px) { main { padding: 22px 16px 40px; } .kpis { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+    .leyenda { display: flex; gap: 14px; flex-wrap: wrap; font-size: 12px; color: var(--muted); }
+    .leyenda span { display: inline-flex; align-items: center; gap: 6px; }
+    .punto { width: 9px; height: 9px; border-radius: 50%; display: inline-block; flex: none; }
+
+    .cal { background: #fff; border: 1px solid var(--line); border-radius: 18px; overflow: hidden; }
+    .cab { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); background: #FBFAF6; border-bottom: 1px solid var(--line); }
+    .cab div { padding: 10px 12px; font-size: 11px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+    .rej { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); }
+    .dia { min-height: 124px; padding: 8px; border-right: 1px solid #F0EEE7; border-bottom: 1px solid #F0EEE7; display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+    .dia:nth-child(7n) { border-right: 0; }
+    .dia.otro { background: #FCFCFA; }
+    .dia.otro .n { opacity: .4; }
+    .dia.pasado .ev { opacity: .62; }
+    .n { font-size: 12px; font-weight: 700; color: var(--muted); width: 24px; height: 24px; display: grid; place-items: center; border-radius: 50%; }
+    .dia.hoy .n { background: var(--ink); color: #fff; }
+
+    .ev { all: unset; cursor: pointer; display: block; background: #fff; border: 1px solid #ECEAE2; border-radius: 10px; padding: 7px 8px 7px 10px; position: relative; box-shadow: 0 1px 2px rgba(0,0,0,.03); transition: box-shadow .15s, transform .15s; }
+    .ev:hover { box-shadow: 0 4px 14px rgba(0,0,0,.08); transform: translateY(-1px); }
+    .ev::before { content: ""; position: absolute; left: 0; top: 7px; bottom: 7px; width: 3px; border-radius: 3px; background: var(--c); }
+    .ev .l1 { display: flex; align-items: center; justify-content: space-between; gap: 6px; font-size: 11px; color: var(--muted); font-weight: 600; }
+    .ev .hora { color: var(--ink); font-weight: 800; }
+    .ev .t { font-size: 12px; font-weight: 600; line-height: 1.3; margin-top: 2px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+    .ev .l3 { margin-top: 4px; font-size: 10.5px; color: var(--muted); }
+    .ev.hacer { background: transparent; border-style: dashed; box-shadow: none; }
+    .ev.hacer .t { color: var(--muted); font-weight: 500; }
+    .ev.sel { outline: 2px solid var(--ink); }
+    .est { font-size: 11px; font-weight: 800; }
+    .mas { font-size: 11px; color: var(--muted); padding-left: 4px; }
+
+    .lista { background: #fff; border: 1px solid var(--line); border-radius: 18px; overflow: hidden; }
+    .lista .fila { all: unset; cursor: pointer; display: grid; grid-template-columns: 150px 1fr 130px 130px; gap: 12px; align-items: center; padding: 12px 18px; border-bottom: 1px solid #F0EEE7; width: 100%; box-sizing: border-box; }
+    .lista .fila:hover { background: #FBFAF6; }
+    .lista .dia-l { font-weight: 700; } .lista .dia-l small { display: block; color: var(--muted); font-weight: 500; }
+
+    .chip { display: inline-flex; align-items: center; gap: 5px; border-radius: 999px; padding: 3px 9px; font-size: 11.5px; font-weight: 700; white-space: nowrap; }
+    .ok { background: #E7F6F0; color: #2E7D5B; } .prog { background: #F1F0EA; color: #555; } .reint { background: #FFF3D6; color: #A86A00; } .mal { background: #FDE8E6; color: #B03A2E; } .metac { background: #EAF1FB; color: #2F5FA8; } .hac { background: transparent; color: var(--muted); border: 1px dashed #CFCBBE; }
+
+    .detalle { position: fixed; top: 0; right: 0; width: min(420px, 100%); height: 100vh; background: #fff; border-left: 1px solid var(--line); box-shadow: -18px 0 40px rgba(0,0,0,.08); padding: 26px 24px; overflow-y: auto; transform: translateX(105%); transition: transform .22s ease; z-index: 50; }
+    .detalle.abierto { transform: none; }
+    .detalle .cerrar { position: absolute; top: 16px; right: 16px; border: 1px solid var(--line); background: #fff; border-radius: 999px; width: 32px; height: 32px; cursor: pointer; font-size: 16px; }
+    .detalle h3 { margin: 6px 0 4px; font-size: 19px; line-height: 1.25; padding-right: 34px; }
+    .detalle .meta-l { color: var(--muted); font-size: 13px; margin-bottom: 18px; }
+    .detalle .bloque { border: 1px solid var(--line); border-radius: 14px; padding: 12px 14px; margin-bottom: 12px; }
+    .detalle .bloque b { display: block; font-size: 12px; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); margin-bottom: 6px; }
+    .detalle .texto { white-space: pre-wrap; font-size: 13px; line-height: 1.5; }
+    .detalle a { color: #2F5FA8; font-weight: 600; }
+    .detalle .err { color: #B03A2E; font-size: 12.5px; margin-top: 6px; }
+    details summary { cursor: pointer; color: var(--muted); font-weight: 600; margin: 18px 4px 8px; }
+    pre { background: var(--ink); color: var(--cream); padding: 12px 14px; border-radius: 10px; font-size: 12px; overflow-x: auto; white-space: pre-wrap; }
+    @media (max-width: 900px) {
+      main { padding: 22px 12px 40px; }
+      .dia { min-height: 96px; padding: 5px; } .ev .l3, .ev .l1 .est-t { display: none; } .ev .t { font-size: 11px; }
+      .lista .fila { grid-template-columns: 1fr; gap: 4px; }
+    }
   </style>
 </head>
 <body>
 <main>
-  <h1>Publicaciones programadas</h1>
-  <p class="sub">Lo que sale solo en Instagram y Facebook (UMME y Cursos Umme). Se comprueba cada 5 minutos y esta página se recarga sola.</p>
-  <div class="kpis" id="kpis"></div>
-  <div class="vistas"><button id="vCal" class="on">Calendario</button><button id="vLista">Lista</button></div>
-  <div id="cal"></div>
-  <div class="card" id="lista" hidden><table><thead><tr><th>Cuándo</th><th>Qué</th><th>Instagram</th><th>Facebook</th></tr></thead><tbody id="filas"></tbody></table></div>
-  <details><summary>Registro del publicador (últimas líneas)</summary><pre id="registro">…</pre></details>
+  <div class="top">
+    <div><h1>Publicaciones</h1><p class="sub">Lo que sale en Instagram y Facebook de UMME y de Cursos Umme. Se actualiza solo cada minuto.</p></div>
+    <div class="kpis" id="kpis"></div>
+  </div>
+  <div class="barra">
+    <div class="nav"><button class="icono" id="ant" aria-label="Mes anterior">‹</button><h2 id="mes">…</h2><button class="icono" id="sig" aria-label="Mes siguiente">›</button><button id="hoyB">Hoy</button></div>
+    <div class="leyenda">
+      <span><i class="punto" style="background:#3FAE8C"></i>Cursos Umme</span>
+      <span><i class="punto" style="background:#D0577A"></i>UMME</span>
+      <span><i class="punto" style="background:#4A7BD0"></i>Programado por ti en Meta</span>
+      <span><i class="punto" style="background:#fff;border:1px dashed #B9B6AA"></i>Por hacer</span>
+    </div>
+    <div class="vistas"><button id="vCal" class="on">Mes</button><button id="vLista">Lista</button></div>
+  </div>
+  <div id="cal" class="cal"></div>
+  <div id="lista" class="lista" hidden></div>
+  <details><summary>Registro del publicador</summary><pre id="registro">…</pre></details>
 </main>
+<aside class="detalle" id="detalle" aria-hidden="true"><button class="cerrar" id="cerrar" aria-label="Cerrar">✕</button><div id="det"></div></aside>
 <script>
-const NOMBRES = { cursosumme: "@cursosumme · Cursos UMME", umme: "@unamaestramuyespecial · Una maestra muy especial" };
-const DIAS = ["dom", "lun", "mar", "mié", "jue", "vie", "sáb"];
+const CUENTA = { cursosumme: { n: "Cursos Umme", c: "#3FAE8C", h: "@cursosumme · Facebook «Cursos UMME»" }, umme: { n: "UMME", c: "#D0577A", h: "@unamaestramuyespecial · Facebook «Una maestra muy especial»" } };
+const TIPO = { reel: "Reel", carrusel: "Carrusel", historia: "Historia" };
+const DIAS = ["lun", "mar", "mié", "jue", "vie", "sáb", "dom"];
 const esc = s => String(s ?? "").replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
-const titulo = id => id.slice(11).replace(/^cu-/, "").replace(/-/g, " ").replace(/^./, c => c.toUpperCase());
-const fecha = c => { const d = new Date(c); return `${DIAS[d.getDay()]} ${d.getDate()}/${d.getMonth() + 1} · ${String(d.getHours()).padStart(2, "0")}:${String(d.getMinutes()).padStart(2, "0")}`; };
-function estado(d) {
-  if (!d) return '<span class="cuenta">—</span>';
-  if (d.hecho) return `<a class="est ok" href="${esc(d.enlace)}" target="_blank" rel="noopener">✓ Publicado ↗</a>`;
-  if (d.intentos >= 3) return `<span class="est mal">✕ Falló</span><div class="err">${esc(d.error)}</div>`;
-  if (d.error) return `<span class="est reint">↻ Reintentando (${d.intentos}/3)</span><div class="err">${esc(d.error)}</div>`;
-  return '<span class="est prog">◷ Programado</span>';
+const clave = d => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+// «Reel «Cursos Umme · temario de 10»» → «Temario de 10» (el tipo y la cuenta ya van debajo)
+const limpio = t => String(t || "").replace(/^(Reel|Carrusel|Historias?|YouTube|Publicación|Vídeo largo|Short)\s*«(.*)»$/i, "$2").replace(/^Cursos Umme\s*·\s*/i, "").replace(/^./, c => c.toUpperCase());
+const bonito = id => id.slice(11).replace(/^cu-/, "").replace(/-historia-\d.*$/, "").replace(/-/g, " ").replace(/^./, c => c.toUpperCase());
+let datos = { eventos: [], porId: {} }, mesVista = new Date(new Date().getFullYear(), new Date().getMonth(), 1), selId = null;
+
+function estadoPub(p) {
+  const ds = [p.ig, p.fb].filter(Boolean);
+  if (ds.length && ds.every(d => d.hecho)) return ["ok", "✓ Publicado"];
+  if (ds.some(d => !d.hecho && d.intentos >= 3)) return ["mal", "✕ Falló"];
+  if (ds.some(d => d.error)) return ["reint", "↻ Reintentando"];
+  if (ds.some(d => d.hecho)) return ["reint", "◐ A medias"];
+  return ["prog", "◷ Programado"];
 }
+// junta la cola y lo de Meta / pendiente en «eventos»; las historias del publicador van dentro de su publicación
+function preparar({ cola, meta = [] }) {
+  const ev = [], porId = {};
+  const madres = cola.filter(p => p.tipo !== "historia");
+  for (const p of madres) { const e = { k: "pub", id: p.id, cuando: p.cuando, cuenta: p.cuenta, tipo: p.tipo, titulo: limpio(p.titulo) || bonito(p.id), p, historias: [] }; ev.push(e); porId[e.id] = e; }
+  for (const h of cola.filter(p => p.tipo === "historia")) {
+    const madre = madres.find(m => h.id.startsWith(m.id + "-"));
+    if (madre) porId[madre.id].historias.push(h);
+    else { const e = { k: "pub", id: h.id, cuando: h.cuando, cuenta: h.cuenta, tipo: "historia", titulo: (limpio(h.titulo) || bonito(h.id)) + " · historias", p: h, historias: [] }; const otra = ev.find(x => x.k === "pub" && x.tipo === "historia" && x.cuando === h.cuando && x.cuenta === h.cuenta && x.id.replace(/-historia.*/, "") === h.id.replace(/-historia.*/, "")); if (otra) otra.historias.push(h); else { ev.push(e); porId[e.id] = e; } }
+  }
+  for (const m of meta) { const tipoM = (String(m.titulo).match(/^(Reel|Carrusel|Historias?|YouTube|Publicación|Short)/i) || [""])[0];
+    const e = { k: m.estado === "pendiente" ? "hacer" : "meta", id: m.id, cuando: m.cuando, cuenta: m.cuenta, titulo: limpio(m.titulo), tipoM, m }; ev.push(e); porId[e.id] = e; }
+  ev.sort((a, b) => a.cuando.localeCompare(b.cuando));
+  return { eventos: ev, porId };
+}
+function color(e) { return e.k === "meta" ? "#4A7BD0" : e.k === "hacer" ? "#C9C5B8" : (CUENTA[e.cuenta] || {}).c || "#999"; }
+function chipEstado(e) {
+  if (e.k === "meta") return e.m.estado === "publicado" ? ["ok", "✓ Publicado"] : ["metac", "Ⓜ En Meta"];
+  if (e.k === "hacer") return ["hac", "✎ Por hacer"];
+  return estadoPub(e.p);
+}
+function tarjeta(e) {
+  const [cls, txt] = chipEstado(e);
+  const extra = e.k === "pub" ? `${TIPO[e.tipo] || e.tipo} · ${(CUENTA[e.cuenta] || {}).n || e.cuenta}${e.historias.length ? ` · +${e.historias.length} historia${e.historias.length > 1 ? "s" : ""}` : ""}` : e.k === "meta" ? `${e.tipoM ? e.tipoM + " · " : ""}Meta Business Suite` : `${e.tipoM ? e.tipoM + " · " : ""}Sin programar`;
+  return `<button class="ev${e.k === "hacer" ? " hacer" : ""}${selId === e.id ? " sel" : ""}" style="--c:${color(e)}" data-id="${esc(e.id)}">
+    <div class="l1"><span class="hora">${e.cuando.slice(11, 16)}</span><span class="est ${cls}" style="background:none;padding:0">${txt.split(" ")[0]}</span></div>
+    <div class="t">${esc(e.titulo)}</div><div class="l3">${esc(extra)}</div></button>`;
+}
+function pintarMes() {
+  const m = mesVista, hoy = new Date();
+  document.getElementById("mes").textContent = m.toLocaleDateString("es-ES", { month: "long", year: "numeric" }).replace(/^./, c => c.toUpperCase());
+  const ini = new Date(m.getFullYear(), m.getMonth(), 1 - ((m.getDay() + 6) % 7));
+  const porDia = {};
+  for (const e of datos.eventos) (porDia[e.cuando.slice(0, 10)] ||= []).push(e);
+  let html = `<div class="cab">${DIAS.map(d => `<div>${d}</div>`).join("")}</div><div class="rej">`;
+  for (let i = 0; i < 42; i++) {
+    const d = new Date(ini.getFullYear(), ini.getMonth(), ini.getDate() + i);
+    if (i >= 35 && d.getMonth() !== m.getMonth()) break;
+    const evs = porDia[clave(d)] || [], vis = evs.slice(0, 4);
+    const cls = [d.getMonth() !== m.getMonth() ? "otro" : "", d.toDateString() === hoy.toDateString() ? "hoy" : "", d < new Date(hoy.toDateString()) ? "pasado" : ""].join(" ");
+    html += `<div class="dia ${cls}"><div class="n">${d.getDate()}</div>${vis.map(tarjeta).join("")}${evs.length > 4 ? `<div class="mas">+${evs.length - 4} más</div>` : ""}</div>`;
+  }
+  document.getElementById("cal").innerHTML = html + "</div>";
+}
+function pintarLista() {
+  const desde = clave(new Date(new Date().getFullYear(), new Date().getMonth(), new Date().getDate() - 7));
+  document.getElementById("lista").innerHTML = datos.eventos.filter(e => e.cuando.slice(0, 10) >= desde).map(e => {
+    const d = new Date(e.cuando), [cls, txt] = chipEstado(e);
+    return `<button class="fila" data-id="${esc(e.id)}"><div class="dia-l">${DIAS[(d.getDay() + 6) % 7]} ${d.getDate()}/${d.getMonth() + 1}<small>${e.cuando.slice(11, 16)}</small></div>
+      <div><span class="punto" style="background:${color(e)};margin-right:8px"></span><b>${esc(e.titulo)}</b></div>
+      <div class="cuenta">${e.k === "pub" ? esc((CUENTA[e.cuenta] || {}).n || e.cuenta) : e.k === "meta" ? "Meta" : "—"}</div><div><span class="chip ${cls}">${txt}</span></div></button>`;
+  }).join("") || '<div style="padding:18px;color:var(--muted)">Nada a la vista.</div>';
+}
+function plataforma(nombre, d) {
+  if (!d) return "";
+  const est = d.hecho ? `<span class="chip ok">✓ Publicado</span> ${d.enlace ? `<a href="${esc(d.enlace)}" target="_blank" rel="noopener">Ver ↗</a>` : ""}` : d.intentos >= 3 ? '<span class="chip mal">✕ Falló</span>' : d.error ? `<span class="chip reint">↻ Reintentando (${d.intentos}/3)</span>` : '<span class="chip prog">◷ Programado</span>';
+  return `<div style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin:6px 0"><span>${nombre}</span><span>${est}</span></div>${d.error && !d.hecho ? `<div class="err">${esc(d.error)}</div>` : ""}`;
+}
+function abrir(id) {
+  const e = datos.porId[id]; if (!e) return;
+  selId = id;
+  const d = new Date(e.cuando);
+  const cuando = `${d.toLocaleDateString("es-ES", { weekday: "long", day: "numeric", month: "long" })} · ${e.cuando.slice(11, 16)}`;
+  let h = `<span class="chip ${chipEstado(e)[0]}">${chipEstado(e)[1]}</span><h3>${esc(e.titulo)}</h3>`;
+  if (e.k === "pub") {
+    h += `<div class="meta-l">${esc(cuando)} · ${esc(TIPO[e.tipo] || e.tipo)}<br>${esc((CUENTA[e.cuenta] || {}).h || e.cuenta)}</div>`;
+    h += `<div class="bloque"><b>Dónde sale</b>${plataforma("Instagram", e.p.ig)}${plataforma("Facebook", e.p.fb)}</div>`;
+    if (e.p.ig && e.p.ig.texto) h += `<div class="bloque"><b>Texto</b><div class="texto">${esc(e.p.ig.texto)}${e.p.ig.texto.length >= 280 ? "…" : ""}</div></div>`;
+    if (e.historias.length) h += `<div class="bloque"><b>Sus historias (${e.historias.length})</b>${e.historias.map(x => `<div style="margin:8px 0 2px;font-weight:600">${x.cuando.slice(11, 16)} · ${esc(bonito(x.id).replace(/^.*historia /i, "Historia "))}</div>${plataforma("Instagram", x.ig)}${plataforma("Facebook", x.fb)}`).join("")}</div>`;
+  } else {
+    h += `<div class="meta-l">${esc(cuando)}<br>${e.k === "meta" ? "Programado a mano en Meta Business Suite" : "En el calendario del proyecto, sin programar todavía"}</div>`;
+    if (e.m.detalle) h += `<div class="bloque"><b>Qué es</b><div class="texto">${esc(e.m.detalle)}</div></div>`;
+  }
+  document.getElementById("det").innerHTML = h;
+  document.getElementById("detalle").classList.add("abierto");
+  pintar();
+}
+function cerrar() { selId = null; document.getElementById("detalle").classList.remove("abierto"); pintar(); }
+function pintar() { pintarMes(); pintarLista(); }
 async function cargar() {
   const r = await fetch("/admin/api/publicador", { credentials: "same-origin" });
   if (!r.ok) return;
-  const { cola, registro, meta = [] } = await r.json();
-  cola.sort((a, b) => a.cuando.localeCompare(b.cuando));
-  const plats = cola.flatMap(p => [p.ig, p.fb].filter(Boolean));
-  const hechas = plats.filter(d => d.hecho).length, fallos = plats.filter(d => !d.hecho && d.intentos >= 3).length;
-  const prox = cola.find(p => [p.ig, p.fb].some(d => d && !d.hecho));
-  const hoy = new Date().toDateString();
+  const j = await r.json();
+  datos = preparar(j);
+  const pubs = j.cola.flatMap(p => [p.ig, p.fb].filter(Boolean));
+  const hechas = pubs.filter(d => d.hecho).length, fallos = pubs.filter(d => !d.hecho && d.intentos >= 3).length;
+  const prox = datos.eventos.find(e => e.k === "pub" && estadoPub(e.p)[0] !== "ok");
+  const hacer = datos.eventos.filter(e => e.k === "hacer" && e.cuando >= clave(new Date())).length;
   document.getElementById("kpis").innerHTML =
-    `<div class="kpi"><b>${cola.length}</b><span>piezas en la cola</span></div>` +
-    `<div class="kpi"><b>${hechas} / ${plats.length}</b><span>publicadas (IG + FB)</span></div>` +
-    `<div class="kpi"><b style="color:${fallos ? "#C0392B" : "#2E9E6B"}">${fallos}</b><span>fallos</span></div>` +
-    `<div class="kpi"><b style="font-size:16px">${prox ? esc(fecha(prox.cuando)) : "—"}</b><span>${prox ? esc(titulo(prox.id)) : "nada pendiente"}</span></div>`;
-  document.getElementById("filas").innerHTML = cola.map(p => {
-    const d = new Date(p.cuando), cls = d.toDateString() === hoy ? "hoy" : d < new Date() ? "pasado" : "";
-    return `<tr class="${cls}"><td style="white-space:nowrap">${esc(fecha(p.cuando))}</td><td><b>${esc(titulo(p.id))}</b><div class="cuenta">${esc(NOMBRES[p.cuenta] || p.cuenta)} · ${esc(p.tipo)}</div></td><td>${estado(p.ig)}</td><td>${estado(p.fb)}</td></tr>`;
-  }).join("") || '<tr><td colspan="4" class="cuenta">No hay nada programado.</td></tr>';
-  document.getElementById("registro").textContent = registro || "(vacío)";
-  pintarCalendario(cola, meta);
+    `<div class="kpi"><b>${prox ? prox.cuando.slice(8, 10) + "/" + prox.cuando.slice(5, 7) + " · " + prox.cuando.slice(11, 16) : "—"}</b><span>${prox ? esc(prox.titulo).slice(0, 28) : "nada pendiente"}</span></div>` +
+    `<div class="kpi"><b>${hechas}/${pubs.length}</b><span>publicadas por el servidor</span></div>` +
+    `<div class="kpi"><b style="color:${fallos ? "#B03A2E" : "#2E7D5B"}">${fallos}</b><span>fallos</span></div>` +
+    `<div class="kpi"><b>${hacer}</b><span>por hacer</span></div>`;
+  document.getElementById("registro").textContent = j.registro || "(vacío)";
+  pintar();
+  if (selId) abrir(selId);
 }
-// el calendario: del mes actual al del último programado; cada pieza en su día con su hora, su cuenta y su estado
-const ICO = { reel: "🎬", carrusel: "🖼️", historia: "◔" };
-function marca(p) {
-  const ds = [p.ig, p.fb].filter(Boolean);
-  if (ds.length && ds.every(d => d.hecho)) return "✓";
-  if (ds.some(d => !d.hecho && d.intentos >= 3)) return "✕";
-  if (ds.some(d => d.error)) return "↻";
-  return "";
-}
-function pintarCalendario(cola, meta) {
-  const hoy = new Date(), porDia = {};
-  for (const p of cola) { const k = p.cuando.slice(0, 10); (porDia[k] ||= []).push(p); }
-  for (const m of meta) { const k = m.cuando.slice(0, 10); (porDia[k] ||= []).push({ ...m, esMeta: true }); }
-  for (const k in porDia) porDia[k].sort((a, b) => a.cuando.localeCompare(b.cuando));
-  const ultimo = cola.length ? new Date(cola[cola.length - 1].cuando) : hoy;
-  let html = '<div class="leyenda"><span><i style="background:#5FBFA5"></i>Cursos Umme</span><span><i style="background:#CF5F7C"></i>Una maestra muy especial</span><span><i style="background:#4A7BD0"></i>Programado por ti en Meta</span><span><i style="background:#fff;border:1.5px dashed #B9B6AA"></i>Por hacer (aún sin programar)</span><span>🎬 reel · 🖼️ carrusel · ◔ historia</span><span>✓ publicado · ↻ reintentando · ✕ falló</span></div>';
-  for (let m = new Date(hoy.getFullYear(), hoy.getMonth(), 1); m <= ultimo; m = new Date(m.getFullYear(), m.getMonth() + 1, 1)) {
-    html += `<div class="mes"><h2>${m.toLocaleDateString("es-ES", { month: "long", year: "numeric" }).replace(/^./, c => c.toUpperCase())}</h2><div class="rej">` + ["lun", "mar", "mié", "jue", "vie", "sáb", "dom"].map(d => `<div class="dn">${d}</div>`).join("");
-    const pad = (m.getDay() + 6) % 7;
-    for (let i = 0; i < pad; i++) html += '<div class="dia fuera"></div>';
-    const dias = new Date(m.getFullYear(), m.getMonth() + 1, 0).getDate();
-    for (let d = 1; d <= dias; d++) {
-      const f = new Date(m.getFullYear(), m.getMonth(), d), k = `${f.getFullYear()}-${String(f.getMonth() + 1).padStart(2, "0")}-${String(d).padStart(2, "0")}`;
-      const ps = porDia[k] || [];
-      html += `<div class="dia${f.toDateString() === hoy.toDateString() ? " hoy" : ""}"><div class="n">${d}</div>` + ps.map(p => {
-        if (p.esMeta && p.estado === "pendiente") return `<div class="pz hacer" title="${esc(p.titulo)} · por hacer: aún no está programado${p.detalle ? " · " + esc(p.detalle) : ""}"><span class="h">${p.cuando.slice(11, 16)}</span> ✎ ${esc(String(p.titulo).slice(0, 34))}</div>`;
-        if (p.esMeta) return `<div class="pz meta${p.estado === "publicado" ? " hecho" : ""}" title="${esc(p.titulo)} · programado en Meta${p.detalle ? " · " + esc(p.detalle) : ""}"><span class="h">${p.cuando.slice(11, 16)}</span> Ⓜ ${esc(String(p.titulo).slice(0, 34))} ${p.estado === "publicado" ? "✓" : ""}</div>`;
-        const mk = marca(p), enl = (p.ig && p.ig.enlace) || (p.fb && p.fb.enlace);
-        const tag = enl ? "a" : "div";
-        return `<${tag} class="pz ${p.cuenta === "cursosumme" ? "cu" : "umme"}${mk === "✓" ? " hecho" : ""}${mk === "✕" ? " mal" : ""}"${enl ? ` href="${esc(enl)}" target="_blank" rel="noopener"` : ""} title="${esc(titulo(p.id))} · ${esc(NOMBRES[p.cuenta] || p.cuenta)}"><span class="h">${p.cuando.slice(11, 16)}</span> ${ICO[p.tipo] || ""} <b>${p.cuenta === "cursosumme" ? "CU" : "UMME"}</b> · ${esc(titulo(p.id).slice(0, 30))} ${mk}</${tag}>`;
-      }).join("") + "</div>";
-    }
-    html += "</div></div>";
-  }
-  document.getElementById("cal").innerHTML = html;
-}
+document.addEventListener("click", ev => { const b = ev.target.closest("[data-id]"); if (b) abrir(b.dataset.id); });
+document.getElementById("cerrar").onclick = cerrar;
+document.addEventListener("keydown", ev => { if (ev.key === "Escape") cerrar(); });
+document.getElementById("ant").onclick = () => { mesVista = new Date(mesVista.getFullYear(), mesVista.getMonth() - 1, 1); pintarMes(); };
+document.getElementById("sig").onclick = () => { mesVista = new Date(mesVista.getFullYear(), mesVista.getMonth() + 1, 1); pintarMes(); };
+document.getElementById("hoyB").onclick = () => { mesVista = new Date(new Date().getFullYear(), new Date().getMonth(), 1); pintarMes(); };
 const vista = v => { document.getElementById("cal").hidden = v !== "cal"; document.getElementById("lista").hidden = v !== "lista"; vCal.classList.toggle("on", v === "cal"); vLista.classList.toggle("on", v === "lista"); try { localStorage.setItem("mj-pub-vista", v); } catch {} };
 vCal.onclick = () => vista("cal"); vLista.onclick = () => vista("lista");
 try { if (localStorage.getItem("mj-pub-vista") === "lista") vista("lista"); } catch {}

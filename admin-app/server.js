@@ -398,7 +398,11 @@ app.get("/admin/api/publicador", (req, res) => {
   const meta = calendario.publicaciones().lista.filter(p => p.fecha && p.hora)
     .filter(p => { const sl = String(p.id).split("|")[1] || ""; return !slugs.some(x => x === sl || x.startsWith(sl + "-") || x.endsWith(sl)); })
     .map(p => ({ id: p.id, cuando: `${p.fecha}T${p.hora}`, titulo: p.titulo, cuenta: p.cuenta || "", estado: p.estado, detalle: String(p.detalle || "").slice(0, 200) }));
-  res.json({ ahora: Date.now(), cola: cola.map(p => ({ id: p.id, cuando: p.cuando, cuenta: p.cuenta, tipo: p.tipo, ig: limpia(p.ig), fb: limpia(p.fb) })), meta, registro });
+  // el título bonito de cada pieza del publicador: el del calendario del proyecto, si está
+  const titulos = {};
+  for (const x of calendario.publicaciones().lista) { const sl = String(x.id).split("|")[1]; if (sl && x.titulo) titulos[sl] = x.titulo; }
+  const tituloDe = id => { const sl = id.slice(11); const k = Object.keys(titulos).find(t => sl === t || sl.startsWith(t + "-")); return k ? titulos[k] : null; };
+  res.json({ ahora: Date.now(), cola: cola.map(p => ({ id: p.id, cuando: p.cuando, cuenta: p.cuenta, tipo: p.tipo, titulo: tituloDe(p.id), ig: limpia(p.ig), fb: limpia(p.fb) })), meta, registro });
 });
 app.get("/admin/api/servidores", async (req, res) => res.json(await copias.estado()));
 // Estado en directo: cada web (HTTP, tiempo, SSL) y el servidor del panel
