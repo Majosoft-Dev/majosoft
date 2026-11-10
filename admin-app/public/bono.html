@@ -43,7 +43,11 @@
     .empty { padding: 30px; text-align: center; color: var(--muted); }
     .pie { color: var(--muted); font-size: 12.5px; margin-top: 18px; line-height: 1.6; }
     @media (max-width: 640px) { .kpis { grid-template-columns: 1fr; } .top h1 { font-size: 23px; } td, th { padding: 10px 12px; } td.f { white-space: normal; width: 74px; } }
-  </style>
+    .subs { list-style: none; margin: 6px 0 0; padding: 0; font-size: 13px; color: #5b5f66; }
+  .subs li { position: relative; padding-left: 18px; margin: 2px 0; }
+  .subs li::before { content: "○"; position: absolute; left: 0; }
+  .subs li.ok::before { content: "✓"; color: #7a9a10; font-weight: 700; }
+</style>
 </head>
 <body class="no-side">
   <div class="top"><div class="in">
@@ -57,6 +61,7 @@
 const esc = s => String(s ?? "").replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
 const hm = min => { const h = Math.floor(min / 60), m = Math.round(min % 60); return m ? `${h} h ${m} min` : `${h} h`; };
 const fecha = s => s ? new Date(s + "T12:00").toLocaleDateString("es-ES", { day: "numeric", month: "short", year: "numeric" }) : "";
+const subs = l => l?.length ? `<ul class="subs">${l.map(x => `<li class="${x.hecha ? "ok" : ""}">${esc(x.texto)}</li>`).join("")}</ul>` : "";
 const mes = s => new Date(s + "T12:00").toLocaleDateString("es-ES", { month: "long", year: "numeric" });
 
 fetch(location.pathname.replace(/\/$/, "") + "/datos").then(r => r.ok ? r.json() : Promise.reject()).then(b => {
@@ -74,7 +79,7 @@ fetch(location.pathname.replace(/\/$/, "") + "/datos").then(r => r.ok ? r.json()
       filas += `<tr class="mes"><td colspan="2">${esc(m.charAt(0).toUpperCase() + m.slice(1))}</td><td class="r">${hm(tot)}</td></tr>`;
       mesAnt = m;
     }
-    filas += `<tr><td class="f">${fecha(e.fecha)}</td><td><b>${esc(e.tarea)}</b>${e.detalle ? `<small>${esc(e.detalle)}</small>` : ""}</td><td class="r">${hm(e.minutos)}</td></tr>`;
+    filas += `<tr><td class="f">${fecha(e.fecha)}</td><td><b>${esc(e.tarea)}</b>${e.detalle ? `<small>${esc(e.detalle)}</small>` : ""}${subs(e.sub)}</td><td class="r">${hm(e.minutos)}</td></tr>`;
   }
   document.getElementById("main").innerHTML = `
     <div class="kpis">

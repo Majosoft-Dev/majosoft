@@ -53,7 +53,11 @@
     .x { border: 0; background: none; cursor: pointer; opacity: .4; font-size: 14px; }
     .x:hover { opacity: 1; }
     @media (max-width: 1000px) { .wrap { grid-template-columns: 1fr; } .nueva { grid-template-columns: 1fr 1fr; } main { padding: 24px 16px 40px; } }
-  </style>
+    .subs { list-style: none; margin: 6px 0 0; padding: 0; font-size: 13px; color: var(--muted, #5b5f66); }
+  .subs li { position: relative; padding-left: 18px; margin: 2px 0; }
+  .subs li::before { content: "○"; position: absolute; left: 0; }
+  .subs li.ok::before { content: "✓"; color: #7a9a10; font-weight: 700; }
+</style>
 </head>
 <body>
   <main>
@@ -80,6 +84,9 @@ const enlace = b => `${location.origin}/admin/bono/${b.token}`;
 
 const put = b => api(`docs/bonos/${b.id}`, { method: "PUT", body: b });
 let store = await api("docs/bonos");
+// Subtareas de la tarea del calendario que generó cada apunte
+const tareas = new Map((await api("docs/tareas").catch(() => [])).map(t => [t.id, t]));
+const subs = id => { const l = (tareas.get(id)?.sub || []).filter(x => x.texto); return l.length ? `<ul class="subs">${l.map(x => `<li class="${x.hecha ? "ok" : ""}">${esc(x.texto)}</li>`).join("")}</ul>` : ""; };
 let cur = null;
 const save = autosaver(() => cur && put(cur));
 
@@ -127,7 +134,7 @@ function editor() {
     </div>
     <h3>Intervenciones (${ents.length})</h3>
     ${ents.length ? `<table><thead><tr><th>Fecha</th><th>Tarea</th><th class="r">Tiempo</th><th></th></tr></thead><tbody>
-      ${ents.map(e => `<tr><td>${fecha(e.fecha)}</td><td><b>${esc(e.tarea)}</b>${e.detalle ? `<small>${esc(e.detalle)}</small>` : ""}</td><td class="r">${hm(Number(e.minutos || 0))}</td><td class="r"><button class="x" data-del="${e.i}" title="Eliminar">🗑</button></td></tr>`).join("")}
+      ${ents.map(e => `<tr><td>${fecha(e.fecha)}</td><td><b>${esc(e.tarea)}</b>${e.detalle ? `<small>${esc(e.detalle)}</small>` : ""}${subs(e.tareaId)}</td><td class="r">${hm(Number(e.minutos || 0))}</td><td class="r"><button class="x" data-del="${e.i}" title="Eliminar">🗑</button></td></tr>`).join("")}
     </tbody></table>` : `<p class="empty">Todavía no hay intervenciones.</p>`}
     <p style="margin-top:22px"><button class="btn btn--danger" id="bDel">Eliminar bono</button></p>
   </div>`;

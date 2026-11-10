@@ -210,12 +210,18 @@ const bonoPorToken = token => {
   }
   return null;
 };
+// Subtareas de la tarea del calendario que generó el apunte (solo texto y si está hecha)
+const subtareas = id => {
+  if (!id) return [];
+  const t = db.prepare("SELECT data FROM docs WHERE kind = 'tareas' AND id = ?").get(String(id));
+  return t ? (JSON.parse(t.data).sub || []).filter(x => x.texto).map(x => ({ texto: String(x.texto), hecha: !!x.hecha })) : [];
+};
 app.get("/admin/bono/:token", (req, res) => bonoPorToken(req.params.token) ? res.sendFile(path.join(PUBLIC, "bono.html")) : res.status(404).send("Enlace no válido"));
 app.get("/admin/bono/:token/datos", (req, res) => {
   const b = bonoPorToken(req.params.token); if (!b) return res.status(404).json({ error: "Enlace no válido" });
   // Solo lo que el cliente debe ver (sin precios internos ni notas privadas)
   res.json({ cliente: b.cliente, titulo: b.titulo, referencia: b.referencia, inicio: b.inicio, horas: Number(b.horas) || 0,
-    entradas: (b.entradas || []).map(e => ({ fecha: e.fecha, tarea: e.tarea, detalle: e.detalle, minutos: Number(e.minutos) || 0 })) });
+    entradas: (b.entradas || []).map(e => ({ fecha: e.fecha, tarea: e.tarea, detalle: e.detalle, minutos: Number(e.minutos) || 0, sub: subtareas(e.tareaId) })) });
 });
 
 /* ===== A partir de aquí, todo requiere sesión ===== */
