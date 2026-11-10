@@ -78,6 +78,8 @@ async function pintarShell(active) {
       <nav>${link("/admin/presupuestos", "presupuestos", "Presupuestos", "doc")}${link("/admin/facturas", "facturas", "Facturas", "invoice")}${link("/admin/bonos", "bonos", "Bonos de horas", "clock")}</nav>
       <div class="side-sec">Comunicación</div>
       <nav>${link("/admin/mensajes", "mensajes", "Mensajes web", "chat")}${link("/admin/correo", "correo", "Correo", "mail")}</nav>
+      <div class="side-sec">Redes</div>
+      <nav>${link("/admin/publicaciones", "publicaciones", "Publicaciones", "cal")}</nav>
       <div class="side-sec">Sistemas</div>
       <nav>${link("/admin/servidores", "servidores", "Servidores", "server")}${link("/admin/consultas", "consultas", "Consultas SQL", "doc")}</nav>
       <div class="side-sec">Cuenta</div>

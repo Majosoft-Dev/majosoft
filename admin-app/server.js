@@ -12,6 +12,8 @@ import * as salud from "./lib/salud.js";
 import * as vigilancia from "./lib/vigilancia.js";
 import * as calendario from "./lib/calendario.js";
 import * as consultas from "./lib/consultas.js";
+import fsMod from "node:fs";
+const require_fs = () => fsMod;
 import {
   verifyPassword, hashPassword, DUMMY_HASH, passwordProblems,
   newTotpSecret, verifyTotp, totpUri, newToken, sha256,
@@ -244,6 +246,20 @@ app.put("/admin/umme/publicaciones", (req, res) => {
   res.json({ ok: true, publicaciones: n });
 });
 
+/* ===== Avisos del publicador de UMME (10/11/2026): correo a María cuando se programa, sale o falla algo ===== */
+app.post("/admin/umme/aviso", async (req, res) => {
+  try {
+  if (!calendario.claveUmmeValida(String(req.get("authorization") || "").replace(/^Bearer /, ""))) {
+    audit("umme_key_fail", { ip: req.ip });
+    return res.status(404).send("No existe");
+  }
+  const { asunto, html, texto, para } = req.body || {};
+  if (!asunto || !html) return res.status(400).json({ error: "Faltan asunto o html" });
+  await correo.enviar({ asunto: String(asunto).slice(0, 200), html: String(html), texto: String(texto || ""), para: para ? String(para) : undefined });
+  res.json({ ok: true });
+  } catch (e) { res.status(500).json({ error: String(e.message || e) }); }
+});
+
 app.use("/admin", requireAuth);
 
 app.get("/admin/api/me", (req, res) => {
@@ -369,6 +385,16 @@ app.get("/admin/api/correo/mensajes/:uid/adjuntos/:i", wrap(async (req, res) => 
 }));
 
 /* ===== Servidores: webs y copias automáticas ===== */
+/* ===== Publicaciones programadas (lee la cola del publicador, /var/www/publicar-umme) ===== */
+app.get("/admin/api/publicador", (req, res) => {
+  const fs = require_fs();
+  const dir = process.env.PUBLICADOR_DIR || "/var/www/publicar-umme";
+  let cola = [], registro = "";
+  try { cola = JSON.parse(fs.readFileSync(path.join(dir, "cola.json"), "utf8")); } catch {}
+  try { registro = fs.readFileSync(path.join(dir, "registro.log"), "utf8").split("\n").filter(Boolean).slice(-15).join("\n"); } catch {}
+  const limpia = d => d ? { hecho: !!d.hecho, enlace: d.enlace || null, a: d.a || null, error: d.error || null, intentos: d.intentos || 0, texto: (d.texto || "").slice(0, 280) } : null;
+  res.json({ ahora: Date.now(), cola: cola.map(p => ({ id: p.id, cuando: p.cuando, cuenta: p.cuenta, tipo: p.tipo, ig: limpia(p.ig), fb: limpia(p.fb) })), registro });
+});
 app.get("/admin/api/servidores", async (req, res) => res.json(await copias.estado()));
 // Estado en directo: cada web (HTTP, tiempo, SSL) y el servidor del panel
 app.get("/admin/api/servidores/estado", async (req, res) => {
@@ -403,7 +429,7 @@ app.post("/admin/api/consultas", async (req, res) => {
   catch (e) { res.status(e.status || 500).json({ error: e.message }); }
 });
 
-const PAGES = { "": "index.html", presupuestos: "presupuestos.html", facturas: "facturas.html", correo: "correo.html", mensajes: "mensajes.html", seguridad: "seguridad.html", servidores: "servidores.html", consultas: "consultas.html", bonos: "bonos.html", tareas: "tareas.html" };
+const PAGES = { "": "index.html", presupuestos: "presupuestos.html", facturas: "facturas.html", correo: "correo.html", mensajes: "mensajes.html", seguridad: "seguridad.html", servidores: "servidores.html", consultas: "consultas.html", bonos: "bonos.html", tareas: "tareas.html", publicaciones: "publicaciones.html" };
 app.get("/admin/menu.js", (req, res) => res.sendFile(path.join(PUBLIC, "menu.js")));
 app.get("/admin/panel.js", (req, res) => res.sendFile(path.join(PUBLIC, "panel.js")));
 app.get(["/admin", "/admin/:page"], (req, res, next) => {

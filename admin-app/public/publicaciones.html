@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Publicaciones · Panel Majosoft</title>
+  <meta name="robots" content="noindex, nofollow" />
+  <link rel="icon" type="image/svg+xml" href="/assets/favicon.svg" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/admin/panel.css" />
+  <script type="module" src="/admin/menu.js" blocking="render"></script>
+  <!-- Publicaciones programadas de UMME y Cursos Umme (10/11/2026): lo que el publicador (/var/www/publicar-umme) va a sacar
+       en Instagram y Facebook, lo que ya ha salido y lo que ha fallado. Se recarga sola cada minuto. -->
+  <style>
+    * { box-sizing: border-box; }
+    body { margin: 0; font-family: Inter, system-ui, sans-serif; background: var(--cream); color: var(--ink); font-size: 14px; }
+    main { max-width: 1180px; padding: 34px 32px 60px; }
+    h1 { font-size: 26px; margin: 0 0 4px; }
+    .sub { color: var(--muted); margin: 0 0 22px; }
+    .kpis { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; margin-bottom: 16px; }
+    .kpi { background: #fff; border: 1px solid var(--line); border-radius: 16px; padding: 16px 18px; }
+    .kpi b { display: block; font-size: 26px; margin-bottom: 2px; }
+    .kpi span { color: var(--muted); font-size: 12.5px; }
+    .card { background: #fff; border: 1px solid var(--line); border-radius: 16px; padding: 8px 8px 4px; margin-bottom: 16px; overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; }
+    th { text-align: left; font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); padding: 10px 12px; border-bottom: 1px solid var(--line); }
+    td { padding: 12px; border-bottom: 1px solid #eeede5; font-size: 13px; vertical-align: top; }
+    tr:last-child td { border-bottom: 0; }
+    .est { display: inline-flex; align-items: center; gap: 6px; font-weight: 700; border-radius: 999px; padding: 4px 10px; font-size: 12px; white-space: nowrap; }
+    .ok { background: #E7F6F0; color: #2E9E6B; } .prog { background: #F1F4F3; color: #555; } .reint { background: #FFF3D6; color: #A86A00; } .mal { background: #FDE8E6; color: #C0392B; }
+    .err { color: #C0392B; font-size: 12px; margin-top: 6px; max-width: 300px; overflow-wrap: anywhere; }
+    .cuenta { color: var(--muted); font-size: 12px; }
+    .hoy td { background: #FFFBEA; }
+    .pasado td:first-child { color: var(--muted); }
+    pre { background: var(--ink); color: var(--cream); padding: 12px 14px; border-radius: 10px; font-size: 12px; overflow-x: auto; white-space: pre-wrap; }
+    details summary { cursor: pointer; color: var(--muted); font-weight: 600; margin: 8px 4px; }
+    @media (max-width: 760px) { main { padding: 22px 16px 40px; } .kpis { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+  </style>
+</head>
+<body>
+<main>
+  <h1>Publicaciones programadas</h1>
+  <p class="sub">Lo que sale solo en Instagram y Facebook (UMME y Cursos Umme). Se comprueba cada 5 minutos y esta página se recarga sola.</p>
+  <div class="kpis" id="kpis"></div>
+  <div class="card"><table><thead><tr><th>Cuándo</th><th>Qué</th><th>Instagram</th><th>Facebook</th></tr></thead><tbody id="filas"></tbody></table></div>
+  <details><summary>Registro del publicador (últimas líneas)</summary><pre id="registro">…</pre></details>
+</main>
+<script>
+const NOMBRES = { cursosumme: "@cursosumme · Cursos UMME", umme: "@unamaestramuyespecial · Una maestra muy especial" };
+const DIAS = ["dom", "lun", "mar", "mié", "jue", "vie", "sáb"];
+const esc = s => String(s ?? "").replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+const titulo = id => id.slice(11).replace(/^cu-/, "").replace(/-/g, " ").replace(/^./, c => c.toUpperCase());
+const fecha = c => { const d = new Date(c); return `${DIAS[d.getDay()]} ${d.getDate()}/${d.getMonth() + 1} · ${String(d.getHours()).padStart(2, "0")}:${String(d.getMinutes()).padStart(2, "0")}`; };
+function estado(d) {
+  if (!d) return '<span class="cuenta">—</span>';
+  if (d.hecho) return `<a class="est ok" href="${esc(d.enlace)}" target="_blank" rel="noopener">✓ Publicado ↗</a>`;
+  if (d.intentos >= 3) return `<span class="est mal">✕ Falló</span><div class="err">${esc(d.error)}</div>`;
+  if (d.error) return `<span class="est reint">↻ Reintentando (${d.intentos}/3)</span><div class="err">${esc(d.error)}</div>`;
+  return '<span class="est prog">◷ Programado</span>';
+}
+async function cargar() {
+  const r = await fetch("/admin/api/publicador", { credentials: "same-origin" });
+  if (!r.ok) return;
+  const { cola, registro } = await r.json();
+  cola.sort((a, b) => a.cuando.localeCompare(b.cuando));
+  const plats = cola.flatMap(p => [p.ig, p.fb].filter(Boolean));
+  const hechas = plats.filter(d => d.hecho).length, fallos = plats.filter(d => !d.hecho && d.intentos >= 3).length;
+  const prox = cola.find(p => [p.ig, p.fb].some(d => d && !d.hecho));
+  const hoy = new Date().toDateString();
+  document.getElementById("kpis").innerHTML =
+    `<div class="kpi"><b>${cola.length}</b><span>piezas en la cola</span></div>` +
+    `<div class="kpi"><b>${hechas} / ${plats.length}</b><span>publicadas (IG + FB)</span></div>` +
+    `<div class="kpi"><b style="color:${fallos ? "#C0392B" : "#2E9E6B"}">${fallos}</b><span>fallos</span></div>` +
+    `<div class="kpi"><b style="font-size:16px">${prox ? esc(fecha(prox.cuando)) : "—"}</b><span>${prox ? esc(titulo(prox.id)) : "nada pendiente"}</span></div>`;
+  document.getElementById("filas").innerHTML = cola.map(p => {
+    const d = new Date(p.cuando), cls = d.toDateString() === hoy ? "hoy" : d < new Date() ? "pasado" : "";
+    return `<tr class="${cls}"><td style="white-space:nowrap">${esc(fecha(p.cuando))}</td><td><b>${esc(titulo(p.id))}</b><div class="cuenta">${esc(NOMBRES[p.cuenta] || p.cuenta)} · ${esc(p.tipo)}</div></td><td>${estado(p.ig)}</td><td>${estado(p.fb)}</td></tr>`;
+  }).join("") || '<tr><td colspan="4" class="cuenta">No hay nada programado.</td></tr>';
+  document.getElementById("registro").textContent = registro || "(vacío)";
+}
+cargar();
+setInterval(cargar, 60e3);
+</script>
+</body>
+</html>
