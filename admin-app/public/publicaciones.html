@@ -49,6 +49,8 @@
     .dia .n { font-size: 12px; font-weight: 700; color: var(--muted); margin-bottom: 4px; }
     .pz { display: block; font-size: 11.5px; line-height: 1.3; border-radius: 7px; padding: 4px 6px; margin-bottom: 4px; text-decoration: none; color: #111; border-left: 4px solid; }
     .pz.cu { background: #E4F5EF; border-color: #5FBFA5; } .pz.umme { background: #FBE7EE; border-color: #CF5F7C; }
+    .pz.meta { background: #EAF1FB; border-color: #4A7BD0; }
+    .pz.hacer { background: #fff; border: 1.5px dashed #B9B6AA; border-left-width: 4px; color: #666; }
     .pz.hecho { opacity: .7; } .pz.mal { outline: 2px solid #C0392B; }
     .pz .h { font-weight: 800; }
     .leyenda { display: flex; gap: 14px; flex-wrap: wrap; font-size: 12px; color: var(--muted); margin: 0 4px 14px; }
@@ -82,7 +84,7 @@ function estado(d) {
 async function cargar() {
   const r = await fetch("/admin/api/publicador", { credentials: "same-origin" });
   if (!r.ok) return;
-  const { cola, registro } = await r.json();
+  const { cola, registro, meta = [] } = await r.json();
   cola.sort((a, b) => a.cuando.localeCompare(b.cuando));
   const plats = cola.flatMap(p => [p.ig, p.fb].filter(Boolean));
   const hechas = plats.filter(d => d.hecho).length, fallos = plats.filter(d => !d.hecho && d.intentos >= 3).length;
@@ -98,7 +100,7 @@ async function cargar() {
     return `<tr class="${cls}"><td style="white-space:nowrap">${esc(fecha(p.cuando))}</td><td><b>${esc(titulo(p.id))}</b><div class="cuenta">${esc(NOMBRES[p.cuenta] || p.cuenta)} · ${esc(p.tipo)}</div></td><td>${estado(p.ig)}</td><td>${estado(p.fb)}</td></tr>`;
   }).join("") || '<tr><td colspan="4" class="cuenta">No hay nada programado.</td></tr>';
   document.getElementById("registro").textContent = registro || "(vacío)";
-  pintarCalendario(cola);
+  pintarCalendario(cola, meta);
 }
 // el calendario: del mes actual al del último programado; cada pieza en su día con su hora, su cuenta y su estado
 const ICO = { reel: "🎬", carrusel: "🖼️", historia: "◔" };
@@ -109,11 +111,13 @@ function marca(p) {
   if (ds.some(d => d.error)) return "↻";
   return "";
 }
-function pintarCalendario(cola) {
+function pintarCalendario(cola, meta) {
   const hoy = new Date(), porDia = {};
   for (const p of cola) { const k = p.cuando.slice(0, 10); (porDia[k] ||= []).push(p); }
+  for (const m of meta) { const k = m.cuando.slice(0, 10); (porDia[k] ||= []).push({ ...m, esMeta: true }); }
+  for (const k in porDia) porDia[k].sort((a, b) => a.cuando.localeCompare(b.cuando));
   const ultimo = cola.length ? new Date(cola[cola.length - 1].cuando) : hoy;
-  let html = '<div class="leyenda"><span><i style="background:#5FBFA5"></i>Cursos Umme</span><span><i style="background:#CF5F7C"></i>Una maestra muy especial</span><span>🎬 reel · 🖼️ carrusel · ◔ historia</span><span>✓ publicado · ↻ reintentando · ✕ falló</span></div>';
+  let html = '<div class="leyenda"><span><i style="background:#5FBFA5"></i>Cursos Umme</span><span><i style="background:#CF5F7C"></i>Una maestra muy especial</span><span><i style="background:#4A7BD0"></i>Programado por ti en Meta</span><span><i style="background:#fff;border:1.5px dashed #B9B6AA"></i>Por hacer (aún sin programar)</span><span>🎬 reel · 🖼️ carrusel · ◔ historia</span><span>✓ publicado · ↻ reintentando · ✕ falló</span></div>';
   for (let m = new Date(hoy.getFullYear(), hoy.getMonth(), 1); m <= ultimo; m = new Date(m.getFullYear(), m.getMonth() + 1, 1)) {
     html += `<div class="mes"><h2>${m.toLocaleDateString("es-ES", { month: "long", year: "numeric" }).replace(/^./, c => c.toUpperCase())}</h2><div class="rej">` + ["lun", "mar", "mié", "jue", "vie", "sáb", "dom"].map(d => `<div class="dn">${d}</div>`).join("");
     const pad = (m.getDay() + 6) % 7;
@@ -123,9 +127,11 @@ function pintarCalendario(cola) {
       const f = new Date(m.getFullYear(), m.getMonth(), d), k = `${f.getFullYear()}-${String(f.getMonth() + 1).padStart(2, "0")}-${String(d).padStart(2, "0")}`;
       const ps = porDia[k] || [];
       html += `<div class="dia${f.toDateString() === hoy.toDateString() ? " hoy" : ""}"><div class="n">${d}</div>` + ps.map(p => {
+        if (p.esMeta && p.estado === "pendiente") return `<div class="pz hacer" title="${esc(p.titulo)} · por hacer: aún no está programado${p.detalle ? " · " + esc(p.detalle) : ""}"><span class="h">${p.cuando.slice(11, 16)}</span> ✎ ${esc(String(p.titulo).slice(0, 34))}</div>`;
+        if (p.esMeta) return `<div class="pz meta${p.estado === "publicado" ? " hecho" : ""}" title="${esc(p.titulo)} · programado en Meta${p.detalle ? " · " + esc(p.detalle) : ""}"><span class="h">${p.cuando.slice(11, 16)}</span> Ⓜ ${esc(String(p.titulo).slice(0, 34))} ${p.estado === "publicado" ? "✓" : ""}</div>`;
         const mk = marca(p), enl = (p.ig && p.ig.enlace) || (p.fb && p.fb.enlace);
         const tag = enl ? "a" : "div";
-        return `<${tag} class="pz ${p.cuenta === "cursosumme" ? "cu" : "umme"}${mk === "✓" ? " hecho" : ""}${mk === "✕" ? " mal" : ""}"${enl ? ` href="${esc(enl)}" target="_blank" rel="noopener"` : ""} title="${esc(titulo(p.id))} · ${esc(NOMBRES[p.cuenta] || p.cuenta)}"><span class="h">${p.cuando.slice(11, 16)}</span> ${ICO[p.tipo] || ""} ${esc(titulo(p.id).slice(0, 34))} ${mk}</${tag}>`;
+        return `<${tag} class="pz ${p.cuenta === "cursosumme" ? "cu" : "umme"}${mk === "✓" ? " hecho" : ""}${mk === "✕" ? " mal" : ""}"${enl ? ` href="${esc(enl)}" target="_blank" rel="noopener"` : ""} title="${esc(titulo(p.id))} · ${esc(NOMBRES[p.cuenta] || p.cuenta)}"><span class="h">${p.cuando.slice(11, 16)}</span> ${ICO[p.tipo] || ""} <b>${p.cuenta === "cursosumme" ? "CU" : "UMME"}</b> · ${esc(titulo(p.id).slice(0, 30))} ${mk}</${tag}>`;
       }).join("") + "</div>";
     }
     html += "</div></div>";

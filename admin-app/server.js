@@ -393,7 +393,12 @@ app.get("/admin/api/publicador", (req, res) => {
   try { cola = JSON.parse(fs.readFileSync(path.join(dir, "cola.json"), "utf8")); } catch {}
   try { registro = fs.readFileSync(path.join(dir, "registro.log"), "utf8").split("\n").filter(Boolean).slice(-15).join("\n"); } catch {}
   const limpia = d => d ? { hecho: !!d.hecho, enlace: d.enlace || null, a: d.a || null, error: d.error || null, intentos: d.intentos || 0, texto: (d.texto || "").slice(0, 280) } : null;
-  res.json({ ahora: Date.now(), cola: cola.map(p => ({ id: p.id, cuando: p.cuando, cuenta: p.cuenta, tipo: p.tipo, ig: limpia(p.ig), fb: limpia(p.fb) })), registro });
+  // lo que la usuaria programa a mano en Meta Business Suite (sale del calendario del proyecto, docs/18, que manda calendario.py), sin repetir lo del publicador
+  const slugs = cola.map(p => p.id.slice(11));
+  const meta = calendario.publicaciones().lista.filter(p => p.fecha && p.hora)
+    .filter(p => { const sl = String(p.id).split("|")[1] || ""; return !slugs.some(x => x === sl || x.startsWith(sl + "-") || x.endsWith(sl)); })
+    .map(p => ({ id: p.id, cuando: `${p.fecha}T${p.hora}`, titulo: p.titulo, cuenta: p.cuenta || "", estado: p.estado, detalle: String(p.detalle || "").slice(0, 200) }));
+  res.json({ ahora: Date.now(), cola: cola.map(p => ({ id: p.id, cuando: p.cuando, cuenta: p.cuenta, tipo: p.tipo, ig: limpia(p.ig), fb: limpia(p.fb) })), meta, registro });
 });
 app.get("/admin/api/servidores", async (req, res) => res.json(await copias.estado()));
 // Estado en directo: cada web (HTTP, tiempo, SSL) y el servidor del panel
