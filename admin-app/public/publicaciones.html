@@ -182,7 +182,7 @@ function preparar({ cola, meta = [] }) {
   const madres = cola.filter(p => p.tipo !== "historia");
   for (const p of madres) { const e = { k: "pub", id: p.id, cuando: p.cuando, cuenta: p.cuenta, tipo: p.tipo, titulo: limpio(p.titulo) || bonito(p.id), p, historias: [] }; ev.push(e); porId[e.id] = e; }
   for (const h of cola.filter(p => p.tipo === "historia")) {
-    const madre = madres.find(m => h.id.startsWith(m.id + "-"));
+    const madre = madres.find(m => h.id.startsWith(m.id + "-") || (h.cuenta === m.cuenta && h.id.slice(11).startsWith(m.id.slice(11) + "-")));
     if (madre) porId[madre.id].historias.push(h);
     else { const e = { k: "pub", id: h.id, cuando: h.cuando, cuenta: h.cuenta, tipo: "historia", titulo: (limpio(h.titulo) || bonito(h.id)) + " · historias", p: h, historias: [] }; const otra = ev.find(x => x.k === "pub" && x.tipo === "historia" && x.cuando === h.cuando && x.cuenta === h.cuenta && x.id.replace(/-historia.*/, "") === h.id.replace(/-historia.*/, "")); if (otra) otra.historias.push(h); else { ev.push(e); porId[e.id] = e; } }
   }
