@@ -397,7 +397,7 @@ app.get("/admin/api/publicador", (req, res) => {
   const slugs = cola.map(p => p.id.slice(11));
   const meta = calendario.publicaciones().lista.filter(p => p.fecha && p.hora)
     .filter(p => { const sl = String(p.id).split("|")[1] || ""; return !slugs.some(x => x === sl || x.startsWith(sl + "-") || x.endsWith(sl)); })
-    .map(p => ({ id: p.id, cuando: `${p.fecha}T${p.hora}`, titulo: p.titulo, cuenta: p.cuenta || "", estado: p.estado, detalle: String(p.detalle || "").slice(0, 200) }));
+    .map(p => ({ id: p.id, cuando: `${p.fecha}T${p.hora}`, titulo: p.titulo, cuenta: p.cuenta || "", canal: p.canal || "", estado: p.estado, situacion: p.situacion || "", detalle: String(p.detalle || "").slice(0, 200) }));
   // el título bonito de cada pieza del publicador: el del calendario del proyecto, si está
   const titulos = {};
   for (const x of calendario.publicaciones().lista) { const sl = String(x.id).split("|")[1]; if (sl && x.titulo) titulos[sl] = x.titulo; }

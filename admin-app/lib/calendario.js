@@ -35,6 +35,8 @@ export function guardarPublicaciones(lista) {
       estado: ["publicado", "programado", "pendiente"].includes(p.estado) ? p.estado : "pendiente",
       titulo: String(p.titulo || "Publicación").slice(0, 200), cuenta: String(p.cuenta || "").slice(0, 60),
       detalle: String(p.detalle || "").slice(0, 2000),
+      // 10/11: para la página Publicaciones (programado de verdad o solo terminado)
+      situacion: /^[a-z-]{1,20}$/.test(p.situacion || "") ? p.situacion : "", canal: String(p.canal || "").slice(0, 80),
     });
   }
   db.prepare(`INSERT INTO docs (kind, id, data, updated_at, updated_by) VALUES ('publicaciones', 'umme', ?, ?, NULL)

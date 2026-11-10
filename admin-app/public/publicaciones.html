@@ -57,8 +57,20 @@
     .ev .hora { color: var(--ink); font-weight: 800; }
     .ev .t { font-size: 12px; font-weight: 600; line-height: 1.3; margin-top: 2px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
     .ev .l3 { margin-top: 4px; font-size: 10.5px; color: var(--muted); }
-    .ev.hacer { background: transparent; border-style: dashed; box-shadow: none; }
-    .ev.hacer .t { color: var(--muted); font-weight: 500; }
+    .ev .quien { display: inline-block; font-size: 10px; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; color: var(--c); }
+    .ev.ro { --c: #C8456D; } .ev.cu { --c: #2E9A79; }
+    .ev.prog { background: color-mix(in srgb, var(--c) 7%, #fff); border-color: color-mix(in srgb, var(--c) 30%, #fff); }
+    .ev.sin { background: #fff; border: 1.5px dashed #CFCBBE; box-shadow: none; }
+    .ev.sin::before { background: repeating-linear-gradient(#CFCBBE 0 4px, transparent 4px 7px); }
+    .ev.sin .t, .ev.sin .hora { color: #8A877E; }
+    .ev.listo { border-color: #E2B33C; }
+    .ev.hecho { opacity: .55; }
+    .ev.oculto { display: none; }
+    .filtros { display: inline-flex; gap: 6px; flex-wrap: wrap; align-items: center; }
+    .filtros button { border: 1px solid var(--line); background: #fff; border-radius: 999px; height: 32px; padding: 0 13px; font: inherit; font-weight: 600; font-size: 13px; cursor: pointer; color: var(--ink); display: inline-flex; align-items: center; gap: 6px; }
+    .filtros button.on { background: var(--ink); color: #fff; border-color: var(--ink); }
+    .filtros .sep { width: 1px; height: 20px; background: var(--line); margin: 0 4px; }
+    .muestra { width: 22px; height: 14px; border-radius: 4px; display: inline-block; border: 1px solid; }
     .ev.sel { outline: 2px solid var(--ink); }
     .est { font-size: 11px; font-weight: 800; }
     .mas { font-size: 11px; color: var(--muted); padding-left: 4px; }
@@ -128,13 +140,17 @@
   </div>
   <div class="barra">
     <div class="nav"><button class="icono" id="ant" aria-label="Mes anterior">‹</button><h2 id="mes">…</h2><button class="icono" id="sig" aria-label="Mes siguiente">›</button><button id="hoyB">Hoy</button></div>
-    <div class="leyenda">
-      <span><i class="punto" style="background:#3FAE8C"></i>Cursos Umme</span>
-      <span><i class="punto" style="background:#D0577A"></i>UMME</span>
-      <span><i class="punto" style="background:#4A7BD0"></i>Programado por ti en Meta</span>
-      <span><i class="punto" style="background:#fff;border:1px dashed #B9B6AA"></i>Por hacer</span>
+    <div class="filtros">
+      <button data-f="todas" class="on">Todas</button><button data-f="ro"><i class="punto" style="background:#C8456D"></i>Rocío</button><button data-f="cu"><i class="punto" style="background:#2E9A79"></i>Cursos Umme</button>
+      <span class="sep"></span><button data-falta="1">Solo lo que falta</button>
     </div>
     <div class="vistas"><button id="vCal" class="on">Mes</button><button id="vLista">Lista</button></div>
+  </div>
+  <div class="leyenda" style="margin:0 2px 10px">
+    <span><i class="muestra" style="background:#FBEFF3;border-color:#EFC3D1"></i>Programado</span>
+    <span><i class="muestra" style="background:#fff;border:1.5px dashed #CFCBBE"></i>Sin programar</span>
+    <span><i class="muestra" style="background:#fff;border:1.5px dashed #E2B33C"></i>Listo, falta programar</span>
+    <span>✓ Publicado</span>
   </div>
   <div id="cal" class="cal"></div>
   <div id="lista" class="lista" hidden></div>
@@ -171,21 +187,35 @@ function preparar({ cola, meta = [] }) {
     else { const e = { k: "pub", id: h.id, cuando: h.cuando, cuenta: h.cuenta, tipo: "historia", titulo: (limpio(h.titulo) || bonito(h.id)) + " · historias", p: h, historias: [] }; const otra = ev.find(x => x.k === "pub" && x.tipo === "historia" && x.cuando === h.cuando && x.cuenta === h.cuenta && x.id.replace(/-historia.*/, "") === h.id.replace(/-historia.*/, "")); if (otra) otra.historias.push(h); else { ev.push(e); porId[e.id] = e; } }
   }
   for (const m of meta) { const tipoM = (String(m.titulo).match(/^(Reel|Carrusel|Historias?|YouTube|Publicación|Short)/i) || [""])[0];
-    const e = { k: m.estado === "pendiente" ? "hacer" : "meta", id: m.id, cuando: m.cuando, cuenta: m.cuenta, titulo: limpio(m.titulo), tipoM, m }; ev.push(e); porId[e.id] = e; }
+    // de verdad programado o publicado solo si el calendario lo dice («Programado…» / «Publicado…»); «listo» = terminado, falta programar
+    const sit = m.situacion || (m.estado === "pendiente" ? "falta" : m.estado);
+    const k = sit === "publicado" || sit === "programado" ? "meta" : "hacer";
+    const e = { k, sit, id: m.id, cuando: m.cuando, cuenta: /^en @cursosumme/.test(m.cuenta) ? "cursosumme" : "umme", titulo: limpio(m.titulo), tipoM, m }; ev.push(e); porId[e.id] = e; }
   ev.sort((a, b) => a.cuando.localeCompare(b.cuando));
   return { eventos: ev, porId };
 }
-function color(e) { return e.k === "meta" ? "#4A7BD0" : e.k === "hacer" ? "#C9C5B8" : (CUENTA[e.cuenta] || {}).c || "#999"; }
+const QUIEN = { umme: "Rocío", cursosumme: "Cursos Umme" };
+function color(e) { return e.cuenta === "cursosumme" ? "#2E9A79" : "#C8456D"; }
+const POR_HACER = { listo: "Listo, falta programar", guion: "Falta grabar o montar", falta: "Por hacer", "sin-tema": "Falta elegir el tema", produccion: "En montaje" };
 function chipEstado(e) {
-  if (e.k === "meta") return e.m.estado === "publicado" ? ["ok", "✓ Publicado"] : ["metac", "Ⓜ En Meta"];
-  if (e.k === "hacer") return ["hac", "✎ Por hacer"];
-  return estadoPub(e.p);
+  if (e.k === "meta") return e.sit === "publicado" ? ["ok", "✓ Publicado"] : ["prog", "◷ Programado en Meta"];
+  if (e.k === "hacer") return [e.sit === "listo" ? "reint" : "hac", POR_HACER[e.sit] || "Por hacer"];
+  const [c, t] = estadoPub(e.p);
+  return [c, c === "prog" ? "◷ Programado (servidor)" : t];
 }
+function clasif(e) {  // «prog» · «sin» · «hecho»
+  if (e.k === "hacer") return "sin" + (e.sit === "listo" ? " listo" : "");
+  const c = chipEstado(e)[0];
+  return c === "ok" ? "prog hecho" : "prog";
+}
+let filtro = "todas", soloFalta = false;
+const visible = e => (filtro === "todas" || (filtro === "cu") === (e.cuenta === "cursosumme")) && (!soloFalta || e.k === "hacer");
 function tarjeta(e) {
   const [cls, txt] = chipEstado(e);
-  const extra = e.k === "pub" ? `${TIPO[e.tipo] || e.tipo} · ${(CUENTA[e.cuenta] || {}).n || e.cuenta}${e.historias.length ? ` · +${e.historias.length} historia${e.historias.length > 1 ? "s" : ""}` : ""}` : e.k === "meta" ? `${e.tipoM ? e.tipoM + " · " : ""}Meta Business Suite` : `${e.tipoM ? e.tipoM + " · " : ""}Sin programar`;
-  return `<button class="ev${e.k === "hacer" ? " hacer" : ""}${selId === e.id ? " sel" : ""}" style="--c:${color(e)}" data-id="${esc(e.id)}">
-    <div class="l1"><span class="hora">${e.cuando.slice(11, 16)}</span><span class="est ${cls}" style="background:none;padding:0">${txt.split(" ")[0]}</span></div>
+  const tipoT = e.k === "pub" ? (TIPO[e.tipo] || e.tipo) : (e.tipoM || "");
+  const extra = `${tipoT ? tipoT + " · " : ""}${txt.replace(/^[^\wÁÉÍÓÚ]+\s*/, "")}${e.k === "pub" && e.historias.length ? ` · +${e.historias.length} historia${e.historias.length > 1 ? "s" : ""}` : ""}`;
+  return `<button class="ev ${e.cuenta === "cursosumme" ? "cu" : "ro"} ${clasif(e)}${visible(e) ? "" : " oculto"}${selId === e.id ? " sel" : ""}" data-id="${esc(e.id)}">
+    <div class="l1"><span><span class="hora">${e.cuando.slice(11, 16)}</span> · <span class="quien">${QUIEN[e.cuenta]}</span></span><span>${txt.startsWith("✓") ? "✓" : ""}</span></div>
     <div class="t">${esc(e.titulo)}</div><div class="l3">${esc(extra)}</div></button>`;
 }
 function pintarMes() {
@@ -198,7 +228,7 @@ function pintarMes() {
   for (let i = 0; i < 42; i++) {
     const d = new Date(ini.getFullYear(), ini.getMonth(), ini.getDate() + i);
     if (i >= 35 && d.getMonth() !== m.getMonth()) break;
-    const evs = porDia[clave(d)] || [], vis = evs.slice(0, 4);
+    const evs = (porDia[clave(d)] || []).filter(visible), vis = evs.slice(0, 4);
     const cls = [d.getMonth() !== m.getMonth() ? "otro" : "", d.toDateString() === hoy.toDateString() ? "hoy" : "", d < new Date(hoy.toDateString()) ? "pasado" : "", d < new Date(hoy.toDateString()) && m.getMonth() === hoy.getMonth() && m.getFullYear() === hoy.getFullYear() ? "antes" : "", evs.length ? "" : "vacio"].join(" ");
     html += `<div class="dia ${cls}"><div class="n"><span class="ds">${d.toLocaleDateString("es-ES", { weekday: "long" })} </span>${d.getDate()}</div>${vis.map(tarjeta).join("")}${evs.length > 4 ? `<div class="mas">+${evs.length - 4} más</div>` : ""}</div>`;
   }
@@ -207,11 +237,11 @@ function pintarMes() {
 }
 function pintarLista() {
   const desde = clave(new Date(new Date().getFullYear(), new Date().getMonth(), new Date().getDate() - 7));
-  document.getElementById("lista").innerHTML = datos.eventos.filter(e => e.cuando.slice(0, 10) >= desde).map(e => {
+  document.getElementById("lista").innerHTML = datos.eventos.filter(e => e.cuando.slice(0, 10) >= desde && visible(e)).map(e => {
     const d = new Date(e.cuando), [cls, txt] = chipEstado(e);
     return `<button class="fila" data-id="${esc(e.id)}"><div class="dia-l">${DIAS[(d.getDay() + 6) % 7]} ${d.getDate()}/${d.getMonth() + 1}<small>${e.cuando.slice(11, 16)}</small></div>
       <div><span class="punto" style="background:${color(e)};margin-right:8px"></span><b>${esc(e.titulo)}</b></div>
-      <div class="cuenta">${e.k === "pub" ? esc((CUENTA[e.cuenta] || {}).n || e.cuenta) : e.k === "meta" ? "Meta" : "—"}</div><div><span class="chip ${cls}">${txt}</span></div></button>`;
+      <div class="cuenta">${QUIEN[e.cuenta]}</div><div><span class="chip ${cls}">${txt}</span></div></button>`;
   }).join("") || '<div style="padding:18px;color:var(--muted)">Nada a la vista.</div>';
 }
 function plataforma(nombre, d) {
@@ -231,7 +261,7 @@ function abrir(id) {
     if (e.p.ig && e.p.ig.texto) h += `<div class="bloque"><b>Texto</b><div class="texto">${esc(e.p.ig.texto)}${e.p.ig.texto.length >= 280 ? "…" : ""}</div></div>`;
     if (e.historias.length) h += `<div class="bloque"><b>Sus historias (${e.historias.length})</b>${e.historias.map(x => `<div style="margin:8px 0 2px;font-weight:600">${x.cuando.slice(11, 16)} · ${esc(bonito(x.id).replace(/^.*historia /i, "Historia "))}</div>${plataforma("Instagram", x.ig)}${plataforma("Facebook", x.fb)}`).join("")}</div>`;
   } else {
-    h += `<div class="meta-l">${esc(cuando)}<br>${e.k === "meta" ? "Programado a mano en Meta Business Suite" : "En el calendario del proyecto, sin programar todavía"}</div>`;
+    h += `<div class="meta-l">${esc(cuando)} · ${QUIEN[e.cuenta]}<br>${e.k === "meta" ? (e.sit === "publicado" ? "Ya publicado" : "Programado a mano en Meta Business Suite") : (POR_HACER[e.sit] || "Por hacer") + " · todavía no está programado"}</div>`;
     if (e.m.detalle) h += `<div class="bloque"><b>Qué es</b><div class="texto">${esc(e.m.detalle)}</div></div>`;
   }
   document.getElementById("det").innerHTML = h;
@@ -249,17 +279,21 @@ async function cargar() {
   const hechas = pubs.filter(d => d.hecho).length, fallos = pubs.filter(d => !d.hecho && d.intentos >= 3).length;
   const prox = datos.eventos.find(e => e.k === "pub" && estadoPub(e.p)[0] !== "ok");
   const hacer = datos.eventos.filter(e => e.k === "hacer" && e.cuando >= clave(new Date())).length;
+  const progRo = datos.eventos.filter(e => e.k !== "hacer" && e.cuenta === "umme" && e.cuando >= clave(new Date())).length, progCu = datos.eventos.filter(e => e.k !== "hacer" && e.cuenta === "cursosumme" && e.cuando >= clave(new Date())).length;
   document.getElementById("kpis").innerHTML =
     `<div class="kpi"><b>${prox ? prox.cuando.slice(8, 10) + "/" + prox.cuando.slice(5, 7) + " · " + prox.cuando.slice(11, 16) : "—"}</b><span>${prox ? esc(prox.titulo).slice(0, 28) : "nada pendiente"}</span></div>` +
-    `<div class="kpi"><b>${hechas}/${pubs.length}</b><span>publicadas por el servidor</span></div>` +
+    `<div class="kpi"><b style="color:#C8456D">${progRo}</b><span>programadas · Rocío</span></div>` +
+    `<div class="kpi"><b style="color:#2E9A79">${progCu}</b><span>programadas · Cursos Umme</span></div>` +
     `<div class="kpi"><b style="color:${fallos ? "#B03A2E" : "#2E7D5B"}">${fallos}</b><span>fallos</span></div>` +
-    `<div class="kpi"><b>${hacer}</b><span>por hacer</span></div>`;
+    `<div class="kpi"><b>${hacer}</b><span>sin programar</span></div>`;
   document.getElementById("registro").textContent = j.registro || "(vacío)";
   pintar();
   if (selId) abrir(selId);
 }
 document.addEventListener("click", ev => { const b = ev.target.closest("[data-id]"); if (b) abrir(b.dataset.id); });
 document.getElementById("cerrar").onclick = cerrar;
+document.querySelectorAll(".filtros [data-f]").forEach(b => b.onclick = () => { filtro = b.dataset.f; document.querySelectorAll(".filtros [data-f]").forEach(x => x.classList.toggle("on", x === b)); pintar(); });
+document.querySelector(".filtros [data-falta]").onclick = ev => { soloFalta = !soloFalta; ev.currentTarget.classList.toggle("on", soloFalta); pintar(); };
 document.addEventListener("keydown", ev => { if (ev.key === "Escape") cerrar(); });
 document.getElementById("ant").onclick = () => { mesVista = new Date(mesVista.getFullYear(), mesVista.getMonth() - 1, 1); pintarMes(); };
 document.getElementById("sig").onclick = () => { mesVista = new Date(mesVista.getFullYear(), mesVista.getMonth() + 1, 1); pintarMes(); };
