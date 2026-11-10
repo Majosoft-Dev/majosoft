@@ -40,7 +40,7 @@
     .vistas button { border: 0; background: transparent; padding: 7px 16px; border-radius: 999px; font: inherit; font-weight: 700; cursor: pointer; color: var(--muted); }
     .vistas button.on { background: var(--ink); color: #fff; }
     .mes { background: #fff; border: 1px solid var(--line); border-radius: 16px; padding: 14px; margin-bottom: 16px; }
-    .mes h2 { font-size: 16px; margin: 2px 4px 12px; text-transform: capitalize; }
+    .mes h2 { font-size: 16px; margin: 2px 4px 12px; }
     .rej { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 6px; }
     .rej .dn { font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); padding: 0 4px; }
     .dia { min-height: 92px; border: 1px solid #eeede5; border-radius: 10px; padding: 6px; background: #FCFCFA; }
@@ -115,7 +115,7 @@ function pintarCalendario(cola) {
   const ultimo = cola.length ? new Date(cola[cola.length - 1].cuando) : hoy;
   let html = '<div class="leyenda"><span><i style="background:#5FBFA5"></i>Cursos Umme</span><span><i style="background:#CF5F7C"></i>Una maestra muy especial</span><span>🎬 reel · 🖼️ carrusel · ◔ historia</span><span>✓ publicado · ↻ reintentando · ✕ falló</span></div>';
   for (let m = new Date(hoy.getFullYear(), hoy.getMonth(), 1); m <= ultimo; m = new Date(m.getFullYear(), m.getMonth() + 1, 1)) {
-    html += `<div class="mes"><h2>${m.toLocaleDateString("es-ES", { month: "long", year: "numeric" })}</h2><div class="rej">` + ["lun", "mar", "mié", "jue", "vie", "sáb", "dom"].map(d => `<div class="dn">${d}</div>`).join("");
+    html += `<div class="mes"><h2>${m.toLocaleDateString("es-ES", { month: "long", year: "numeric" }).replace(/^./, c => c.toUpperCase())}</h2><div class="rej">` + ["lun", "mar", "mié", "jue", "vie", "sáb", "dom"].map(d => `<div class="dn">${d}</div>`).join("");
     const pad = (m.getDay() + 6) % 7;
     for (let i = 0; i < pad; i++) html += '<div class="dia fuera"></div>';
     const dias = new Date(m.getFullYear(), m.getMonth() + 1, 0).getDate();
