@@ -53,8 +53,16 @@
     .x { border: 0; background: none; cursor: pointer; opacity: .4; font-size: 14px; }
     .x:hover { opacity: 1; }
     @media (max-width: 1000px) { .wrap { grid-template-columns: 1fr; } .nueva { grid-template-columns: 1fr 1fr; } main { padding: 24px 16px 40px; } }
-    .subs { list-style: none; margin: 6px 0 0; padding: 0; font-size: 13px; color: var(--muted, #5b5f66); }
-  .subs li { position: relative; padding-left: 18px; margin: 2px 0; }
+    .subs { margin-top: 6px; font-size: 13px; color: #5b5f66; }
+  .subs summary { list-style: none; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; font-weight: 600; color: #3d4047; user-select: none; }
+  .subs summary::-webkit-details-marker { display: none; }
+  .subs summary::before { content: ""; width: 6px; height: 6px; border-right: 2px solid currentColor; border-bottom: 2px solid currentColor; transform: rotate(-45deg); transition: transform .2s; }
+  .subs[open] summary::before { transform: rotate(45deg); }
+  .subs summary:hover { color: #000; }
+  .subs ul { list-style: none; margin: 6px 0 0; padding: 0; }
+  .subs[open] ul { animation: subsIn .22s ease-out; }
+  @keyframes subsIn { from { opacity: 0; transform: translateY(-4px); } }
+  .subs li { position: relative; padding-left: 18px; margin: 3px 0; }
   .subs li::before { content: "○"; position: absolute; left: 0; }
   .subs li.ok::before { content: "✓"; color: #7a9a10; font-weight: 700; }
 </style>
@@ -86,7 +94,7 @@ const put = b => api(`docs/bonos/${b.id}`, { method: "PUT", body: b });
 let store = await api("docs/bonos");
 // Subtareas de la tarea del calendario que generó cada apunte
 const tareas = new Map((await api("docs/tareas").catch(() => [])).map(t => [t.id, t]));
-const subs = id => { const l = (tareas.get(id)?.sub || []).filter(x => x.texto); return l.length ? `<ul class="subs">${l.map(x => `<li class="${x.hecha ? "ok" : ""}">${esc(x.texto)}</li>`).join("")}</ul>` : ""; };
+const subs = id => { const l = (tareas.get(id)?.sub || []).filter(x => x.texto); return l.length ? `<details class="subs"><summary>${l.length} subtarea${l.length === 1 ? "" : "s"}</summary><ul>${l.map(x => `<li class="${x.hecha ? "ok" : ""}">${esc(x.texto)}</li>`).join("")}</ul></details>` : ""; };
 let cur = null;
 const save = autosaver(() => cur && put(cur));
 

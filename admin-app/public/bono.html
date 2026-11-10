@@ -43,8 +43,16 @@
     .empty { padding: 30px; text-align: center; color: var(--muted); }
     .pie { color: var(--muted); font-size: 12.5px; margin-top: 18px; line-height: 1.6; }
     @media (max-width: 640px) { .kpis { grid-template-columns: 1fr; } .top h1 { font-size: 23px; } td, th { padding: 10px 12px; } td.f { white-space: normal; width: 74px; } }
-    .subs { list-style: none; margin: 6px 0 0; padding: 0; font-size: 13px; color: #5b5f66; }
-  .subs li { position: relative; padding-left: 18px; margin: 2px 0; }
+    .subs { margin-top: 6px; font-size: 13px; color: #5b5f66; }
+  .subs summary { list-style: none; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; font-weight: 600; color: #3d4047; user-select: none; }
+  .subs summary::-webkit-details-marker { display: none; }
+  .subs summary::before { content: ""; width: 6px; height: 6px; border-right: 2px solid currentColor; border-bottom: 2px solid currentColor; transform: rotate(-45deg); transition: transform .2s; }
+  .subs[open] summary::before { transform: rotate(45deg); }
+  .subs summary:hover { color: #000; }
+  .subs ul { list-style: none; margin: 6px 0 0; padding: 0; }
+  .subs[open] ul { animation: subsIn .22s ease-out; }
+  @keyframes subsIn { from { opacity: 0; transform: translateY(-4px); } }
+  .subs li { position: relative; padding-left: 18px; margin: 3px 0; }
   .subs li::before { content: "○"; position: absolute; left: 0; }
   .subs li.ok::before { content: "✓"; color: #7a9a10; font-weight: 700; }
 </style>
@@ -61,7 +69,7 @@
 const esc = s => String(s ?? "").replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
 const hm = min => { const h = Math.floor(min / 60), m = Math.round(min % 60); return m ? `${h} h ${m} min` : `${h} h`; };
 const fecha = s => s ? new Date(s + "T12:00").toLocaleDateString("es-ES", { day: "numeric", month: "short", year: "numeric" }) : "";
-const subs = l => l?.length ? `<ul class="subs">${l.map(x => `<li class="${x.hecha ? "ok" : ""}">${esc(x.texto)}</li>`).join("")}</ul>` : "";
+const subs = l => l?.length ? `<details class="subs"><summary>${l.length} subtarea${l.length === 1 ? "" : "s"}</summary><ul>${l.map(x => `<li class="${x.hecha ? "ok" : ""}">${esc(x.texto)}</li>`).join("")}</ul></details>` : "";
 const mes = s => new Date(s + "T12:00").toLocaleDateString("es-ES", { month: "long", year: "numeric" });
 
 fetch(location.pathname.replace(/\/$/, "") + "/datos").then(r => r.ok ? r.json() : Promise.reject()).then(b => {

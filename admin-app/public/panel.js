@@ -76,7 +76,7 @@ export async function mountShell(active) {
       <div class="side-sec">Comunicación</div>
       <nav>${link("/admin/mensajes", "mensajes", "Mensajes web", "chat")}${link("/admin/correo", "correo", "Correo", "mail")}</nav>
       <div class="side-sec">Sistemas</div>
-      <nav>${link("/admin/servidores", "servidores", "Servidores", "server")}</nav>
+      <nav>${link("/admin/servidores", "servidores", "Servidores", "server")}${link("/admin/consultas", "consultas", "Consultas SQL", "doc")}</nav>
       <div class="side-sec">Cuenta</div>
       <nav>${link("/admin/seguridad", "seguridad", "Seguridad", "shield")}<a href="/" target="_blank" rel="noopener">${icon("web")}Ver la web ↗</a></nav>
       <div class="side-user">

@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Consultas SQL · Panel Majosoft</title>
+  <meta name="robots" content="noindex, nofollow" />
+  <link rel="icon" type="image/svg+xml" href="/assets/favicon.svg" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/admin/panel.css" />
+  <style>
+    * { box-sizing: border-box; }
+    body { margin: 0; font-family: Inter, system-ui, sans-serif; background: var(--cream); color: var(--ink); font-size: 14px; }
+    main { max-width: 1180px; padding: 34px 32px 60px; }
+    .btn { display: inline-flex; align-items: center; gap: 6px; padding: 9px 15px; border-radius: 10px; border: 1px solid var(--line); background: #fff; color: var(--ink); font: inherit; font-weight: 700; font-size: 13px; cursor: pointer; }
+    .btn:hover { border-color: var(--ink); }
+    .btn--ink { background: var(--ink); color: var(--cream); border-color: var(--ink); }
+    .btn[disabled] { opacity: .5; cursor: wait; }
+    .bases { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 12px; }
+    .base { border: 1px solid var(--line); background: #fff; border-radius: 12px; padding: 9px 13px; cursor: pointer; font: inherit; text-align: left; color: inherit; }
+    .base small { display: block; color: var(--muted); font-size: 11.5px; font-weight: 600; }
+    .base b { font-size: 13px; }
+    .base.on { background: var(--ink); color: var(--cream); border-color: var(--ink); }
+    .base.on small { color: var(--lime); }
+    .term { background: #15161a; border-radius: 16px; overflow: hidden; border: 1px solid #15161a; }
+    .term-head { display: flex; justify-content: space-between; align-items: center; gap: 10px; padding: 10px 14px; color: #a9a99c; font-size: 12px; border-bottom: 1px solid #2a2c31; flex-wrap: wrap; }
+    .term-head .ro { color: var(--lime); font-weight: 700; }
+    textarea { display: block; width: 100%; min-height: 150px; resize: vertical; border: none; outline: none; background: transparent; color: #f2f1e8; font: 13.5px/1.6 "JetBrains Mono", ui-monospace, monospace; padding: 14px 16px; tab-size: 2; }
+    .acts { display: flex; gap: 8px; align-items: center; padding: 10px 14px; border-top: 1px solid #2a2c31; flex-wrap: wrap; }
+    .acts .hint { color: #8c8c80; font-size: 12px; margin-left: auto; }
+    .acts .btn { background: var(--lime); border-color: var(--lime); color: #15161a; }
+    .acts .btn.sec { background: transparent; color: #d9d8cc; border-color: #3a3c42; }
+    .res { margin-top: 14px; background: #fff; border: 1px solid var(--line); border-radius: 16px; overflow: hidden; }
+    .res-head { display: flex; justify-content: space-between; gap: 10px; padding: 11px 16px; border-bottom: 1px solid var(--line); color: var(--muted); font-size: 12.5px; flex-wrap: wrap; }
+    .scroll { overflow: auto; max-height: 60vh; }
+    table { border-collapse: collapse; width: 100%; font: 12.5px/1.45 "JetBrains Mono", ui-monospace, monospace; }
+    th, td { padding: 7px 12px; border-bottom: 1px solid #eeede5; text-align: left; vertical-align: top; white-space: pre; max-width: 420px; overflow: hidden; text-overflow: ellipsis; }
+    th { position: sticky; top: 0; background: #fafaf5; font-weight: 600; z-index: 1; }
+    tr:hover td { background: #fafaf5; }
+    td.null { color: #b0b0a4; font-style: italic; }
+    .err { padding: 16px; color: var(--bad); white-space: pre-wrap; font: 13px/1.5 "JetBrains Mono", ui-monospace, monospace; }
+    .empty { padding: 30px 16px; text-align: center; color: var(--muted); }
+    .hist { margin-top: 14px; }
+    .hist summary { cursor: pointer; font-weight: 700; color: var(--muted); font-size: 13px; }
+    .hist button { display: block; width: 100%; text-align: left; border: none; border-bottom: 1px solid #eeede5; background: #fff; padding: 8px 12px; font: 12px "JetBrains Mono", ui-monospace, monospace; cursor: pointer; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: inherit; }
+    .hist button:hover { background: #fafaf5; }
+    .hist .list { margin-top: 8px; border: 1px solid var(--line); border-radius: 12px; overflow: hidden; }
+    @media (max-width: 1000px) { main { padding: 24px 16px 40px; } }
+  </style>
+</head>
+<body>
+  <main>
+    <div class="page-head"><div><div class="crumbs">Sistemas</div><h1>Consultas SQL</h1><p>Consulta las bases de datos de las academias. Solo lectura: las órdenes que modifican datos las rechaza el propio servidor.</p></div></div>
+    <div class="bases" id="bases"></div>
+    <div class="term">
+      <div class="term-head"><span id="donde">—</span><span class="ro">● Solo lectura · máx. 15 s · 1000 filas</span></div>
+      <textarea id="sql" spellcheck="false" placeholder="SELECT * FROM … LIMIT 50;"></textarea>
+      <div class="acts">
+        <button class="btn" id="run">▶ Ejecutar</button>
+        <button class="btn sec" id="tablas">Ver tablas</button>
+        <button class="btn sec" id="csvBtn" hidden>Descargar CSV</button>
+        <span class="hint">⌘ / Ctrl + Enter para ejecutar</span>
+      </div>
+    </div>
+    <div id="res"></div>
+    <details class="hist" id="hist" hidden><summary>Consultas recientes</summary><div class="list" id="histList"></div></details>
+  </main>
+<script type="module">
+import { api, mountShell, toast } from "/admin/panel.js";
+await mountShell("consultas");
+const $ = id => document.getElementById(id);
+const esc = s => String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]);
+const leer = k => { try { return JSON.parse(localStorage.getItem(k)); } catch { return null; } };
+const guardar = (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} };
+
+const bases = await api("consultas/bases");
+let base = bases.find(b => b.id === leer("mj-sql-base")) || bases[0], ultimo = null;
+const TABLAS = { pg: "SELECT table_schema, table_name FROM information_schema.tables WHERE table_schema NOT IN ('pg_catalog','information_schema') ORDER BY 1, 2;",
+  mysql: "SELECT table_name, table_rows FROM information_schema.tables WHERE table_schema = DATABASE() ORDER BY 1;" };
+
+function pintarBases() {
+  $("bases").innerHTML = bases.map(b => `<button class="base ${b.id === base.id ? "on" : ""}" data-b="${b.id}"><small>${esc(b.servidor)}</small><b>${esc(b.nombre)}</b></button>`).join("");
+  $("donde").textContent = `${base.servidor} · ${base.nombre}`;
+}
+$("bases").onclick = e => { const b = e.target.closest("[data-b]"); if (!b) return; base = bases.find(x => x.id === b.dataset.b); guardar("mj-sql-base", base.id); pintarBases(); };
+$("sql").value = leer("mj-sql-borrador") || "";
+$("sql").oninput = () => guardar("mj-sql-borrador", $("sql").value);
+
+function pintarHist() {
+  const h = leer("mj-sql-hist") || [];
+  $("hist").hidden = !h.length;
+  $("histList").innerHTML = h.map((x, i) => `<button data-h="${i}" title="${esc(x.sql)}">${esc(x.sql.replace(/\s+/g, " "))}</button>`).join("");
+}
+$("histList").onclick = e => { const b = e.target.closest("[data-h]"); if (b) { $("sql").value = (leer("mj-sql-hist") || [])[+b.dataset.h].sql; $("sql").focus(); } };
+
+async function ejecutar(sql) {
+  sql = sql.trim(); if (!sql) return toast("Escribe una consulta", true);
+  $("run").disabled = true; $("res").innerHTML = `<div class="res"><div class="empty">Ejecutando…</div></div>`;
+  try {
+    const r = await api("consultas", { method: "POST", body: { base: base.id, sql } });
+    ultimo = r; $("csvBtn").hidden = !r.columnas.length;
+    const h = [{ sql }, ...(leer("mj-sql-hist") || []).filter(x => x.sql !== sql)].slice(0, 15); guardar("mj-sql-hist", h); pintarHist();
+    $("res").innerHTML = `<div class="res"><div class="res-head"><span>${r.columnas.length ? `${r.total} fila${r.total === 1 ? "" : "s"}${r.truncado ? " · se muestran las primeras " + r.filas.length : ""}` : "Hecho, sin resultados"}</span><span>${r.ms} ms</span></div>
+      ${r.columnas.length ? `<div class="scroll"><table><thead><tr>${r.columnas.map(c => `<th>${esc(c)}</th>`).join("")}</tr></thead><tbody>${r.filas.map(f => `<tr>${f.map(v => v === "" || v === "NULL" ? `<td class="null">${v === "" ? "" : "NULL"}</td>` : `<td title="${esc(v)}">${esc(v)}</td>`).join("")}</tr>`).join("")}</tbody></table></div>` : ""}</div>`;
+  } catch (e) {
+    ultimo = null; $("csvBtn").hidden = true;
+    $("res").innerHTML = `<div class="res"><div class="err">${esc(e.message)}</div></div>`;
+  } finally { $("run").disabled = false; }
+}
+$("run").onclick = () => ejecutar($("sql").value);
+$("tablas").onclick = () => ejecutar(TABLAS[base.motor]);
+$("sql").onkeydown = e => {
+  if (e.key === "Enter" && (e.metaKey || e.ctrlKey)) { e.preventDefault(); ejecutar($("sql").value); }
+  if (e.key === "Tab") { e.preventDefault(); document.execCommand("insertText", false, "  "); }
+};
+$("csvBtn").onclick = () => {
+  if (!ultimo) return;
+  const q = v => /[",\n]/.test(v) ? `"${v.replace(/"/g, '""')}"` : v;
+  const txt = [ultimo.columnas, ...ultimo.filas].map(f => f.map(q).join(",")).join("\n");
+  const a = Object.assign(document.createElement("a"), { href: URL.createObjectURL(new Blob(["﻿" + txt], { type: "text/csv" })), download: `${base.id}-${new Date().toISOString().slice(0, 10)}.csv` });
+  a.click(); URL.revokeObjectURL(a.href);
+};
+pintarBases(); pintarHist();
+</script>
+</body>
+</html>

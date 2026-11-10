@@ -11,6 +11,7 @@ import * as copias from "./lib/copias.js";
 import * as salud from "./lib/salud.js";
 import * as vigilancia from "./lib/vigilancia.js";
 import * as calendario from "./lib/calendario.js";
+import * as consultas from "./lib/consultas.js";
 import {
   verifyPassword, hashPassword, DUMMY_HASH, passwordProblems,
   newTotpSecret, verifyTotp, totpUri, newToken, sha256,
@@ -393,7 +394,16 @@ app.post("/admin/api/servidores/copias", async (req, res) => {
 });
 
 /* ===== Páginas privadas ===== */
-const PAGES = { "": "index.html", presupuestos: "presupuestos.html", facturas: "facturas.html", correo: "correo.html", mensajes: "mensajes.html", seguridad: "seguridad.html", servidores: "servidores.html", bonos: "bonos.html", tareas: "tareas.html" };
+/* ===== Consultas SQL de solo lectura a las academias ===== */
+app.get("/admin/api/consultas/bases", (req, res) => res.json(consultas.BASES.map(({ id, servidor, nombre, motor }) => ({ id, servidor, nombre, motor }))));
+app.post("/admin/api/consultas", async (req, res) => {
+  const { base, sql } = req.body || {};
+  audit("sql_query", { user: req.session.user, ip: req.ip, detail: `${base}: ${String(sql || "").replace(/\s+/g, " ").slice(0, 300)}` });
+  try { res.json(await consultas.consultar(String(base || ""), sql)); }
+  catch (e) { res.status(e.status || 500).json({ error: e.message }); }
+});
+
+const PAGES = { "": "index.html", presupuestos: "presupuestos.html", facturas: "facturas.html", correo: "correo.html", mensajes: "mensajes.html", seguridad: "seguridad.html", servidores: "servidores.html", consultas: "consultas.html", bonos: "bonos.html", tareas: "tareas.html" };
 app.get("/admin/panel.js", (req, res) => res.sendFile(path.join(PUBLIC, "panel.js")));
 app.get(["/admin", "/admin/:page"], (req, res, next) => {
   const f = PAGES[(req.params.page || "").replace(/\.html$/, "")];
