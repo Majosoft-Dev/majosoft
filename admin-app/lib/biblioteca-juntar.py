@@ -45,7 +45,7 @@ for p in piezas:
         p["grupos"].append("animaciones")
     if not p["grupos"]:
         print("Sin grupo:", p["id"])
-grupos = [{"id": k, "titulo": g["titulo"]} for k, g in GRUPOS.items()]
+grupos = [{"id": k, **{c: g.get(c, "") for c in ("titulo", "familia", "descripcion", "portada")}} for k, g in GRUPOS.items()]
 
 json.dump({"proyectos": list(proyectos.values()), "grupos": grupos, "piezas": piezas}, open(out, "w"), ensure_ascii=False)
 print(f"{len(piezas)} piezas de {len(proyectos)} proyectos → {os.path.normpath(out)}")

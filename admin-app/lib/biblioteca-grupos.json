@@ -9,7 +9,10 @@
    "wp-login-foto",
    "ro-acceso-caja",
    "fi-teclado-pin"
-  ]
+  ],
+  "familia": "Entrar y moverse",
+  "descripcion": "Pantallas de entrada: contraseña, dos pasos, PIN.",
+  "portada": "login-dos-pasos"
  },
  "menus": {
   "titulo": "Menús y navegación",
@@ -24,7 +27,10 @@
    "ro-menu-movil-desplegable",
    "ar-barra-superior-lima",
    "paginacion"
-  ]
+  ],
+  "familia": "Entrar y moverse",
+  "descripcion": "Menús laterales, barras superiores y menús de móvil.",
+  "portada": "ro-menu-lateral-iconos"
  },
  "cabeceras": {
   "titulo": "Cabeceras de página",
@@ -35,7 +41,10 @@
    "cabecera-pagina",
    "wp-cabecera-pagina",
    "re-ficha-cabecera"
-  ]
+  ],
+  "familia": "Entrar y moverse",
+  "descripcion": "Título de página con migas, antetítulo y acciones.",
+  "portada": "re-cabecera-pagina"
  },
  "selectores": {
   "titulo": "Selectores",
@@ -59,7 +68,10 @@
    "um-listado-tarjeta",
    "ro-galeria-documentos",
    "arbol-casillas"
-  ]
+  ],
+  "familia": "Controles",
+  "descripcion": "Pestañas, segmentados, desplegables: elegir entre opciones.",
+  "portada": "fi-segmentado-pastilla"
  },
  "botones": {
   "titulo": "Botones",
@@ -70,7 +82,10 @@
    "wp-botones-pildora",
    "ce-boton-estados",
    "enlace-compartir"
-  ]
+  ],
+  "familia": "Controles",
+  "descripcion": "Jerarquía de botones, píldoras y botones con estado.",
+  "portada": "wp-botones-pildora"
  },
  "campos": {
   "titulo": "Campos y formularios",
@@ -87,7 +102,10 @@
    "sm-panel-lateral-precio",
    "campo-sugerencias",
    "fi-selector-mes"
-  ]
+  ],
+  "familia": "Controles",
+  "descripcion": "Campos sueltos, filas de ajuste y formularios completos.",
+  "portada": "re-fila-ajuste"
  },
  "interruptores": {
   "titulo": "Interruptores y casillas",
@@ -96,7 +114,10 @@
    "interruptor",
    "arbol-casillas",
    "um-selector-modulos"
-  ]
+  ],
+  "familia": "Controles",
+  "descripcion": "Switches, casillas y árboles con casillas.",
+  "portada": "interruptor"
  },
  "subidas": {
   "titulo": "Subida de archivos",
@@ -106,7 +127,10 @@
    "bb-subida-miniaturas",
    "um-tema-arrastrable",
    "importar-archivo-seleccion"
-  ]
+  ],
+  "familia": "Controles",
+  "descripcion": "Soltar fotos, portadas y archivos con vista previa.",
+  "portada": "ce-zona-foto"
  },
  "editores": {
   "titulo": "Editores",
@@ -120,7 +144,10 @@
    "ce-vista-google",
    "wp-vista-previa-email",
    "sm-tarjeta-promocion"
-  ]
+  ],
+  "familia": "Controles",
+  "descripcion": "Texto enriquecido, documentos y vistas previas.",
+  "portada": "editor-documento-a4"
  },
  "tablas": {
   "titulo": "Tablas y listados",
@@ -144,7 +171,10 @@
    "ro-tabla-a-fichas",
    "fi-jornada-desplegable",
    "accion-en-bloque-flotante"
-  ]
+  ],
+  "familia": "Mostrar datos",
+  "descripcion": "Tablas, filtros, paginación y filas de lista.",
+  "portada": "tabla-listado-2"
  },
  "tarjetas": {
   "titulo": "Tarjetas",
@@ -158,7 +188,10 @@
    "ro-galeria-documentos",
    "um-tema-arrastrable",
    "ar-semana-selector"
-  ]
+  ],
+  "familia": "Mostrar datos",
+  "descripcion": "Tarjetas de producto, curso, resumen o bloque.",
+  "portada": "bb-tarjeta-producto-estado"
  },
  "calendarios": {
   "titulo": "Calendarios y agendas",
@@ -172,7 +205,10 @@
    "ro-calendario-publicaciones",
    "ro-agenda-dias",
    "fi-selector-mes"
-  ]
+  ],
+  "familia": "Mostrar datos",
+  "descripcion": "Meses, ocupación, agendas y selector de mes.",
+  "portada": "wp-calendario-ocupacion"
  },
  "cifras": {
   "titulo": "Cifras y KPIs",
@@ -189,7 +225,10 @@
    "ro-kpi-en-vivo",
    "vista-publica-cliente",
    "ce-grafico-evolucion"
-  ]
+  ],
+  "familia": "Mostrar datos",
+  "descripcion": "KPIs, cifras en vivo y métricas con umbral.",
+  "portada": "kpis"
  },
  "graficas": {
   "titulo": "Gráficas",
@@ -206,7 +245,10 @@
    "metricas-con-barra",
    "ro-grafica-barras",
    "bloque-hoy"
-  ]
+  ],
+  "familia": "Mostrar datos",
+  "descripcion": "Barras, líneas, mapas de calor y rankings.",
+  "portada": "grafica-barras-mensual"
  },
  "etiquetas": {
   "titulo": "Etiquetas y estados",
@@ -220,7 +262,10 @@
    "re-lista-estancias",
    "bb-tabla-estado-editable",
    "bb-tarjeta-producto-estado"
-  ]
+  ],
+  "familia": "Mostrar datos",
+  "descripcion": "Pastillas de estado, insignias y niveles.",
+  "portada": "pastillas-estado"
  },
  "modales": {
   "titulo": "Modales y diálogos",
@@ -233,7 +278,10 @@
    "wp-confirmacion-propia",
    "ar-modal-icono",
    "importar-archivo-seleccion"
-  ]
+  ],
+  "familia": "Avisar y detallar",
+  "descripcion": "Confirmaciones y ventanas de edición.",
+  "portada": "dialogo-confirmacion"
  },
  "avisos": {
   "titulo": "Avisos y toasts",
@@ -250,7 +298,10 @@
    "ro-tareas-para-hoy",
    "re-franja-viendo-como",
    "accion-en-bloque-flotante"
-  ]
+  ],
+  "familia": "Avisar y detallar",
+  "descripcion": "Toasts, banners y «requiere tu atención».",
+  "portada": "fi-avisos-toast"
  },
  "vacios": {
   "titulo": "Estados vacíos y de carga",
@@ -260,7 +311,10 @@
    "um-estado-vacio",
    "estados-vacios",
    "wp-estado-vacio"
-  ]
+  ],
+  "familia": "Avisar y detallar",
+  "descripcion": "Qué se ve cuando no hay nada o está cargando.",
+  "portada": "um-skeleton"
  },
  "mensajes": {
   "titulo": "Chat y mensajes",
@@ -272,7 +326,10 @@
    "um-tickets-acordeon",
    "ro-envio-destinatarios",
    "wp-vista-previa-email"
-  ]
+  ],
+  "familia": "Avisar y detallar",
+  "descripcion": "Chats, bandejas, correos y tickets.",
+  "portada": "re-chat"
  },
  "detalle": {
   "titulo": "Fichas y paneles de detalle",
@@ -288,7 +345,10 @@
    "um-tickets-acordeon",
    "ro-desplegable-acordeon",
    "modal-edicion-ancho"
-  ]
+  ],
+  "familia": "Avisar y detallar",
+  "descripcion": "Fichas, cajones laterales y desplegables.",
+  "portada": "fi-solicitud-correccion"
  },
  "arrastrar": {
   "titulo": "Arrastrar y ordenar",
@@ -297,7 +357,10 @@
    "um-tema-arrastrable",
    "sm-tarjeta-producto",
    "ar-asignar-arrastrando"
-  ]
+  ],
+  "familia": "Transversal",
+  "descripcion": "Reordenar y asignar arrastrando.",
+  "portada": "ar-asignar-arrastrando"
  },
  "progreso": {
   "titulo": "Progreso",
@@ -310,7 +373,10 @@
    "um-nivel-y-porcentaje",
    "metricas-con-barra",
    "ce-boton-estados"
-  ]
+  ],
+  "familia": "Mostrar datos",
+  "descripcion": "Barras y anillos de avance.",
+  "portada": "ro-envio-destinatarios"
  },
  "movil": {
   "titulo": "Pensado para móvil",
@@ -324,7 +390,10 @@
    "vista-publica-cliente",
    "calendario-mes-tarjetas",
    "fi-teclado-pin"
-  ]
+  ],
+  "familia": "Transversal",
+  "descripcion": "Piezas que cambian o nacen para el móvil.",
+  "portada": "ro-tabla-a-fichas"
  },
  "animaciones": {
   "titulo": "Animaciones",
@@ -356,6 +425,9 @@
    "campos-formulario",
    "fi-teclado-pin",
    "um-botones-jerarquia"
-  ]
+  ],
+  "familia": "Transversal",
+  "descripcion": "Movimiento: pastillas que se deslizan, entradas, esqueletos.",
+  "portada": "ce-boton-estados"
  }
 }

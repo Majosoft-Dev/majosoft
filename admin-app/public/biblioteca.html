@@ -14,53 +14,100 @@
   <style>
     * { box-sizing: border-box; }
     body { margin: 0; font-family: Inter, system-ui, sans-serif; background: var(--cream); color: var(--ink); font-size: 14px; }
-    main { max-width: 1180px; padding: 34px 32px 60px; }
+    main { max-width: 1400px; padding: 34px 32px 60px; }
+    .page-head { align-items: center; }
 
-    /* Barra de filtros */
-    .filtros { display: flex; flex-direction: column; gap: 10px; margin-bottom: 26px; position: sticky; top: 0; z-index: 5; background: var(--cream); padding: 10px 0; }
-    .buscar { position: relative; max-width: 420px; }
-    .buscar svg { position: absolute; left: 12px; top: 50%; translate: 0 -50%; width: 16px; height: 16px; color: var(--muted); }
-    .buscar input { width: 100%; border: 1px solid var(--line); background: #fff; border-radius: 12px; padding: 10px 12px 10px 36px; font: inherit; color: var(--ink); outline: none; }
-    .buscar input:focus { border-color: var(--ink); }
-    .chips { display: flex; flex-wrap: wrap; gap: 6px; }
-    .chip { border: 1px solid var(--line); background: #fff; color: var(--ink2); border-radius: 99px; padding: 6px 12px; font: inherit; font-size: 12.5px; font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; }
-    .chip i { width: 8px; height: 8px; border-radius: 50%; background: var(--c, var(--muted)); }
-    .chip small { color: var(--muted); font-weight: 600; }
-    .chip.on { background: var(--ink); color: var(--cream); border-color: var(--ink); }
-    .chip.on small { color: #a9a99c; }
+    /* Buscador grande */
+    .buscar { position: relative; width: min(100%, 400px); }
+    .buscar svg { position: absolute; left: 14px; top: 50%; translate: 0 -50%; width: 17px; height: 17px; color: var(--muted); pointer-events: none; }
+    .buscar input { width: 100%; border: 1px solid var(--line); background: #fff; border-radius: 14px; padding: 12px 44px 12px 40px; font: inherit; font-size: 14.5px; color: var(--ink); outline: none; transition: border-color .2s, box-shadow .2s; }
+    .buscar input:focus { border-color: var(--ink); box-shadow: 0 0 0 4px rgba(21,22,26,.06); }
+    .buscar kbd { position: absolute; right: 12px; top: 50%; translate: 0 -50%; font: 600 11px "JetBrains Mono", monospace; color: var(--muted); border: 1px solid var(--line); border-radius: 6px; padding: 2px 7px; background: var(--cream); }
+    .buscar input:focus + kbd, .buscar input:not(:placeholder-shown) + kbd { display: none; }
 
-    /* Secciones y tarjetas */
-    .sec { margin-bottom: 34px; }
-    .sec h2 { font-size: 17px; letter-spacing: -.01em; margin: 0 0 12px; display: flex; align-items: baseline; gap: 8px; }
-    .sec h2 small { color: var(--muted); font-size: 12.5px; font-weight: 600; }
-    .rejilla { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 14px; }
-    .pieza { background: #fff; border: 1px solid var(--line); border-radius: 16px; overflow: hidden; cursor: pointer; text-align: left; padding: 0; font: inherit; color: inherit; display: flex; flex-direction: column; }
-    .pieza:hover { border-color: var(--ink2); box-shadow: 0 10px 30px rgba(21,22,26,.08); transform: translateY(-2px); }
-    .pieza:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
-    .mini { position: relative; height: 190px; overflow: hidden; background: #f7f7f2; border-bottom: 1px solid var(--line); }
-    .mini iframe { position: absolute; top: 0; left: 0; width: 182%; height: 182%; border: 0; transform: scale(.55); transform-origin: 0 0; pointer-events: none; }
-    .pieza .txt { padding: 12px 14px 14px; display: flex; flex-direction: column; gap: 6px; }
-    .pieza b { font-size: 14px; letter-spacing: -.01em; }
-    .pieza p { margin: 0; color: var(--muted); font-size: 12.5px; line-height: 1.45; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
-    .meta { display: flex; gap: 6px; flex-wrap: wrap; }
-    .pro { display: inline-flex; align-items: center; gap: 5px; font-size: 11.5px; font-weight: 700; padding: 3px 8px; border-radius: 99px; background: color-mix(in srgb, var(--c) 14%, #fff); color: color-mix(in srgb, var(--c) 75%, #000); }
-    .pro i { width: 6px; height: 6px; border-radius: 50%; background: var(--c); }
-    .stack { font-size: 11.5px; font-weight: 600; color: var(--muted); padding: 3px 8px; border-radius: 99px; background: var(--cream); }
-    button.stack { border: 0; font: inherit; font-size: 11.5px; font-weight: 600; cursor: pointer; }
-    button.stack:hover { background: var(--ink); color: var(--cream); }
-    .vacio { text-align: center; color: var(--muted); padding: 60px 20px; background: #fff; border: 1px dashed var(--line); border-radius: 16px; }
+    /* Estructura: índice a la izquierda, contenido a la derecha */
+    .bib { display: grid; grid-template-columns: 216px minmax(0, 1fr); gap: 36px; align-items: start; }
+    .indice { position: sticky; top: 24px; max-height: calc(100vh - 48px); overflow-y: auto; display: flex; flex-direction: column; gap: 2px; padding-bottom: 20px; scrollbar-width: thin; }
+    .indice .fam { font-size: 10.5px; font-weight: 800; letter-spacing: .09em; text-transform: uppercase; color: var(--muted); margin: 16px 10px 4px; }
+    .indice a { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 7px 10px; border-radius: 9px; color: var(--ink2); text-decoration: none; font-weight: 600; font-size: 13.5px; transition: background .15s, color .15s; }
+    .indice a small { color: var(--muted); font-weight: 600; font-size: 11.5px; font-variant-numeric: tabular-nums; }
+    .indice a:hover { background: #fff; color: var(--ink); }
+    .indice a.on { background: var(--ink); color: var(--cream); }
+    .indice a.on small { color: var(--lime); }
+    .indice a.vacio-g { opacity: .4; }
+    .indice .todas { font-weight: 800; color: var(--ink); }
+    .indice .pro-sel { margin: 6px 0 4px; }
+    .indice .pro-sel label { display: block; font-size: 10.5px; font-weight: 800; letter-spacing: .09em; text-transform: uppercase; color: var(--muted); margin: 0 10px 6px; }
+    .indice select { width: 100%; }
+
+    /* Cabecera de cada vista */
+    .vista-head { display: flex; align-items: flex-end; justify-content: space-between; gap: 16px; flex-wrap: wrap; margin-bottom: 20px; }
+    .vista-head .miga { font-size: 12px; font-weight: 700; color: var(--muted); margin-bottom: 6px; }
+    .vista-head .miga a { color: inherit; text-decoration: none; }
+    .vista-head .miga a:hover { color: var(--ink); }
+    .vista-head h2 { margin: 0; font-size: 26px; letter-spacing: -.03em; }
+    .vista-head p { margin: 4px 0 0; color: var(--muted); font-size: 14px; }
+    .filtro-on { display: inline-flex; align-items: center; gap: 8px; background: #fff; border: 1px solid var(--line); border-radius: 99px; padding: 6px 6px 6px 12px; font-size: 12.5px; font-weight: 700; }
+    .filtro-on i { width: 8px; height: 8px; border-radius: 50%; background: var(--c); }
+    .filtro-on button { border: 0; background: var(--cream); border-radius: 99px; width: 22px; height: 22px; cursor: pointer; color: var(--muted); font-size: 12px; }
+    .filtro-on button:hover { background: var(--ink); color: var(--cream); }
+
+    /* Portada: losas por grupo */
+    .familia { margin-bottom: 34px; }
+    .familia h3 { font-size: 11.5px; font-weight: 800; letter-spacing: .09em; text-transform: uppercase; color: var(--muted); margin: 0 0 12px; }
+    .losas { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 14px; }
+    .losa { display: flex; flex-direction: column; background: #fff; border: 1px solid var(--line); border-radius: 18px; overflow: hidden; text-decoration: none; color: inherit; }
+    .losa .mini { height: 150px; }
+    .losa .txt { padding: 14px 16px 16px; display: flex; flex-direction: column; gap: 4px; flex: 1; }
+    .losa b { font-size: 15.5px; letter-spacing: -.015em; }
+    .losa p { margin: 0; color: var(--muted); font-size: 12.5px; line-height: 1.45; flex: 1; }
+    .losa .pie { display: flex; align-items: center; justify-content: space-between; margin-top: 8px; font-size: 12px; font-weight: 700; color: var(--ink2); }
+    .puntos { display: flex; }
+    .puntos i { width: 12px; height: 12px; border-radius: 50%; background: var(--c); border: 2px solid #fff; margin-left: -4px; }
+
+    /* Tarjetas de pieza */
+    .rejilla { display: grid; grid-template-columns: repeat(auto-fill, minmax(270px, 1fr)); gap: 16px; }
+    .pieza { background: #fff; border: 1px solid var(--line); border-radius: 18px; overflow: hidden; cursor: pointer; text-align: left; padding: 0; font: inherit; color: inherit; display: flex; flex-direction: column; text-decoration: none; }
+    .pieza .mini { height: 200px; }
+    .pieza .txt { padding: 13px 15px 15px; display: flex; flex-direction: column; gap: 8px; }
+    .pieza b { font-size: 14px; letter-spacing: -.01em; line-height: 1.35; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+    .meta { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; }
+    .pro { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 700; color: var(--ink2); }
+    .pro i { width: 8px; height: 8px; border-radius: 50%; background: var(--c); flex: none; }
+    .stack { font-size: 11.5px; font-weight: 600; color: var(--muted); }
+    .stack::before { content: "·"; margin-right: 6px; }
+
+    .losa, .pieza { transition: border-color .2s, box-shadow .25s, transform .25s cubic-bezier(.16, 1, .3, 1); }
+    .losa:hover, .pieza:hover { border-color: #bdbcb0; box-shadow: 0 14px 34px rgba(21,22,26,.09); transform: translateY(-3px); }
+    .losa:focus-visible, .pieza:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+
+    /* Miniatura viva: la pieza a escala, centrada si es baja */
+    .mini { position: relative; overflow: hidden; background: #fff; border-bottom: 1px solid var(--line); }
+    .mini iframe { position: absolute; top: 0; left: 0; width: 182%; height: 182%; border: 0; transform: translateY(var(--y, 0px)) scale(.55); transform-origin: 0 0; pointer-events: none; opacity: 0; transition: opacity .3s; }
+    .mini iframe.listo { opacity: 1; }
+    .mini::after { content: "Abrir"; position: absolute; right: 10px; bottom: 10px; background: var(--ink); color: var(--cream); font-size: 11.5px; font-weight: 700; padding: 5px 10px; border-radius: 99px; opacity: 0; translate: 0 4px; transition: opacity .2s, translate .2s; }
+    .pieza:hover .mini::after { opacity: 1; translate: 0 0; }
+    .losa .mini::after { content: "Ver grupo"; }
+    .losa:hover .mini::after { opacity: 1; translate: 0 0; }
+
+    .vacio { text-align: center; color: var(--muted); padding: 60px 20px; background: #fff; border: 1px dashed var(--line); border-radius: 18px; }
     .vacio b { display: block; color: var(--ink); font-size: 15px; margin-bottom: 4px; }
+    .vacio button { margin-top: 12px; border: 1px solid var(--line); background: #fff; border-radius: 99px; padding: 7px 14px; font: inherit; font-weight: 700; cursor: pointer; }
 
     /* Detalle a pantalla completa */
     .det { position: fixed; inset: 0; z-index: 60; background: rgba(21,22,26,.45); display: none; padding: 24px; }
-    .det.on { display: grid; place-items: stretch; }
-    .det-in { background: var(--cream); border-radius: 18px; display: grid; grid-template-columns: minmax(0, 1fr) 420px; overflow: hidden; box-shadow: 0 30px 80px rgba(0,0,0,.3); max-height: calc(100vh - 48px); }
+    .det.on { display: grid; animation: det-in .2s ease both; }
+    .det.on .det-in { animation: det-sube .3s cubic-bezier(.16, 1, .3, 1) both; }
+    @keyframes det-in { from { opacity: 0; } }
+    @keyframes det-sube { from { transform: translateY(14px) scale(.99); opacity: 0; } }
+    .det-in { background: var(--cream); border-radius: 20px; display: grid; grid-template-columns: minmax(0, 1fr) 420px; overflow: hidden; box-shadow: 0 30px 80px rgba(0,0,0,.3); max-height: calc(100vh - 48px); }
     .escena { display: flex; flex-direction: column; min-width: 0; min-height: 0; border-right: 1px solid var(--line); }
     .escena-bar { display: flex; align-items: center; gap: 8px; padding: 12px 14px; border-bottom: 1px solid var(--line); background: #fff; }
     .tabs { display: flex; gap: 4px; background: var(--cream); border: 1px solid var(--line); padding: 3px; border-radius: 10px; }
     .tabs button { border: none; background: none; padding: 6px 11px; border-radius: 7px; font: inherit; font-size: 12px; font-weight: 700; color: var(--muted); cursor: pointer; }
     .tabs button.on { background: var(--ink); color: var(--cream); }
     .escena-bar .sp { flex: 1; }
+    .escena-bar .pos { font-size: 12px; font-weight: 700; color: var(--muted); font-variant-numeric: tabular-nums; margin-right: 4px; }
     .ico { border: 1px solid var(--line); background: #fff; border-radius: 9px; width: 34px; height: 34px; display: grid; place-items: center; cursor: pointer; color: var(--ink); font-size: 16px; }
     .ico:hover { border-color: var(--ink); }
     .lienzo { flex: 1; overflow: auto; padding: 22px; display: flex; justify-content: center; align-items: flex-start; background-image: radial-gradient(#dcdbd0 1px, transparent 1px); background-size: 16px 16px; }
@@ -70,6 +117,9 @@
     .ficha h4 { margin: 0 0 6px; font-size: 11.5px; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }
     .ficha p { margin: 0; line-height: 1.55; }
     .ficha ul { margin: 0; padding-left: 18px; line-height: 1.55; display: flex; flex-direction: column; gap: 6px; }
+    .etis { display: flex; flex-wrap: wrap; gap: 6px; }
+    .etis a { font-size: 11.5px; font-weight: 700; color: var(--ink2); background: #fff; border: 1px solid var(--line); padding: 4px 9px; border-radius: 99px; text-decoration: none; }
+    .etis a:hover { background: var(--ink); color: var(--cream); border-color: var(--ink); }
     .usar { background: #f1f2d6; border-radius: 12px; padding: 12px 14px; }
     .usar h4 { color: #6b7000; }
     .arch a { display: block; font: 12px "JetBrains Mono", monospace; color: var(--ink2); text-decoration: none; padding: 6px 8px; border-radius: 7px; background: #fff; border: 1px solid var(--line); margin-bottom: 4px; overflow-wrap: anywhere; }
@@ -90,40 +140,47 @@
       .escena { border-right: 0; border-bottom: 1px solid var(--line); min-height: 60vh; }
       .ficha { overflow: visible; }
     }
+    /* Tablet y móvil: el índice pasa a una fila de pastillas que se desliza */
+    @media (max-width: 900px) {
+      .bib { grid-template-columns: 1fr; gap: 18px; }
+      .indice { position: static; flex-direction: row; overflow-x: auto; max-height: none; gap: 6px; padding: 0 16px 4px; margin: 0 -16px; scrollbar-width: none; }
+      .indice .fam, .indice .pro-sel label { display: none; }
+      .indice a { flex: none; background: #fff; border: 1px solid var(--line); border-radius: 99px; padding: 6px 12px; font-size: 12.5px; }
+      .indice a.on { border-color: var(--ink); }
+      .indice .pro-sel { flex: none; margin: 0; min-width: 170px; }
+    }
     @media (max-width: 700px) {
       main { padding: 22px 16px 50px; }
-      .rejilla { grid-template-columns: 1fr; }
-      .filtros { position: static; }
-      .chips { flex-wrap: nowrap; overflow-x: auto; margin: 0 -16px; padding: 0 16px; scrollbar-width: none; }
-      .chip { flex: none; }
+      .rejilla, .losas { grid-template-columns: 1fr; }
       .tabs-ancho { display: none; }
     }
+    @media (prefers-reduced-motion: reduce) { .losa, .pieza, .mini iframe, .det, .det-in { transition: none !important; animation: none !important; } }
   </style>
 </head>
 <body>
   <main>
     <div class="page-head">
       <div><div class="crumbs">Diseño</div><h1>Biblioteca de UI</h1><p id="resumen">Todas las piezas de los paneles que hemos construido.</p></div>
+      <label class="buscar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg><input id="q" type="search" placeholder="Buscar una pieza…" aria-label="Buscar una pieza" autocomplete="off" /><kbd>/</kbd></label>
     </div>
-    <div class="filtros">
-      <label class="buscar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg><input id="q" type="search" placeholder="Buscar: calendario, tabla, login, móvil…" autocomplete="off" /></label>
-      <div class="chips" id="fProyecto"></div>
-      <div class="chips" id="fCategoria"></div>
+    <div class="bib">
+      <nav class="indice" id="indice" aria-label="Grupos"></nav>
+      <section id="vista"></section>
     </div>
-    <div id="lista"></div>
   </main>
 
-  <div class="det" id="det" role="dialog" aria-modal="true">
+  <div class="det" id="det" role="dialog" aria-modal="true" aria-label="Pieza">
     <div class="det-in">
       <div class="escena">
         <div class="escena-bar">
           <div class="tabs tabs-ancho" id="ancho"><button data-w="100%" class="on">Escritorio</button><button data-w="820px">Tablet</button><button data-w="390px">Móvil</button></div>
           <span class="sp"></span>
+          <span class="pos" id="pos"></span>
           <button class="ico" id="ant" title="Anterior (←)">‹</button>
           <button class="ico" id="sig" title="Siguiente (→)">›</button>
           <button class="ico" id="cerrar" title="Cerrar (Esc)">✕</button>
         </div>
-        <div class="lienzo"><iframe id="grande" title="Vista de la pieza" sandbox="allow-scripts allow-forms allow-modals"></iframe></div>
+        <div class="lienzo" id="lienzo"></div>
       </div>
       <div class="ficha" id="ficha"></div>
     </div>
@@ -135,89 +192,164 @@ await mountShell("biblioteca");
 const $ = id => document.getElementById(id);
 const esc = s => String(s ?? "").replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
 const norm = s => String(s ?? "").toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "");
-
-const COLORES = ["#2f7d4f", "#2563c9", "#a86b00", "#b4236e", "#6b4fc9", "#0f8a8a", "#b42318", "#5c6b0c", "#8a5a2b", "#3a3a33"];
+const plural = (n, a, b) => `${n} ${n === 1 ? a : b}`;
 
 const { proyectos, piezas, grupos } = await fetch("/admin/biblioteca.json", { credentials: "same-origin" }).then(r => r.json());
-// Grupos por tipo de pieza (selectores, login, animaciones…). Una pieza puede estar en varios; el primero es el suyo.
-const GR = Object.fromEntries(grupos.map(g => [g.id, g.titulo]));
+const GR = Object.fromEntries(grupos.map(g => [g.id, g]));
+const PZ = Object.fromEntries(piezas.map(p => [p.id, p]));
+const familias = [...new Set(grupos.map(g => g.familia))];
+const COLORES = ["#2f7d4f", "#2563c9", "#a86b00", "#b4236e", "#6b4fc9", "#0f8a8a", "#b42318", "#5c6b0c", "#8a5a2b", "#3a3a33", "#c2410c"];
 const nombresPro = [...new Set(piezas.map(p => p.proyecto))];
 const color = pro => COLORES[nombresPro.indexOf(pro) % COLORES.length];
 const fuentes = Object.fromEntries(proyectos.map(p => [p.proyecto, p.tipografia || ""]));
-$("resumen").textContent = `${piezas.length} piezas de ${nombresPro.length} ${nombresPro.length === 1 ? "proyecto" : "proyectos"}: cada una funcionando, con su origen, sus reglas y su código.`;
+$("resumen").textContent = `${piezas.length} piezas de ${nombresPro.length} proyectos, cada una funcionando, con sus reglas y su código.`;
 
-// Página aislada para cada pieza. Avisa de su altura a la ventana para que el iframe grande se ajuste.
+/* ===== La página de cada pieza (aislada en su iframe) =====
+   Avisa de su altura para que el iframe grande se ajuste y las miniaturas bajas se centren. */
+const FUENTES = "family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;600&family=Instrument+Serif:ital@0;1&family=Archivo:wght@400;500;600;700;800&family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&family=Krona+One&family=Anton&family=Outfit:wght@400;500;600;700;800&family=Just+Another+Hand";
 const doc = p => `<!doctype html><html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;600&family=Instrument+Serif:ital@0;1&family=Archivo:wght@400;500;600;700;800&family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&family=Krona+One&family=Anton&family=Outfit:wght@400;500;600;700;800&family=Just+Another+Hand&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?${FUENTES}&display=swap" rel="stylesheet">
 <style>*{box-sizing:border-box}html,body{margin:0}body{padding:20px;font-family:Inter,system-ui,sans-serif;font-size:14px;color:#15161a;background:#fff}</style>
 <style>${p.css}</style></head><body>${p.html}
 <script>try{${p.js}\n}catch(e){console.error(e)}<\/script>
-<script>const t=()=>parent.postMessage({bibAlto:document.documentElement.scrollHeight,id:${JSON.stringify(p.id)}},"*");addEventListener("load",t);new ResizeObserver(t).observe(document.body);<\/script></body></html>`;
+<script>const t=()=>parent.postMessage({bibAlto:Math.ceil(document.body.getBoundingClientRect().height)},"*");addEventListener("load",t);new ResizeObserver(t).observe(document.body);<\/script></body></html>`;
 
-// Filtros
-const estado = { q: "", pro: "", grupo: "" };
-const cuenta = (k, v) => piezas.filter(p => p[k] === v).length;
-const cuentaGrupo = g => piezas.filter(p => p.grupos.includes(g) && (!estado.pro || p.proyecto === estado.pro)).length;
-function pintarChips() {
-  $("fProyecto").innerHTML = `<button class="chip ${estado.pro ? "" : "on"}" data-v="">Todos los proyectos <small>${piezas.length}</small></button>` +
-    nombresPro.map(n => `<button class="chip ${estado.pro === n ? "on" : ""}" data-v="${esc(n)}" style="--c:${color(n)}"><i></i>${esc(n)} <small>${cuenta("proyecto", n)}</small></button>`).join("");
-  $("fCategoria").innerHTML = `<button class="chip ${estado.grupo ? "" : "on"}" data-v="">Todo</button>` +
-    grupos.filter(g => cuentaGrupo(g.id) || estado.grupo === g.id).map(g => `<button class="chip ${estado.grupo === g.id ? "on" : ""}" data-v="${g.id}">${esc(g.titulo)} <small>${cuentaGrupo(g.id)}</small></button>`).join("");
-}
-$("fProyecto").onclick = e => { const b = e.target.closest(".chip"); if (!b) return; estado.pro = b.dataset.v; if (estado.grupo && !cuentaGrupo(estado.grupo)) estado.grupo = ""; pintarChips(); pintar(); };
-$("fCategoria").onclick = e => { const b = e.target.closest(".chip"); if (!b) return; estado.grupo = b.dataset.v; pintarChips(); pintar(); };
-$("q").oninput = e => { estado.q = norm(e.target.value.trim()); pintar(); };
-
-let visibles = [];
-const filtrar = () => piezas.filter(p =>
-  (!estado.pro || p.proyecto === estado.pro) && (!estado.grupo || p.grupos.includes(estado.grupo)) &&
-  (!estado.q || norm([p.nombre, p.descripcion, p.cuando_usar, p.proyecto, p.stack, ...p.grupos.map(g => GR[g]), ...p.reglas].join(" ")).includes(estado.q)));
-
-// Las miniaturas se cargan solo cuando aparecen en pantalla
+// Miniaturas: se cargan al aparecer en pantalla
 const vigia = new IntersectionObserver(es => es.forEach(e => {
   if (!e.isIntersecting) return;
-  const f = e.target, p = piezas.find(x => x.id === f.dataset.id);
-  f.srcdoc = doc(p); vigia.unobserve(f);
+  const f = e.target; f.srcdoc = doc(PZ[f.dataset.id]); vigia.unobserve(f);
 }), { rootMargin: "300px" });
+const mini = id => `<div class="mini"><iframe data-id="${esc(id)}" tabindex="-1" aria-hidden="true" sandbox="allow-scripts"></iframe></div>`;
+addEventListener("message", e => {
+  const alto = e.data?.bibAlto; if (!alto) return;
+  if (actual && e.source === $("grande")?.contentWindow) { $("grande").style.height = Math.min(Math.max(alto + 2, 200), 4000) + "px"; return; }
+  for (const f of document.querySelectorAll(".mini iframe")) if (f.contentWindow === e.source) {
+    const caja = f.parentElement.clientHeight, real = alto * .55;
+    f.style.setProperty("--y", real < caja ? (caja - real) / 2 + "px" : "0px");
+    f.classList.add("listo"); break;
+  }
+});
 
-function pintar() {
-  visibles = filtrar();
-  if (!visibles.length) { $("lista").innerHTML = `<div class="vacio"><b>Nada con ese filtro</b>Prueba con otra palabra o quita algún filtro.</div>`; return; }
-  // Con un grupo elegido salen todas las suyas; si no, cada pieza una sola vez, en su grupo principal
-  const secciones = estado.grupo ? [[estado.grupo, visibles]]
-    : grupos.map(g => [g.id, visibles.filter(p => p.grupos[0] === g.id)]).filter(([, l]) => l.length);
-  $("lista").innerHTML = secciones.map(([c, l]) => `<section class="sec"><h2>${esc(GR[c])} <small>${l.length}</small></h2><div class="rejilla">${l.map(p => `
-    <button class="pieza" data-id="${esc(p.id)}">
-      <div class="mini"><iframe data-id="${esc(p.id)}" tabindex="-1" aria-hidden="true" sandbox="allow-scripts" loading="lazy"></iframe></div>
-      <div class="txt"><b>${esc(p.nombre)}</b><p>${esc(p.descripcion)}</p>
-        <div class="meta"><span class="pro" style="--c:${color(p.proyecto)}"><i></i>${esc(p.proyecto)}</span>${p.stack ? `<span class="stack">${esc(p.stack)}</span>` : ""}</div></div>
-    </button>`).join("")}</div></section>`).join("");
-  $("lista").querySelectorAll(".mini iframe").forEach(f => vigia.observe(f));
-  visibles = secciones.flatMap(([, l]) => l);   // mismo orden que en pantalla, para ‹ ›
+/* ===== Estado en la dirección: #g=grupo&pro=proyecto&p=pieza (así «atrás» funciona) ===== */
+let estado = { g: "", pro: "", p: "" }, q = "";
+const leer = () => { const h = new URLSearchParams(location.hash.slice(1));
+  // enlaces antiguos: #id-de-pieza
+  if (location.hash.length > 1 && !location.hash.includes("=")) return { g: "", pro: "", p: decodeURIComponent(location.hash.slice(1)) };
+  return { g: h.get("g") || "", pro: h.get("pro") || "", p: h.get("p") || "" }; };
+const enlace = s => { const h = new URLSearchParams(); for (const k of ["g", "pro", "p"]) if (s[k]) h.set(k, s[k]); const t = h.toString(); return t ? "#" + t : location.pathname; };
+const ir = (cambios, reemplazar = false) => {
+  const nuevo = { ...estado, ...cambios }, url = enlace(nuevo);
+  reemplazar ? history.replaceState(null, "", url) : history.pushState(null, "", url);
+  aplicar();
+};
+document.addEventListener("click", e => {
+  const a = e.target.closest("a[data-ir]"); if (!a || e.metaKey || e.ctrlKey) return;
+  e.preventDefault(); ir(JSON.parse(a.dataset.ir));
+});
+const ira = cambios => `href="${enlace({ ...estado, ...cambios })}" data-ir='${esc(JSON.stringify(cambios))}'`;
+
+const delProyecto = l => estado.pro ? l.filter(p => p.proyecto === estado.pro) : l;
+const delGrupo = g => delProyecto(piezas.filter(p => p.grupos.includes(g)));
+
+/* ===== Índice lateral ===== */
+function pintarIndice() {
+  const total = delProyecto(piezas).length;
+  $("indice").innerHTML = `
+    <a class="todas ${!estado.g && !q ? "on" : ""}" ${ira({ g: "" })}>Todos los grupos <small>${total}</small></a>
+    <div class="pro-sel"><label for="pro">Proyecto</label><select id="pro"><option value="">Todos los proyectos</option>${nombresPro.map(n => `<option value="${esc(n)}" ${estado.pro === n ? "selected" : ""}>${esc(n)} (${piezas.filter(p => p.proyecto === n).length})</option>`).join("")}</select></div>` +
+    familias.map(f => `<div class="fam">${esc(f)}</div>` + grupos.filter(g => g.familia === f).map(g => {
+      const n = delGrupo(g.id).length;
+      return `<a class="${estado.g === g.id && !q ? "on" : ""} ${n ? "" : "vacio-g"}" ${ira({ g: g.id })}>${esc(g.titulo)} <small>${n}</small></a>`;
+    }).join("")).join("");
+  $("pro").onchange = e => ir({ pro: e.target.value });
 }
-$("lista").onclick = e => { const b = e.target.closest(".pieza"); if (b) abrir(b.dataset.id); };
 
-// Detalle
+/* ===== Vistas ===== */
+let visibles = [];
+const tarjeta = p => `<a class="pieza" ${ira({ p: p.id })}>${mini(p.id)}
+  <div class="txt"><b>${esc(p.nombre)}</b><div class="meta"><span class="pro" style="--c:${color(p.proyecto)}"><i></i>${esc(p.proyecto.replace(/ \(.*\)$/, ""))}</span>${p.stack ? `<span class="stack">${esc(p.stack)}</span>` : ""}</div></div></a>`;
+const chipProyecto = () => estado.pro ? `<span class="filtro-on" style="--c:${color(estado.pro)}"><i></i>${esc(estado.pro)}<button id="quitarPro" title="Quitar filtro">✕</button></span>` : "";
+const sinNada = txt => `<div class="vacio"><b>No hay piezas aquí</b>${txt}${estado.pro ? `<br><button id="quitarPro2">Ver todos los proyectos</button>` : ""}</div>`;
+
+function vistaInicio() {
+  visibles = [];
+  return `<div class="vista-head"><div><h2>¿Qué estás buscando?</h2><p>Elige un tipo de pieza o escribe arriba lo que necesitas.</p></div>${chipProyecto()}</div>` +
+    familias.map(f => {
+      const losas = grupos.filter(g => g.familia === f).map(g => {
+        const l = delGrupo(g.id); if (!l.length) return "";
+        const portada = l.find(p => p.id === g.portada) || l[0];
+        const pros = [...new Set(l.map(p => p.proyecto))];
+        return `<a class="losa" ${ira({ g: g.id })}>${mini(portada.id)}<div class="txt"><b>${esc(g.titulo)}</b><p>${esc(g.descripcion)}</p>
+          <div class="pie"><span>${plural(l.length, "pieza", "piezas")}</span><span class="puntos" title="${esc(pros.join(", "))}">${pros.slice(0, 6).map(n => `<i style="--c:${color(n)}"></i>`).join("")}</span></div></div></a>`;
+      }).join("");
+      return losas ? `<div class="familia"><h3>${esc(f)}</h3><div class="losas">${losas}</div></div>` : "";
+    }).join("") || sinNada("Este proyecto no tiene piezas.");
+}
+function vistaGrupo() {
+  const g = GR[estado.g]; visibles = delGrupo(g.id);
+  return `<div class="vista-head"><div><div class="miga"><a ${ira({ g: "" })}>Biblioteca</a> › ${esc(g.familia)}</div><h2>${esc(g.titulo)}</h2><p>${esc(g.descripcion)} · ${plural(visibles.length, "pieza", "piezas")}</p></div>${chipProyecto()}</div>` +
+    (visibles.length ? `<div class="rejilla">${visibles.map(tarjeta).join("")}</div>` : sinNada("Ningún proyecto de este filtro tiene piezas de este grupo."));
+}
+function vistaBusqueda() {
+  const t = norm(q);
+  visibles = delProyecto(piezas).filter(p => norm([p.nombre, p.descripcion, p.cuando_usar, p.proyecto, p.stack, ...p.grupos.map(g => GR[g]?.titulo), ...p.reglas].join(" ")).includes(t));
+  return `<div class="vista-head"><div><div class="miga"><a ${ira({ g: "" })}>Biblioteca</a> › Búsqueda</div><h2>«${esc(q)}»</h2><p>${plural(visibles.length, "resultado", "resultados")}</p></div>${chipProyecto()}</div>` +
+    (visibles.length ? `<div class="rejilla">${visibles.map(tarjeta).join("")}</div>` : sinNada("Prueba con otra palabra: tabla, login, calendario, toast…"));
+}
+function pintarVista() {
+  $("vista").innerHTML = q ? vistaBusqueda() : estado.g && GR[estado.g] ? vistaGrupo() : vistaInicio();
+  $("vista").querySelectorAll(".mini iframe").forEach(f => vigia.observe(f));
+  for (const id of ["quitarPro", "quitarPro2"]) if ($(id)) $(id).onclick = () => ir({ pro: "" });
+}
+
+let ultimaVista = "";
+function aplicar() {
+  estado = leer();
+  const clave = [estado.g, estado.pro, q].join("|");
+  if (clave !== ultimaVista) {
+    ultimaVista = clave; pintarIndice(); pintarVista();
+    if (!estado.p) scrollTo({ top: 0 });
+  }
+  estado.p && PZ[estado.p] ? abrir(PZ[estado.p]) : cerrarDetalle();
+}
+addEventListener("popstate", aplicar);
+
+let tq;
+$("q").oninput = e => { clearTimeout(tq); tq = setTimeout(() => { q = e.target.value.trim(); aplicar(); }, 120); };
+addEventListener("keydown", e => {
+  if (e.key === "/" && !e.target.matches("input, textarea") && !actual) { e.preventDefault(); $("q").focus(); }
+  if (e.key === "Escape" && e.target === $("q")) { $("q").value = ""; q = ""; aplicar(); $("q").blur(); }
+});
+
+/* ===== Detalle de una pieza ===== */
 let actual = null, pestana = "html";
-function abrir(id) {
-  const p = piezas.find(x => x.id === id); if (!p) return;
+function abrir(p) {
+  if (actual?.id === p.id) return;
   actual = p;
-  if (!["html", "css", "js"].includes(pestana) || !p[pestana]) pestana = "html";
-  $("grande").style.height = "200px";
-  $("grande").srcdoc = doc(p);
+  const lista = visibles.length ? visibles : piezas, i = lista.findIndex(x => x.id === p.id);
+  $("pos").textContent = i >= 0 ? `${i + 1} de ${lista.length}` : "";
+  if (!p[pestana]) pestana = "html";
+  // Un iframe nuevo cada vez: cambiar el srcdoc de uno ya cargado añade un paso al historial y «atrás» dejaría de cerrar
+  const f = document.createElement("iframe");
+  Object.assign(f, { id: "grande", title: "Vista de la pieza", srcdoc: doc(p) });
+  f.setAttribute("sandbox", "allow-scripts allow-forms allow-modals");
+  f.style.width = $("ancho").querySelector(".on").dataset.w;
+  $("lienzo").replaceChildren(f);
   const arch = p.archivos.map(a => { const [ruta, linea] = a.split(/:(?=\d+$)/);
     return `<a href="vscode://file/Users/lolyfernandezrodriguez/Desktop/${encodeURI(ruta)}${linea ? ":" + linea : ""}" title="Abrir en VS Code">${esc(a)}</a>`; }).join("");
+  const lista2 = (t, l) => l?.length ? `<div><h4>${t}</h4><ul>${l.map(r => `<li>${esc(r)}</li>`).join("")}</ul></div>` : "";
   $("ficha").innerHTML = `
-    <div><div class="meta" style="margin-bottom:10px"><span class="pro" style="--c:${color(p.proyecto)}"><i></i>${esc(p.proyecto)}</span>${p.grupos.map(g => `<button class="stack ir" data-g="${g}" title="Ver todas las piezas de este grupo">${esc(GR[g])}</button>`).join("")}${p.stack ? `<span class="stack">${esc(p.stack)}</span>` : ""}</div>
+    <div><div class="meta" style="margin-bottom:8px"><span class="pro" style="--c:${color(p.proyecto)}"><i></i>${esc(p.proyecto)}</span>${p.stack ? `<span class="stack">${esc(p.stack)}</span>` : ""}</div>
       <h3>${esc(p.nombre)}</h3></div>
     <p>${esc(p.descripcion)}</p>
+    <div class="etis">${p.grupos.map(g => `<a ${ira({ g, p: "" })} title="Ver todas las piezas de este grupo">${esc(GR[g]?.titulo)}</a>`).join("")}</div>
     ${p.cuando_usar ? `<div class="usar"><h4>Cuándo usarla</h4><p>${esc(p.cuando_usar)}</p></div>` : ""}
-    ${p.reglas.length ? `<div><h4>Reglas aprendidas</h4><ul>${p.reglas.map(r => `<li>${esc(r)}</li>`).join("")}</ul></div>` : ""}
-    ${p.variantes?.length ? `<div><h4>Cómo es en otros proyectos</h4><ul>${p.variantes.map(r => `<li>${esc(r)}</li>`).join("")}</ul></div>` : ""}
+    ${lista2("Reglas aprendidas", p.reglas)}
+    ${lista2("Cómo es en otros proyectos", p.variantes)}
     ${fuentes[p.proyecto] ? `<div><h4>Tipografía del proyecto</h4><p>${esc(fuentes[p.proyecto])}</p></div>` : ""}
     ${arch ? `<div class="arch"><h4>Dónde está</h4>${arch}</div>` : ""}
     <div class="codigo">
-      <div class="codigo-bar">${["html", "css", "js"].map(k => `<button data-k="${k}" class="${pestana === k ? "on" : ""}" ${p[k] ? "" : "disabled"}>${k.toUpperCase()}</button>`).join("")}
+      <div class="codigo-bar">${["html", "css", "js"].map(k => `<button data-k="${k}" ${p[k] ? "" : "disabled"}>${k.toUpperCase()}</button>`).join("")}
         <span class="sp"></span><button class="copiar" id="copiar">Copiar</button><button class="copiar" id="copiarTodo" title="Una página HTML completa con todo dentro">Copiar todo</button></div>
       <pre id="code"></pre>
     </div>`;
@@ -225,15 +357,12 @@ function abrir(id) {
   $("ficha").scrollTop = 0;
   $("det").classList.add("on");
   document.body.style.overflow = "hidden";
-  if (location.hash !== "#" + p.id) history.replaceState(null, "", "#" + p.id);
 }
 function pintarCodigo() {
   $("code").textContent = actual[pestana];
   $("ficha").querySelectorAll(".codigo-bar [data-k]").forEach(b => b.classList.toggle("on", b.dataset.k === pestana));
 }
-$("ficha").onclick = async e => {
-  const ir = e.target.closest("[data-g]");
-  if (ir) { estado.grupo = ir.dataset.g; cerrar(); pintarChips(); pintar(); scrollTo({ top: 0 }); return; }
+$("ficha").addEventListener("click", async e => {
   const k = e.target.closest("[data-k]");
   if (k && !k.disabled) { pestana = k.dataset.k; pintarCodigo(); return; }
   const c = e.target.closest(".copiar"); if (!c) return;
@@ -243,13 +372,15 @@ $("ficha").onclick = async e => {
     : p[pestana];
   try { await navigator.clipboard.writeText(txt); toast(c.id === "copiarTodo" ? "Copiada la pieza entera" : `Copiado el ${pestana.toUpperCase()}`); }
   catch { toast("No se ha podido copiar", true); }
-};
-function cerrar() {
+});
+function cerrarDetalle() {
+  if (!actual) return;
   $("det").classList.remove("on"); document.body.style.overflow = ""; actual = null;
-  $("grande").srcdoc = "";
-  history.replaceState(null, "", location.pathname + location.search);
+  $("lienzo").replaceChildren();
 }
-const mover = d => { if (!actual) return; const i = visibles.findIndex(p => p.id === actual.id); const n = visibles[(i + d + visibles.length) % visibles.length]; if (n) abrir(n.id); };
+const cerrar = () => ir({ p: "" });
+const mover = d => { if (!actual) return; const l = visibles.length ? visibles : piezas; const i = l.findIndex(p => p.id === actual.id);
+  const n = l[(i + d + l.length) % l.length]; if (n) ir({ p: n.id }, true); };
 $("cerrar").onclick = cerrar;
 $("ant").onclick = () => mover(-1);
 $("sig").onclick = () => mover(1);
@@ -261,15 +392,9 @@ addEventListener("keydown", e => {
   if (e.key === "ArrowRight") mover(1);
 });
 $("ancho").onclick = e => { const b = e.target.closest("button"); if (!b) return;
-  $("ancho").querySelectorAll("button").forEach(x => x.classList.toggle("on", x === b)); $("grande").style.width = b.dataset.w; };
-addEventListener("message", e => {
-  if (e.source === $("grande").contentWindow && actual && e.data?.id === actual.id && e.data.bibAlto)
-    $("grande").style.height = Math.min(Math.max(e.data.bibAlto + 2, 200), 4000) + "px";
-});
+  $("ancho").querySelectorAll("button").forEach(x => x.classList.toggle("on", x === b)); if ($("grande")) $("grande").style.width = b.dataset.w; };
 
-pintarChips();
-pintar();
-if (location.hash.length > 1) abrir(decodeURIComponent(location.hash.slice(1)));
+aplicar();
 </script>
 </body>
 </html>
