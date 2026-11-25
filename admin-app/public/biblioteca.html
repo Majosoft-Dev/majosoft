@@ -145,7 +145,7 @@ $("resumen").textContent = `${piezas.length} piezas de ${nombresPro.length} ${no
 
 // Página aislada para cada pieza. Avisa de su altura a la ventana para que el iframe grande se ajuste.
 const doc = p => `<!doctype html><html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;600&family=Instrument+Serif:ital@0;1&family=Archivo:wght@400;500;600;700;800&family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&family=Krona+One&family=Anton&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;600&family=Instrument+Serif:ital@0;1&family=Archivo:wght@400;500;600;700;800&family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&family=Krona+One&family=Anton&family=Outfit:wght@400;500;600;700;800&family=Just+Another+Hand&display=swap" rel="stylesheet">
 <style>*{box-sizing:border-box}html,body{margin:0}body{padding:20px;font-family:Inter,system-ui,sans-serif;font-size:14px;color:#15161a;background:#fff}</style>
 <style>${p.css}</style></head><body>${p.html}
 <script>try{${p.js}\n}catch(e){console.error(e)}<\/script>
@@ -208,6 +208,7 @@ function abrir(id) {
     <p>${esc(p.descripcion)}</p>
     ${p.cuando_usar ? `<div class="usar"><h4>Cuándo usarla</h4><p>${esc(p.cuando_usar)}</p></div>` : ""}
     ${p.reglas.length ? `<div><h4>Reglas aprendidas</h4><ul>${p.reglas.map(r => `<li>${esc(r)}</li>`).join("")}</ul></div>` : ""}
+    ${p.variantes?.length ? `<div><h4>Cómo es en otros proyectos</h4><ul>${p.variantes.map(r => `<li>${esc(r)}</li>`).join("")}</ul></div>` : ""}
     ${fuentes[p.proyecto] ? `<div><h4>Tipografía del proyecto</h4><p>${esc(fuentes[p.proyecto])}</p></div>` : ""}
     ${arch ? `<div class="arch"><h4>Dónde está</h4>${arch}</div>` : ""}
     <div class="codigo">
