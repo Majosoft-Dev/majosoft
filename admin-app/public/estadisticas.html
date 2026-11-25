@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Estadísticas · Panel Majosoft</title>
+  <meta name="robots" content="noindex, nofollow" />
+  <link rel="icon" type="image/svg+xml" href="/assets/favicon.svg" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/admin/panel.css" />
+  <script type="module" src="/admin/menu.js" blocking="render"></script>
+  <style>
+    * { box-sizing: border-box; }
+    body { margin: 0; font-family: Inter, system-ui, sans-serif; background: var(--cream); color: var(--ink); font-size: 14px; }
+    main { max-width: 1180px; padding: 34px 32px 60px; }
+    .tabs { display: flex; gap: 4px; background: #fff; border: 1px solid var(--line); padding: 4px; border-radius: 12px; }
+    .tabs button { border: none; background: none; padding: 7px 12px; border-radius: 8px; font: inherit; font-size: 12.5px; font-weight: 700; color: var(--muted); cursor: pointer; }
+    .tabs button.on { background: var(--ink); color: var(--cream); }
+    .ahora { display: inline-flex; align-items: center; gap: 8px; font-size: 12.5px; font-weight: 700; color: var(--muted); margin-right: 10px; }
+    .ahora i { width: 8px; height: 8px; border-radius: 50%; background: var(--ok); box-shadow: 0 0 0 3px rgba(47,125,79,.18); }
+    .ahora.cero i { background: var(--line); box-shadow: none; }
+    .tools { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; }
+
+    .kpis { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-bottom: 14px; }
+    .kpi { background: #fff; border: 1px solid var(--line); border-radius: 16px; padding: 18px 20px; }
+    .kpi small { color: var(--muted); font-size: 12px; font-weight: 700; }
+    .kpi b { display: block; font-size: 28px; letter-spacing: -.03em; margin-top: 6px; }
+    .kpi em { font-style: normal; font-size: 12px; font-weight: 700; color: var(--muted); }
+    .kpi em.sube { color: var(--ok); } .kpi em.baja { color: var(--bad); }
+    .kpi.dark { background: var(--ink); color: var(--cream); border-color: var(--ink); }
+    .kpi.dark small, .kpi.dark em { color: #a9a99c; } .kpi.dark b { color: var(--lime); }
+    .kpi.dark em.sube { color: var(--lime); } .kpi.dark em.baja { color: #ff8a7a; }
+
+    .card { background: #fff; border: 1px solid var(--line); border-radius: 16px; padding: 18px 20px; min-width: 0; }
+    .card h2 { margin: 0 0 2px; font-size: 15px; letter-spacing: -.01em; }
+    .card .sub { color: var(--muted); font-size: 12.5px; margin-bottom: 14px; }
+    .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-top: 14px; }
+
+    /* Gráfica por días */
+    .chart { position: relative; }
+    .chart { min-height: 240px; }
+    .chart svg { display: block; overflow: visible; }
+    .chart .eje { font-size: 11px; fill: var(--muted); font-family: Inter, system-ui, sans-serif; }
+    .chart .linea { stroke: #eeede5; stroke-width: 1; }
+    .chart .base { stroke: var(--line); stroke-width: 1; }
+    .chart .barra { fill: var(--ink2); }
+    .chart .hit:hover + .barra, .chart .barra.on { fill: var(--lime2); }
+    .chart .hit { fill: transparent; cursor: default; }
+    .tip { position: absolute; pointer-events: none; background: var(--ink); color: var(--cream); border-radius: 10px; padding: 8px 11px; font-size: 12px; line-height: 1.5; white-space: nowrap; transform: translate(-50%, -100%); opacity: 0; transition: opacity .1s; z-index: 2; }
+    .tip b { color: var(--lime); }
+    .tip.on { opacity: 1; }
+
+    /* Listas con barra de proporción */
+    .filas { display: flex; flex-direction: column; gap: 4px; }
+    .fila { position: relative; display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 8px 10px; border-radius: 8px; overflow: hidden; }
+    .fila::before { content: ""; position: absolute; inset: 0 auto 0 0; width: var(--p); background: #f1f2d6; border-radius: 8px; }
+    .fila > * { position: relative; }
+    .fila .nom { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-weight: 600; }
+    .fila .nom small { color: var(--muted); font-weight: 500; margin-left: 6px; }
+    .fila .num { font-variant-numeric: tabular-nums; font-weight: 700; white-space: nowrap; }
+    .fila .num small { color: var(--muted); font-weight: 500; margin-left: 8px; }
+    .cab { display: flex; justify-content: space-between; color: var(--muted); font-size: 11px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; padding: 0 10px 6px; }
+
+    /* Horas del día */
+    .horas { display: grid; grid-template-columns: repeat(24, 1fr); gap: 2px; align-items: end; height: 120px; }
+    .horas div { background: var(--ink2); border-radius: 4px 4px 0 0; min-height: 2px; }
+    .horas div:hover { background: var(--lime2); }
+    .horas-eje { display: grid; grid-template-columns: repeat(4, 1fr); color: var(--muted); font-size: 11px; margin-top: 6px; }
+
+    .vacio { color: var(--muted); padding: 18px 10px; text-align: center; }
+    .nota { color: var(--muted); font-size: 12px; margin-top: 18px; line-height: 1.6; }
+    .aviso { background: #fff; border: 1px dashed var(--line); border-radius: 16px; padding: 40px 24px; text-align: center; color: var(--muted); }
+    .aviso b { display: block; color: var(--ink); font-size: 16px; margin-bottom: 6px; }
+    .kpis > *, .grid > * { min-width: 0; }
+    @media (max-width: 1000px) { .grid { grid-template-columns: minmax(0, 1fr); } .kpis { grid-template-columns: repeat(2, minmax(0, 1fr)); } main { padding: 24px 16px 40px; } }
+    @media (max-width: 600px) { .fila .nom small { display: none; } .kpi { padding: 14px 16px; } .kpi b { font-size: 24px; } .kpi em { display: block; font-size: 11.5px; } .card { padding: 16px; } }
+  </style>
+</head>
+<body>
+  <main>
+    <div class="page-head">
+      <div><div class="crumbs">Comunicación</div><h1>Estadísticas de la web</h1><p>Quién entra en majosoft.es, qué mira y de dónde llega.</p></div>
+      <div class="tools">
+        <span class="ahora cero" id="ahora"><i></i><span></span></span>
+        <div class="tabs" id="rango"><button data-d="7">7 días</button><button data-d="30" class="on">30 días</button><button data-d="90">3 meses</button><button data-d="365">1 año</button></div>
+      </div>
+    </div>
+    <div id="contenido"></div>
+  </main>
+<script type="module">
+import { mountShell, api, toast } from "/admin/panel.js";
+await mountShell("estadisticas");
+const $ = id => document.getElementById(id);
+const esc = s => String(s ?? "").replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+const num = n => Number(n || 0).toLocaleString("es-ES");
+const fecha = (d, o = { day: "numeric", month: "short" }) => new Date(d + "T12:00:00").toLocaleDateString("es-ES", o);
+
+// Nombres legibles de las páginas de la web
+const PAGINAS = { "/": "Inicio", "/academia-bombero": "Academia Guía del Bombero", "/academia-objetivo-baeza": "Academia Objetivo Baeza", "/cursos-umme": "Cursos UMME", "/olivatour": "Olivatour" };
+const pagina = r => PAGINAS[r] ? `${esc(PAGINAS[r])}<small>${esc(r)}</small>` : esc(r);
+
+let dias = 30;
+try { dias = +localStorage.getItem("mj-estadisticas-dias") || 30; } catch {}
+
+function cambio(ahora, antes) {
+  if (!antes) return ahora ? `<em>nuevo</em>` : `<em>&nbsp;</em>`;
+  const p = Math.round(100 * (ahora - antes) / antes);
+  return `<em class="${p > 0 ? "sube" : p < 0 ? "baja" : ""}">${p > 0 ? "▲ " : p < 0 ? "▼ " : ""}${Math.abs(p)} % que el periodo anterior</em>`;
+}
+
+function filas(lista, { nombre, valor, extra, vacio }) {
+  if (!lista.length) return `<div class="vacio">${vacio}</div>`;
+  const max = Math.max(...lista.map(valor), 1);
+  return `<div class="filas">${lista.map(x => `<div class="fila" style="--p:${(100 * valor(x) / max).toFixed(1)}%">
+    <span class="nom">${nombre(x)}</span><span class="num">${num(valor(x))}${extra ? `<small>${extra(x)}</small>` : ""}</span></div>`).join("")}</div>`;
+}
+
+// Agrupa por semanas cuando hay muchos días, para que las barras no queden como hilos
+function agrupar(serie) {
+  if (serie.length <= 90) return serie.map(d => ({ ...d, etiqueta: fecha(d.dia, { weekday: "long", day: "numeric", month: "long" }) }));
+  const out = [];
+  for (let i = 0; i < serie.length; i += 7) {
+    const tramo = serie.slice(i, i + 7);
+    out.push({ dia: tramo[0].dia, vistas: tramo.reduce((n, d) => n + d.vistas, 0), personas: tramo.reduce((n, d) => n + d.personas, 0),
+      etiqueta: `Semana del ${fecha(tramo[0].dia, { day: "numeric", month: "long" })}` });
+  }
+  return out;
+}
+
+function grafica(serie, W) {
+  const datos = agrupar(serie), H = 240, izq = 34, abajo = 22, arriba = 8;
+  const max = Math.max(...datos.map(d => d.personas), 1);
+  const paso = Math.max(1, Math.ceil(max / 4 / (max > 20 ? 5 : 1)) * (max > 20 ? 5 : 1)), tope = Math.ceil(max / paso) * paso;
+  const ancho = (W - izq) / datos.length, gap = Math.min(2, ancho * .2), alto = H - abajo - arriba;
+  const y = v => arriba + alto - alto * v / tope;
+  let svg = "";
+  for (let v = 0; v <= tope; v += paso) svg += `<line class="${v ? "linea" : "base"}" x1="${izq}" x2="${W}" y1="${y(v)}" y2="${y(v)}"/><text class="eje" x="${izq - 8}" y="${y(v) + 4}" text-anchor="end">${v}</text>`;
+  const cada = Math.ceil(datos.length / Math.max(2, Math.floor(W / 110)));
+  datos.forEach((d, i) => {
+    const x = izq + i * ancho, h = alto * d.personas / tope, bw = Math.max(1, ancho - gap), r = Math.min(4, bw / 2, h);
+    svg += `<rect class="hit" data-i="${i}" x="${x}" y="${arriba}" width="${ancho}" height="${alto}"/>`;
+    if (h > 0) svg += `<path class="barra" d="M${x},${y(0)} V${y(d.personas) + r} q0,-${r} ${r},-${r} h${bw - 2 * r} q${r},0 ${r},${r} V${y(0)} Z"/>`;
+    else svg += `<g class="barra"></g>`;
+    if (i % cada === 0) svg += `<text class="eje" x="${x + ancho / 2}" y="${H - 4}" text-anchor="middle">${fecha(d.dia)}</text>`;
+  });
+  return { html: `<svg width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" role="img" aria-label="Personas por ${datos.length === serie.length ? "día" : "semana"}">${svg}</svg><div class="tip" id="tip"></div>`, datos };
+}
+
+function horas(lista) {
+  const n = Array(24).fill(0); lista.forEach(h => n[h.h] = h.n);
+  const max = Math.max(...n, 1);
+  return `<div class="horas">${n.map((v, h) => `<div style="height:${(100 * v / max).toFixed(1)}%" title="${String(h).padStart(2, "0")}:00 – ${String(h).padStart(2, "0")}:59 · ${num(v)} páginas vistas"></div>`).join("")}</div>
+    <div class="horas-eje"><span>00 h</span><span>06 h</span><span>12 h</span><span>18 h</span></div>`;
+}
+
+async function cargar() {
+  document.querySelectorAll("#rango button").forEach(b => b.classList.toggle("on", +b.dataset.d === dias));
+  let d;
+  try { d = await api("estadisticas?dias=" + dias); } catch (e) { toast(e.message, true); return; }
+  const t = d.totales;
+  $("ahora").classList.toggle("cero", !t.ahora);
+  $("ahora").lastElementChild.textContent = t.ahora === 1 ? "1 persona ahora mismo" : `${t.ahora} personas ahora mismo`;
+  if (!t.primera) {
+    $("contenido").innerHTML = `<div class="aviso"><b>Aún no hay visitas registradas</b>Las visitas se empiezan a contar desde hoy. Vuelve en un rato y aparecerán aquí.</div>`;
+    return;
+  }
+  const semanas = d.serie.length > 90;
+  $("contenido").innerHTML = `
+    <div class="kpis">
+      <div class="kpi dark"><small>Personas</small><b>${num(t.personas)}</b>${cambio(t.personas, t.personasAntes)}</div>
+      <div class="kpi"><small>Páginas vistas</small><b>${num(t.vistas)}</b>${cambio(t.vistas, t.vistasAntes)}</div>
+      <div class="kpi"><small>Páginas por persona</small><b>${String(t.paginasPorPersona).replace(".", ",")}</b><em>${t.soloUna} % solo vio una página</em></div>
+      <div class="kpi"><small>Mensajes por el formulario</small><b>${num(t.mensajes)}</b><em>${t.personas ? `${(100 * t.mensajes / t.personas).toFixed(1).replace(".", ",")} % de las personas` : "&nbsp;"}</em></div>
+    </div>
+    <div class="card">
+      <h2>Personas por ${semanas ? "semana" : "día"}</h2>
+      <div class="sub">Del ${fecha(d.desde, { day: "numeric", month: "long" })} al ${fecha(d.hasta, { day: "numeric", month: "long", year: "numeric" })}. Pasa el ratón por una barra para ver el detalle.</div>
+      <div class="chart" id="chart"></div>
+    </div>
+    <div class="grid">
+      <div class="card"><h2>Páginas más vistas</h2><div class="sub">Cuántas veces se ha visto cada página y por cuántas personas.</div>
+        <div class="cab"><span>Página</span><span>Vistas · personas</span></div>
+        ${filas(d.paginas, { nombre: x => pagina(x.ruta), valor: x => x.vistas, extra: x => num(x.personas), vacio: "Sin datos" })}</div>
+      <div class="card"><h2>De dónde llegan</h2><div class="sub">«Directo» es quien escribe la dirección o viene de un enlace sin origen (WhatsApp, correo…).</div>
+        <div class="cab"><span>Origen</span><span>Entradas</span></div>
+        ${filas(d.origenes, { nombre: x => esc(x.origen), valor: x => x.n, vacio: "Sin datos" })}</div>
+      <div class="card"><h2>Por dónde entran</h2><div class="sub">La primera página que ven al llegar a la web.</div>
+        ${filas(d.entradas, { nombre: x => pagina(x.ruta), valor: x => x.n, vacio: "Sin datos" })}</div>
+      <div class="card"><h2>A qué hora</h2><div class="sub">Páginas vistas según la hora del día (hora de España).</div>
+        ${horas(d.horas)}</div>
+      <div class="card"><h2>Dispositivo</h2><div class="sub">Personas según el tamaño de su pantalla.</div>
+        ${filas(d.dispositivos, { nombre: x => esc(x.nombre), valor: x => x.n, extra: x => Math.round(100 * x.n / Math.max(1, d.dispositivos.reduce((s, y) => s + y.n, 0))) + " %", vacio: "Sin datos" })}</div>
+      <div class="card"><h2>Navegador</h2><div class="sub">Personas según el navegador que usan.</div>
+        ${filas(d.navegadores, { nombre: x => esc(x.nombre), valor: x => x.n, extra: x => Math.round(100 * x.n / Math.max(1, d.navegadores.reduce((s, y) => s + y.n, 0))) + " %", vacio: "Sin datos" })}</div>
+    </div>
+    <p class="nota">Se cuenta desde el ${new Date(t.primera).toLocaleDateString("es-ES", { day: "numeric", month: "long", year: "numeric" })}. Sin cookies y sin guardar IPs: a cada persona se la reconoce solo dentro del mismo día, así que «personas» suma las de cada día.
+      No cuentan los robots ni los navegadores desde los que se ha entrado a este panel (el tuyo incluido). Los datos se guardan 13 meses.</p>`;
+
+  ultima = d.serie; pintarGrafica();
+}
+
+let ultima = [];
+function pintarGrafica() {
+  const chart = $("chart"); if (!chart) return;
+  const g = grafica(ultima, chart.clientWidth);
+  chart.innerHTML = g.html;
+  // Tooltip de la gráfica
+  const tip = $("tip"), svg = chart.querySelector("svg");
+  let marcada;
+  svg.addEventListener("mousemove", e => {
+    const hit = e.target.closest(".hit");
+    if (!hit) return;
+    const i = +hit.dataset.i, x = g.datos[i];
+    marcada?.classList.remove("on"); marcada = hit.nextElementSibling; marcada.classList.add("on");
+    tip.innerHTML = `${esc(x.etiqueta)}<br><b>${num(x.personas)}</b> ${x.personas === 1 ? "persona" : "personas"} · ${num(x.vistas)} páginas vistas`;
+    const r = svg.getBoundingClientRect(), c = chart.getBoundingClientRect(), hr = hit.getBoundingClientRect();
+    tip.style.left = Math.min(Math.max(hr.left + hr.width / 2 - c.left, 90), c.width - 90) + "px";
+    tip.style.top = (r.top - c.top + 4) + "px";
+    tip.classList.add("on");
+  });
+  svg.addEventListener("mouseleave", () => { tip.classList.remove("on"); marcada?.classList.remove("on"); });
+}
+
+let rt; addEventListener("resize", () => { clearTimeout(rt); rt = setTimeout(pintarGrafica, 120); });
+$("rango").onclick = e => {
+  const b = e.target.closest("[data-d]"); if (!b) return;
+  dias = +b.dataset.d; try { localStorage.setItem("mj-estadisticas-dias", dias); } catch {}
+  cargar();
+};
+cargar();
+setInterval(() => { if (document.visibilityState === "visible") cargar(); }, 60e3);
+</script>
+</body>
+</html>

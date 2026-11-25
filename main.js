@@ -450,3 +450,19 @@ document.querySelectorAll('a[href^="#"]').forEach((enlace) => {
     });
   });
 })();
+
+/* ===== Estadísticas internas (panel de Majosoft) =====
+   Avisa al panel de qué página se ha visto. Sin cookies y sin datos personales.
+   Las visitas desde un navegador que haya entrado al panel no cuentan. */
+(() => {
+  try { if (localStorage.getItem('mj-no-contar')) return; } catch (e) {}
+  if (navigator.webdriver) return;
+  const datos = JSON.stringify({
+    p: location.pathname,
+    r: document.referrer,
+    w: screen.width,
+    u: new URLSearchParams(location.search).get('utm_source') || '',
+  });
+  if (navigator.sendBeacon) navigator.sendBeacon('/api/visita', datos);
+  else fetch('/api/visita', { method: 'POST', body: datos, keepalive: true }).catch(() => {});
+})();

@@ -14,6 +14,7 @@ import * as calendario from "./lib/calendario.js";
 import * as consultas from "./lib/consultas.js";
 import fsMod from "node:fs";
 const require_fs = () => fsMod;
+import * as visitas from "./lib/visitas.js";
 import {
   verifyPassword, hashPassword, DUMMY_HASH, passwordProblems,
   newTotpSecret, verifyTotp, totpUri, newToken, sha256,
@@ -198,6 +199,15 @@ app.post("/api/contacto", (req, res) => {
   contactos.set(req.ip, [...prev, now]);
   db.prepare("INSERT INTO mensajes (at, nombre, email, mensaje, ip) VALUES (?, ?, ?, ?, ?)").run(now, n, e, m, req.ip);
   res.json({ ok: true });
+});
+
+/* ===== Estadísticas de la web (público): main.js avisa de cada página vista ===== */
+app.post("/api/visita", express.json({ type: () => true, limit: "2kb" }), (req, res) => {
+  const origin = req.get("origin");
+  if (origin && !ORIGINS.has(origin)) return res.status(403).end();
+  const b = req.body || {};
+  visitas.registrar({ ip: req.ip, ua: String(req.get("user-agent") || ""), ruta: b.p, referente: b.r, ancho: b.w, fuente: b.u });
+  res.status(204).end();
 });
 
 /* ===== Páginas públicas del panel (solo el login) ===== */
@@ -428,6 +438,9 @@ app.post("/admin/api/servidores/copias", async (req, res) => {
   res.json({ ok: true });
 });
 
+/* ===== Estadísticas de majosoft.es ===== */
+app.get("/admin/api/estadisticas", (req, res) => res.json(visitas.resumen(+req.query.dias || 30)));
+
 /* ===== Páginas privadas ===== */
 /* ===== Consultas SQL de solo lectura a las academias ===== */
 app.get("/admin/api/consultas/bases", (req, res) => res.json(consultas.BASES.map(({ id, servidor, nombre, motor }) => ({ id, servidor, nombre, motor }))));
@@ -438,7 +451,7 @@ app.post("/admin/api/consultas", async (req, res) => {
   catch (e) { res.status(e.status || 500).json({ error: e.message }); }
 });
 
-const PAGES = { "": "index.html", presupuestos: "presupuestos.html", facturas: "facturas.html", correo: "correo.html", mensajes: "mensajes.html", seguridad: "seguridad.html", servidores: "servidores.html", consultas: "consultas.html", bonos: "bonos.html", tareas: "tareas.html", publicaciones: "publicaciones.html" };
+const PAGES = { "": "index.html", presupuestos: "presupuestos.html", facturas: "facturas.html", correo: "correo.html", mensajes: "mensajes.html", seguridad: "seguridad.html", servidores: "servidores.html", consultas: "consultas.html", estadisticas: "estadisticas.html", bonos: "bonos.html", tareas: "tareas.html", publicaciones: "publicaciones.html" };
 app.get("/admin/menu.js", (req, res) => res.sendFile(path.join(PUBLIC, "menu.js")));
 app.get("/admin/panel.js", (req, res) => res.sendFile(path.join(PUBLIC, "panel.js")));
 app.get(["/admin", "/admin/:page"], (req, res, next) => {
