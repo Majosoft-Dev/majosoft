@@ -90,6 +90,26 @@
     .losa .mini::after { content: "Ver grupo"; }
     .losa:hover .mini::after { opacity: 1; translate: 0 0; }
 
+    /* Vista directa (controles y movimiento): cada conjunto con sus versiones funcionando a tamaño real */
+    .saltos { display: flex; flex-wrap: wrap; gap: 6px; margin: -6px 0 22px; }
+    .saltos a { font-size: 12.5px; font-weight: 700; color: var(--ink2); background: #fff; border: 1px solid var(--line); border-radius: 99px; padding: 6px 12px; text-decoration: none; }
+    .saltos a small { color: var(--muted); margin-left: 4px; }
+    .saltos a:hover { border-color: var(--ink); }
+    .conj { margin-bottom: 34px; scroll-margin-top: 20px; }
+    .conj-head { display: flex; align-items: baseline; gap: 10px; margin-bottom: 12px; }
+    .conj-head h3 { margin: 0; font-size: 18px; letter-spacing: -.02em; }
+    .conj-head span { font-size: 12.5px; font-weight: 700; color: var(--muted); }
+    .versiones { display: grid; grid-template-columns: repeat(auto-fit, minmax(420px, 1fr)); gap: 14px; align-items: start; }
+    .versiones.una { grid-template-columns: 1fr; }
+    .ver.ancha { grid-column: 1 / -1; }
+    .ver { background: #fff; border: 1px solid var(--line); border-radius: 18px; overflow: hidden; }
+    .ver-vivo { padding: 0; background: #fff; }
+    .ver-vivo iframe { display: block; width: 100%; height: 160px; border: 0; opacity: 0; transition: opacity .3s; }
+    .ver-vivo iframe.listo { opacity: 1; }
+    .ver-pie { display: flex; align-items: center; gap: 10px; padding: 10px 14px; border-top: 1px solid var(--line); background: #fcfcf9; }
+    .ver-nom { flex: 1; min-width: 0; font-size: 12.5px; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .ver-cod { flex: none; font-size: 12px; font-weight: 700; color: var(--ink); text-decoration: none; border: 1px solid var(--line); border-radius: 99px; padding: 5px 11px; background: #fff; }
+    .ver-cod:hover { background: var(--ink); color: var(--cream); border-color: var(--ink); }
     .vacio { text-align: center; color: var(--muted); padding: 60px 20px; background: #fff; border: 1px dashed var(--line); border-radius: 18px; }
     .vacio b { display: block; color: var(--ink); font-size: 15px; margin-bottom: 4px; }
     .vacio button { margin-top: 12px; border: 1px solid var(--line); background: #fff; border-radius: 99px; padding: 7px 14px; font: inherit; font-weight: 700; cursor: pointer; }
@@ -151,7 +171,7 @@
     }
     @media (max-width: 700px) {
       main { padding: 22px 16px 50px; }
-      .rejilla, .losas { grid-template-columns: 1fr; }
+      .rejilla, .losas, .versiones { grid-template-columns: 1fr; }
       .tabs-ancho { display: none; }
     }
     @media (prefers-reduced-motion: reduce) { .losa, .pieza, .mini iframe, .det, .det-in { transition: none !important; animation: none !important; } }
@@ -212,17 +232,24 @@ const doc = p => `<!doctype html><html lang="es"><head><meta charset="utf-8"><me
 <style>*{box-sizing:border-box}html,body{margin:0}body{padding:20px;font-family:Inter,system-ui,sans-serif;font-size:14px;color:#15161a;background:#fff}</style>
 <style>${p.css}</style></head><body>${p.html}
 <script>try{${p.js}\n}catch(e){console.error(e)}<\/script>
-<script>const t=()=>parent.postMessage({bibAlto:Math.ceil(document.body.getBoundingClientRect().height)},"*");addEventListener("load",t);new ResizeObserver(t).observe(document.body);<\/script></body></html>`;
+<script>const t=()=>parent.postMessage({bibAlto:Math.ceil(document.body.getBoundingClientRect().height),bibAncha:document.documentElement.scrollWidth>innerWidth+2},"*");addEventListener("load",t);new ResizeObserver(t).observe(document.body);<\/script></body></html>`;
 
 // Miniaturas: se cargan al aparecer en pantalla
 const vigia = new IntersectionObserver(es => es.forEach(e => {
   if (!e.isIntersecting) return;
   const f = e.target; f.srcdoc = doc(PZ[f.dataset.id]); vigia.unobserve(f);
 }), { rootMargin: "300px" });
+const vivo = id => `<iframe class="vivo" data-id="${esc(id)}" title="${esc(PZ[id].nombre)}" sandbox="allow-scripts allow-forms allow-modals"></iframe>`;
 const mini = id => `<div class="mini"><iframe data-id="${esc(id)}" tabindex="-1" aria-hidden="true" sandbox="allow-scripts"></iframe></div>`;
 addEventListener("message", e => {
   const alto = e.data?.bibAlto; if (!alto) return;
   if (actual && e.source === $("grande")?.contentWindow) { $("grande").style.height = Math.min(Math.max(alto + 2, 200), 4000) + "px"; return; }
+  for (const f of document.querySelectorAll("iframe.vivo")) if (f.contentWindow === e.source) {
+    f.style.height = Math.min(Math.max(alto, 60), 900) + "px"; f.classList.add("listo");
+    // Si no cabe en media columna, ocupa la fila entera
+    if (e.data.bibAncha) f.closest(".ver")?.classList.add("ancha");
+    return;
+  }
   for (const f of document.querySelectorAll(".mini iframe")) if (f.contentWindow === e.source) {
     const caja = f.parentElement.clientHeight, real = alto * .55;
     f.style.setProperty("--y", real < caja ? (caja - real) / 2 + "px" : "0px");
@@ -285,8 +312,24 @@ function vistaInicio() {
       return losas ? `<div class="familia"><h3>${esc(f)}</h3><div class="losas">${losas}</div></div>` : "";
     }).join("") || sinNada("Este proyecto no tiene piezas.");
 }
+function vistaDirecta(g) {
+  // Conjuntos: las versiones parecidas juntas; lo que no esté en ninguno va solo
+  const enConj = new Set(g.conjuntos.flatMap(c => c.piezas));
+  const conjuntos = [...g.conjuntos, ...delGrupo(g.id).filter(p => !enConj.has(p.id)).map(p => ({ titulo: p.nombre, piezas: [p.id] }))]
+    .map(c => ({ ...c, l: delProyecto(c.piezas.map(i => PZ[i]).filter(Boolean)) })).filter(c => c.l.length);
+  visibles = conjuntos.flatMap(c => c.l);
+  const cab = `<div class="vista-head"><div><div class="miga"><a ${ira({ g: "" })}>Biblioteca</a> › ${esc(g.familia)}</div><h2>${esc(g.titulo)}</h2><p>${esc(g.descripcion)} · ${plural(conjuntos.length, "tipo", "tipos")}, ${plural(visibles.length, "versión", "versiones")}</p></div>${chipProyecto()}</div>`;
+  if (!conjuntos.length) return cab + sinNada("Ningún proyecto de este filtro tiene piezas de este grupo.");
+  return cab + (conjuntos.length > 1 ? `<nav class="saltos">${conjuntos.map((c, i) => `<a href="#" data-salto="c${i}">${esc(c.titulo)}${c.l.length > 1 ? `<small>${c.l.length}</small>` : ""}</a>`).join("")}</nav>` : "") +
+    conjuntos.map((c, i) => `<section class="conj" id="c${i}"><div class="conj-head"><h3>${esc(c.titulo)}</h3>${c.l.length > 1 ? `<span>${c.l.length} versiones</span>` : ""}</div>
+      <div class="versiones ${c.ancho || c.l.length === 1 ? "una" : ""}">${c.l.map(p => `<article class="ver"><div class="ver-vivo">${vivo(p.id)}</div>
+        <div class="ver-pie"><span class="pro" style="--c:${color(p.proyecto)}"><i></i>${esc(p.proyecto.replace(/ \(.*\)$/, ""))}</span><span class="ver-nom">${esc(p.nombre)}</span><a class="ver-cod" ${ira({ p: p.id })}>Código y reglas</a></div></article>`).join("")}</div></section>`).join("");
+}
+document.addEventListener("click", e => { const s = e.target.closest("[data-salto]"); if (!s) return; e.preventDefault(); $(s.dataset.salto)?.scrollIntoView({ behavior: "smooth" }); });
 function vistaGrupo() {
-  const g = GR[estado.g]; visibles = delGrupo(g.id);
+  const g = GR[estado.g];
+  if (g.directo) return vistaDirecta(g);
+  visibles = delGrupo(g.id);
   return `<div class="vista-head"><div><div class="miga"><a ${ira({ g: "" })}>Biblioteca</a> › ${esc(g.familia)}</div><h2>${esc(g.titulo)}</h2><p>${esc(g.descripcion)} · ${plural(visibles.length, "pieza", "piezas")}</p></div>${chipProyecto()}</div>` +
     (visibles.length ? `<div class="rejilla">${visibles.map(tarjeta).join("")}</div>` : sinNada("Ningún proyecto de este filtro tiene piezas de este grupo."));
 }
@@ -298,7 +341,7 @@ function vistaBusqueda() {
 }
 function pintarVista() {
   $("vista").innerHTML = q ? vistaBusqueda() : estado.g && GR[estado.g] ? vistaGrupo() : vistaInicio();
-  $("vista").querySelectorAll(".mini iframe").forEach(f => vigia.observe(f));
+  $("vista").querySelectorAll("iframe[data-id]").forEach(f => vigia.observe(f));
   for (const id of ["quitarPro", "quitarPro2"]) if ($(id)) $(id).onclick = () => ir({ pro: "" });
 }
 

@@ -1,0 +1,1263 @@
+{
+ "proyectos": [
+  {
+   "proyecto": "Bambina",
+   "paleta": {
+    "fondo": "#000000",
+    "fondo-alt": "#111111",
+    "superficie": "#1a1a1a",
+    "texto": "#ffffff",
+    "texto-suave": "#bcbcbc",
+    "texto-tenue": "#999999",
+    "borde": "#2b2b2b",
+    "acento": "#facbe5",
+    "acento-hover": "#f9e4ed",
+    "acento-fuerte": "#f59cc5",
+    "error": "#950f1e"
+   },
+   "tipografia": "Chivo (sans) en todo; radios 4px/12px y botones en píldora rosa con texto oscuro"
+  },
+  {
+   "proyecto": "Mar de Dunas (web-playa)",
+   "paleta": {
+    "fondo-panel": "#f3f6fa",
+    "tarjeta": "#ffffff",
+    "marino": "#13233f",
+    "azul": "#0a63d8",
+    "cielo": "#d3e3ec",
+    "cielo-tarjeta": "#e7f0f6",
+    "sol": "#ffb400",
+    "texto-suave": "#56617a",
+    "linea": "rgba(19,35,63,.09)",
+    "ok": "#1f7a4d",
+    "ok-fondo": "#eaf5ee",
+    "error": "#c62f2f",
+    "error-fondo": "#fbeceb",
+    "aviso": "#a86a00",
+    "segmentado": "#e4ebf2"
+   },
+   "tipografia": "Instrument Serif (titulares en MAYÚSCULAS, palabra destacada en cursiva azul) + Archivo Variable para todo lo informativo; Pinyon Script solo en el logo"
+  },
+  {
+   "proyecto": "Santana Motors (panel Medusa)",
+   "paleta": {
+    "negro-santana": "#020203",
+    "tarjeta-oscura": "#0b0b0d",
+    "componente": "#1b1b1b",
+    "texto": "#ffffff",
+    "texto-suave": "#a9a9a9",
+    "texto-tenue": "#8f8f90",
+    "borde-oscuro": "rgba(255,255,255,.1)",
+    "fondo-claro": "#f5f5f5",
+    "texto-claro": "#020203",
+    "texto-suave-claro": "#55555a",
+    "borde-claro": "rgba(2,2,3,.09)",
+    "naranja-aviso": "#c2410c",
+    "error": "#e11d48"
+   },
+   "tipografia": "Krona One para títulos de página/paneles + Manrope para todo lo demás; monocromo sin acento de color, botones en píldora"
+  },
+  {
+   "proyecto": "Panel de Rocío (web_rocio_nueva)",
+   "paleta": {
+    "menta": "#def1ec",
+    "menta-2": "#b3e8da",
+    "melocoton": "#ffb5a7",
+    "melocoton-2": "#f59a89",
+    "melocoton-3": "#ec8573",
+    "fondo": "#f1f7f5",
+    "texto": "#000000",
+    "texto-suave": "#555555",
+    "linea": "#e3eeea",
+    "borde-campo": "#d6e3df",
+    "verde-vivo": "#5fae97",
+    "verde-suave": "#e6f5f0",
+    "error": "#c2410c",
+    "ok": "#2e7d5b",
+    "icono-menu": "#7fa69a"
+   },
+   "tipografia": "DM Sans 400/600 en todo el panel; Taberna Script (caligrafía) solo en el título de acceso"
+  },
+  {
+   "proyecto": "Arbitraje (y Designaciones, su prototipo)",
+   "paleta": {
+    "fondo": "#f3f2ee",
+    "tarjeta": "#ffffff",
+    "texto": "#111111",
+    "texto-suave": "#6b6b66",
+    "linea": "#e6e4dd",
+    "lima": "#d4ec3a",
+    "lima-texto": "#1d2400",
+    "lima-oscuro": "#9fb81a",
+    "chip": "#efeee9",
+    "barra-oscura": "#16160f",
+    "texto-barra": "#f4f3ee",
+    "ok": "#2f7a3a",
+    "mal": "#a3352b"
+   },
+   "tipografia": "Inter 400-800 (marca en 800 con letter-spacing -.02em); modo oscuro automático con prefers-color-scheme"
+  },
+  {
+   "proyecto": "Fichaje",
+   "paleta": {
+    "texto": "#15161a",
+    "texto-2": "#3a3a33",
+    "lima": "#d6e022",
+    "lima-oscuro": "#aebb0c",
+    "fondo": "#f7f6f0",
+    "superficie": "#ffffff",
+    "gris": "#e4e2d8",
+    "pista": "#ece9de",
+    "peligro": "#a3352b",
+    "exito": "#2f6b2f",
+    "oscuro-fondo": "#111217",
+    "oscuro-superficie": "#191a20"
+   },
+   "tipografia": "-apple-system / Inter / SF Pro Text; cifras con font-variant-numeric: tabular-nums; radios grandes (22-28px) y píldoras"
+  }
+ ],
+ "piezas": [
+  {
+   "id": "bb-acceso-contrasena",
+   "nombre": "Acceso con una sola contraseña",
+   "categoria": "acceso",
+   "proyecto": "Bambina",
+   "stack": "astro",
+   "archivos": [
+    "/Users/lolyfernandezrodriguez/Desktop/Bambina/src/pages/panel-7806a9e2/index.astro:8",
+    "/Users/lolyfernandezrodriguez/Desktop/Bambina/src/pages/panel-7806a9e2/index.astro:166"
+   ],
+   "descripcion": "Pantalla mínima de panel privado: título, un campo de contraseña y botón píldora; el error aparece en línea bajo el botón.",
+   "cuando_usar": "Paneles de una sola persona sin usuarios (tienda pequeña) donde basta una contraseña compartida.",
+   "reglas": [
+    "La ruta del panel es secreta (/panel-7806a9e2) y la contraseña se cambia con un commit dedicado (d96ac50 «Nueva contraseña del panel de administración»).",
+    "Los errores de formulario no usan el globo nativo del navegador (blanco, fuera de estilo en una web negra): mensaje en línea con los colores del sitio (src/scripts/form-validation.ts)."
+   ],
+   "html": "<div class=\"bb-acceso\">\n  <h1>Panel privado</h1>\n  <form class=\"bb-acceso__form\" onsubmit=\"return false\">\n    <label>Contraseña<input type=\"password\" placeholder=\"••••••••\"></label>\n    <button type=\"submit\" class=\"bb-acceso__btn\">Entrar</button>\n    <p class=\"bb-acceso__error\">Contraseña incorrecta.</p>\n  </form>\n</div>",
+   "css": ".bb-acceso{background:#000;color:#fff;font-family:\"Chivo\",system-ui,sans-serif;padding:48px 32px;max-width:520px}\n.bb-acceso h1{margin:0 0 24px;font-size:2rem;font-weight:700}\n.bb-acceso__form{display:flex;flex-direction:column;gap:16px;max-width:420px}\n.bb-acceso__form label{display:flex;flex-direction:column;gap:.35em;font-size:.85rem;color:#999}\n.bb-acceso__form input{font-family:inherit;font-size:.95rem;color:#fff;background:#111;border:1px solid #2b2b2b;border-radius:4px;padding:.6em .75em}\n.bb-acceso__btn{align-self:flex-start;display:inline-flex;align-items:center;justify-content:center;padding:.85em 1.6em;border-radius:999px;background:#facbe5;color:#1a1a1a;font:700 .95rem \"Chivo\",system-ui,sans-serif;border:0;cursor:pointer;transition:background-color .2s,transform .2s,box-shadow .2s}\n.bb-acceso__btn:hover{background:#f9e4ed;transform:translateY(-1px);box-shadow:0 6px 16px -6px rgba(245,156,197,.5)}\n.bb-acceso__btn:active{transform:scale(.97)}\n.bb-acceso__error{color:#950f1e;font-size:.85rem;margin:0}",
+   "js": ""
+  },
+  {
+   "id": "bb-pestanas-subrayado",
+   "nombre": "Pestañas con subrayado de acento",
+   "categoria": "navegacion",
+   "proyecto": "Bambina",
+   "stack": "astro",
+   "archivos": [
+    "/Users/lolyfernandezrodriguez/Desktop/Bambina/src/pages/panel-7806a9e2/index.astro:26",
+    "/Users/lolyfernandezrodriguez/Desktop/Bambina/src/pages/panel-7806a9e2/index.astro:260"
+   ],
+   "descripcion": "Dos o tres pestañas de texto en negrita sobre una línea; la activa se ilumina y lleva subrayado rosa de 2px.",
+   "cuando_usar": "Para separar dos áreas de un panel muy pequeño (p. ej. Productos / Notas de compra) sin menú lateral.",
+   "reglas": [
+    "Pestañas en el cliente (data-tab-btn / data-tab con hidden): todo el panel es una sola página.",
+    "Variante más rica: control segmentado con pastilla deslizante (fi-segmentado-pastilla)."
+   ],
+   "html": "<div class=\"bb-tabs\">\n  <button type=\"button\" class=\"bb-tabs__btn is-active\">Productos</button>\n  <button type=\"button\" class=\"bb-tabs__btn\">Notas de compra</button>\n</div>",
+   "css": ".bb-tabs{display:flex;gap:16px;margin:32px 0;border-bottom:1px solid #2b2b2b;background:#000;padding:0 16px;font-family:\"Chivo\",system-ui,sans-serif}\n.bb-tabs__btn{background:none;border:none;color:#999;font:700 1rem \"Chivo\",system-ui,sans-serif;padding:.6em .2em;margin-bottom:-1px;border-bottom:2px solid transparent;cursor:pointer}\n.bb-tabs__btn.is-active{color:#fff;border-bottom-color:#f59cc5}",
+   "js": "document.querySelectorAll('.bb-tabs').forEach(function(t){t.addEventListener('click',function(e){var b=e.target.closest('.bb-tabs__btn');if(!b)return;t.querySelectorAll('.bb-tabs__btn').forEach(function(x){x.classList.toggle('is-active',x===b)});});});"
+  },
+  {
+   "id": "bb-editor-variantes",
+   "nombre": "Editor de variantes repetibles",
+   "categoria": "formularios",
+   "proyecto": "Bambina",
+   "stack": "astro",
+   "archivos": [
+    "/Users/lolyfernandezrodriguez/Desktop/Bambina/src/pages/panel-7806a9e2/index.astro:111",
+    "/Users/lolyfernandezrodriguez/Desktop/Bambina/src/pages/panel-7806a9e2/index.astro:488",
+    "/Users/lolyfernandezrodriguez/Desktop/Bambina/src/pages/panel-7806a9e2/index.astro:536"
+   ],
+   "descripcion": "Caja con antetítulo en mayúsculas y filas nombre / precio / precio tachado / Quitar; un botón «+ Añadir variante» crea filas nuevas.",
+   "cuando_usar": "Cuando un registro tiene una lista variable de subelementos con varios campos (variantes, tallas, tramos).",
+   "reglas": [
+    "Las filas añadidas después de activar la validación propia no quedan cubiertas: cada fila nueva replica el mensaje de error en línea (comentario en addOptionRow).",
+    "El precio tachado es opcional y va en su propia columna para no mezclarlo con el precio real."
+   ],
+   "html": "<div class=\"bb-variantes\">\n  <p class=\"bb-variantes__label\">Variantes</p>\n  <div class=\"bb-variantes__filas\">\n    <div class=\"bb-variantes__fila\"><input value=\"Taza blanca\"><input type=\"number\" value=\"14.90\"><input type=\"number\" placeholder=\"Precio tachado (opcional)\"><button type=\"button\" class=\"bb-variantes__btn\">Quitar</button></div>\n    <div class=\"bb-variantes__fila\"><input value=\"Taza negra\"><input type=\"number\" value=\"16.50\"><input type=\"number\" value=\"19.00\"><button type=\"button\" class=\"bb-variantes__btn\">Quitar</button></div>\n  </div>\n  <button type=\"button\" class=\"bb-variantes__btn bb-variantes__add\">+ Añadir variante</button>\n</div>",
+   "css": ".bb-variantes{background:#000;color:#fff;font-family:\"Chivo\",system-ui,sans-serif;border:1px solid #2b2b2b;border-radius:4px;padding:16px 32px;max-width:640px}\n.bb-variantes__label{text-transform:uppercase;letter-spacing:.08em;font-size:.75rem;color:#999;font-weight:700;margin:0 0 12px}\n.bb-variantes__fila{display:grid;grid-template-columns:1fr auto auto auto;gap:.5em;align-items:center;margin-bottom:.5em}\n.bb-variantes__fila input{font-family:inherit;font-size:.9rem;color:#fff;background:#111;border:1px solid #2b2b2b;border-radius:4px;padding:.5em .6em;width:100%;box-sizing:border-box}\n.bb-variantes__btn{display:inline-flex;align-items:center;padding:.5em 1em;font:700 .8rem \"Chivo\",system-ui,sans-serif;border-radius:999px;background:transparent;color:#fff;border:1px solid #2b2b2b;cursor:pointer}\n.bb-variantes__btn:hover{border-color:#f59cc5;color:#f59cc5}\n.bb-variantes__add{margin-top:4px}",
+   "js": "document.querySelectorAll('.bb-variantes').forEach(function(b){b.addEventListener('click',function(e){var t=e.target;if(t.classList.contains('bb-variantes__add')){var f=document.createElement('div');f.className='bb-variantes__fila';f.innerHTML='<input placeholder=\"Nombre de la variante\"><input type=\"number\" placeholder=\"Precio\"><input type=\"number\" placeholder=\"Precio tachado (opcional)\"><button type=\"button\" class=\"bb-variantes__btn\">Quitar</button>';b.querySelector('.bb-variantes__filas').appendChild(f);}else if(t.classList.contains('bb-variantes__btn')){t.closest('.bb-variantes__fila').remove();}});});"
+  },
+  {
+   "id": "bb-subida-miniaturas",
+   "nombre": "Subida de fotos y vídeos con miniaturas pendientes",
+   "categoria": "formularios",
+   "proyecto": "Bambina",
+   "stack": "astro",
+   "archivos": [
+    "/Users/lolyfernandezrodriguez/Desktop/Bambina/src/pages/panel-7806a9e2/index.astro:62",
+    "/Users/lolyfernandezrodriguez/Desktop/Bambina/src/pages/panel-7806a9e2/index.astro:424",
+    "/Users/lolyfernandezrodriguez/Desktop/Bambina/src/pages/panel-7806a9e2/index.astro:745"
+   ],
+   "descripcion": "Selector de archivos múltiple + botón «Subir contenido» con estado; las subidas quedan como miniaturas de 56px con una × roja para quitarlas antes de guardar.",
+   "cuando_usar": "Formularios donde se suben varias imágenes/vídeos y conviene saber al momento si la subida ha funcionado.",
+   "reglas": [
+    "Se sube aparte de «Guardar producto» para que el usuario vea de inmediato si la subida funcionó, en vez de descubrirlo al enviar todo el formulario (comentario junto a pendingMedia).",
+    "La primera imagen subida es la portada del producto; se explica en una pista bajo el campo.",
+    "Variante con arrastrar y soltar sobre la propia foto: sm-tarjeta-producto (Santana)."
+   ],
+   "html": "<div class=\"bb-subida\">\n  <label>Fotos y vídeos<input type=\"file\" accept=\"image/*,video/*\" multiple></label>\n  <div class=\"bb-subida__fila\"><button type=\"button\" class=\"bb-subida__btn\">Subir contenido</button><span class=\"bb-subida__estado\">2 archivos subidos</span></div>\n  <div class=\"bb-subida__thumbs\">\n    <div class=\"bb-subida__thumb\"><div class=\"bb-subida__img\" style=\"background:linear-gradient(135deg,#f59cc5,#333)\"></div><button type=\"button\" aria-label=\"Quitar\">×</button></div>\n    <div class=\"bb-subida__thumb\"><div class=\"bb-subida__img\" style=\"background:linear-gradient(135deg,#facbe5,#111)\"></div><button type=\"button\" aria-label=\"Quitar\">×</button></div>\n  </div>\n  <p class=\"bb-subida__hint\">La primera imagen que subas será la portada del producto. Puedes añadir varias fotos y también vídeos.</p>\n</div>",
+   "css": ".bb-subida{background:#000;color:#fff;font-family:\"Chivo\",system-ui,sans-serif;padding:24px;max-width:420px;display:flex;flex-direction:column;gap:10px}\n.bb-subida label{display:flex;flex-direction:column;gap:.35em;font-size:.85rem;color:#999}\n.bb-subida input[type=file]{font:inherit;color:#bcbcbc;background:#111;border:1px solid #2b2b2b;border-radius:4px;padding:.6em .75em}\n.bb-subida__fila{display:flex;align-items:center;gap:.6em}\n.bb-subida__btn{padding:.5em 1em;font:700 .8rem \"Chivo\",system-ui,sans-serif;border-radius:999px;background:transparent;color:#fff;border:1px solid #2b2b2b;cursor:pointer}\n.bb-subida__btn:hover{border-color:#f59cc5;color:#f59cc5}\n.bb-subida__estado{font-size:.8rem;color:#999}\n.bb-subida__thumbs{display:flex;gap:.5em;flex-wrap:wrap}\n.bb-subida__thumb{position:relative}\n.bb-subida__img{width:56px;height:56px;border-radius:2px;background:#111}\n.bb-subida__thumb button{position:absolute;top:-.4em;right:-.4em;width:1.3em;height:1.3em;line-height:1;border-radius:50%;border:none;background:#950f1e;color:#fff;font-size:.75rem;cursor:pointer}\n.bb-subida__hint{color:#999;font-size:.8rem;margin:0}",
+   "js": "document.querySelectorAll('.bb-subida__thumb button').forEach(function(b){b.addEventListener('click',function(){b.parentElement.remove();});});"
+  },
+  {
+   "id": "bb-tabla-estado-editable",
+   "nombre": "Tabla de pedidos con estado editable en la fila",
+   "categoria": "listados",
+   "proyecto": "Bambina",
+   "stack": "astro",
+   "archivos": [
+    "/Users/lolyfernandezrodriguez/Desktop/Bambina/src/pages/panel-7806a9e2/index.astro:147",
+    "/Users/lolyfernandezrodriguez/Desktop/Bambina/src/pages/panel-7806a9e2/index.astro:295",
+    "/Users/lolyfernandezrodriguez/Desktop/Bambina/src/pages/panel-7806a9e2/index.astro:970"
+   ],
+   "descripcion": "Tabla compacta con cabeceras en mayúsculas pequeñas; la última columna es un desplegable de estado (Pendiente / En proceso / Enviado / Entregado) que guarda al cambiar.",
+   "cuando_usar": "Listas que se rellenan solas (pedidos de la tienda) y en las que la única acción es avanzar el estado.",
+   "reglas": [
+    "Texto de ayuda encima: «Esta lista se rellena sola… solo actualizar el estado» para que nadie anote a mano.",
+    "Guardado inmediato con PATCH al cambiar el select, sin botón Guardar."
+   ],
+   "html": "<div class=\"bb-pedidos\">\n  <table>\n    <thead><tr><th>Fecha</th><th>Cliente</th><th>Producto</th><th>Importe</th><th>Estado</th></tr></thead>\n    <tbody>\n      <tr><td>12/11/2026</td><td>Lucía Pérez</td><td>Letrero neón «Hola»</td><td>89.00€</td><td><select><option>Pendiente</option><option selected>En proceso</option><option>Enviado</option><option>Entregado</option></select></td></tr>\n      <tr><td>10/11/2026</td><td>Marcos Gil</td><td>Cartel mascota</td><td>120.00€</td><td><select><option>Pendiente</option><option>En proceso</option><option selected>Enviado</option><option>Entregado</option></select></td></tr>\n    </tbody>\n  </table>\n</div>",
+   "css": ".bb-pedidos{background:#000;padding:16px;font-family:\"Chivo\",system-ui,sans-serif}\n.bb-pedidos table{width:100%;border-collapse:collapse;font-size:.85rem}\n.bb-pedidos th,.bb-pedidos td{text-align:left;padding:.5em .6em;border-bottom:1px solid #2b2b2b;color:#bcbcbc}\n.bb-pedidos th{color:#999;text-transform:uppercase;font-size:.7rem;letter-spacing:.06em}\n.bb-pedidos select{font:inherit;color:#fff;background:#111;border:1px solid #2b2b2b;border-radius:4px;padding:.3em .5em}",
+   "js": ""
+  },
+  {
+   "id": "bb-tarjeta-producto-estado",
+   "nombre": "Rejilla de tarjetas de producto con estado Activo/Inactivo",
+   "categoria": "listados",
+   "proyecto": "Bambina",
+   "stack": "astro",
+   "archivos": [
+    "/Users/lolyfernandezrodriguez/Desktop/Bambina/src/pages/panel-7806a9e2/index.astro:317",
+    "/Users/lolyfernandezrodriguez/Desktop/Bambina/src/pages/panel-7806a9e2/index.astro:684"
+   ],
+   "descripcion": "Rejilla auto-fill de tarjetas de 150px: foto cuadrada, nombre, slug, precio en rosa, pastilla de estado y botones Editar / Desactivar; se elevan al pasar el ratón.",
+   "cuando_usar": "Catálogos cortos gestionados a mano donde importa ver de un vistazo qué está publicado.",
+   "reglas": [
+    "Los productos que vienen del código (products.ts) se muestran con una etiqueta «Código (products.ts)» en lugar de botones: no se pueden editar desde el panel.",
+    "Formulario a la izquierda y lista a la derecha; por debajo de 960px se apilan (formulario primero)."
+   ],
+   "html": "<div class=\"bb-prods\">\n  <div class=\"bb-prods__card\">\n    <div class=\"bb-prods__img\" style=\"background:linear-gradient(135deg,#f59cc5,#1a1a1a)\"></div>\n    <p class=\"bb-prods__name\">Letrero «Luna»</p><p class=\"bb-prods__slug\">letrero-luna</p><p class=\"bb-prods__price\">65.00€</p>\n    <p class=\"bb-prods__status is-active\">Activo</p>\n    <div class=\"bb-prods__actions\"><button class=\"bb-prods__btn\">Editar</button><button class=\"bb-prods__btn\">Desactivar</button></div>\n  </div>\n  <div class=\"bb-prods__card\">\n    <div class=\"bb-prods__img\" style=\"background:linear-gradient(135deg,#333,#111)\"></div>\n    <p class=\"bb-prods__name\">Cartel mascota</p><p class=\"bb-prods__slug\">cartel-mascota</p><p class=\"bb-prods__price\">120.00€</p>\n    <p class=\"bb-prods__status is-inactive\">Inactivo</p>\n    <div class=\"bb-prods__actions\"><button class=\"bb-prods__btn\">Editar</button><button class=\"bb-prods__btn\">Activar</button></div>\n  </div>\n</div>",
+   "css": ".bb-prods{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:32px;background:#000;padding:24px;font-family:\"Chivo\",system-ui,sans-serif;max-width:520px}\n.bb-prods__card{display:flex;flex-direction:column;gap:.5em;background:#1a1a1a;border:1px solid #2b2b2b;border-radius:12px;padding:16px;transition:border-color .2s,transform .2s,box-shadow .2s}\n.bb-prods__card:hover{border-color:#f59cc5;transform:translateY(-2px);box-shadow:0 10px 24px -12px rgba(245,156,197,.35)}\n.bb-prods__img{width:100%;aspect-ratio:1/1;border-radius:4px;background:#111}\n.bb-prods__name{font-size:.95rem;font-weight:700;color:#fff;margin:0}\n.bb-prods__slug{font-size:.72rem;color:#999;margin:0}\n.bb-prods__price{font-size:1rem;font-weight:700;color:#f59cc5;margin:0}\n.bb-prods__status{align-self:flex-start;font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;padding:.3em .8em;border-radius:999px;margin:0}\n.bb-prods__status.is-active{color:#f59cc5;background:rgba(245,156,197,.12)}\n.bb-prods__status.is-inactive{color:#999;background:#111}\n.bb-prods__actions{display:flex;flex-direction:column;gap:.4em;margin-top:auto}\n.bb-prods__btn{padding:.5em 1em;font:700 .8rem \"Chivo\",system-ui,sans-serif;border-radius:999px;background:transparent;color:#fff;border:1px solid #2b2b2b;cursor:pointer;width:100%}\n.bb-prods__btn:hover{border-color:#f59cc5;color:#f59cc5}",
+   "js": ""
+  },
+  {
+   "id": "wp-menu-lateral-grupos",
+   "nombre": "Menú lateral por grupos con usuario al pie",
+   "categoria": "navegacion",
+   "proyecto": "Mar de Dunas (web-playa)",
+   "stack": "astro",
+   "archivos": [
+    "/Users/lolyfernandezrodriguez/Desktop/web-playa/src/layouts/AdminLayout.astro:24",
+    "/Users/lolyfernandezrodriguez/Desktop/web-playa/src/layouts/AdminLayout.astro:85",
+    "/Users/lolyfernandezrodriguez/Desktop/web-playa/src/layouts/AdminLayout.astro:984"
+   ],
+   "descripcion": "Barra lateral blanca de 250px: logo, grupos con etiqueta azul (Día a día, Apartamento, Web, Sistema), enlace activo como píldora marino, y al pie nombre+rol, Salir y «Ver la web ↗».",
+   "cuando_usar": "Paneles con 8-15 secciones agrupables y varios roles (los enlaces se filtran por permiso).",
+   "reglas": [
+    "Código en el historial: git show 0fa3a82^:<ruta> (el panel pasó a reservas.majosoft.es en 0fa3a82).",
+    "Los grupos se calculan por rol y desaparecen si quedan vacíos (adminOnly + canAccess).",
+    "Evolución en commits: identidad de la web (b3e27b6) → más color con menú marino (6031276) → aspecto Apple, menú claro (033197c) → «tu estética encima»: menú blanco con activo marino (8429492).",
+    "En ≤900px el menú sale fuera de pantalla y se abre con un botón «Menú» (aria-expanded); el resto se oscurece con box-shadow de 100vmax.",
+    "Variante con iconos y contadores: ro-menu-lateral-iconos."
+   ],
+   "html": "<aside class=\"wp-nav\">\n  <div class=\"wp-nav__brand\">MAR DE DUNAS<small>Gestión de reservas</small></div>\n  <nav>\n    <div class=\"wp-nav__group\"><p class=\"wp-nav__label\">Día a día</p><a href=\"#\" aria-current=\"page\">Hoy</a><a href=\"#\">Calendario</a><a href=\"#\">Reservas</a><a href=\"#\">Mensajes</a></div>\n    <div class=\"wp-nav__group\"><p class=\"wp-nav__label\">Apartamento</p><a href=\"#\">Ficha y fotos</a><a href=\"#\">Precios y temporadas</a></div>\n    <div class=\"wp-nav__group\"><p class=\"wp-nav__label\">Sistema</p><a href=\"#\">Registro</a><a href=\"#\">Mi cuenta</a></div>\n  </nav>\n  <div class=\"wp-nav__user\"><span>Ana Torres<small>Administración</small></span><button type=\"button\">Salir</button></div>\n  <a href=\"#\" class=\"wp-nav__site\">Ver la web ↗</a>\n</aside>",
+   "css": ".wp-nav{display:flex;flex-direction:column;gap:1.6rem;width:250px;min-height:560px;box-sizing:border-box;padding:1.8rem 1.4rem 1.4rem;background:#fff;border-right:1px solid rgba(19,35,63,.09);font-family:\"Archivo Variable\",\"Archivo\",system-ui,sans-serif;color:#13233f}\n.wp-nav__brand{font:400 1.35rem/1 \"Instrument Serif\",Georgia,serif;letter-spacing:.04em}\n.wp-nav__brand small{display:block;margin-top:.35rem;font:400 .75rem/1.3 \"Archivo\",system-ui,sans-serif;color:#56617a}\n.wp-nav nav{display:flex;flex-direction:column;gap:1.3rem}\n.wp-nav__label{margin:0 0 .25rem .6rem;color:#0a63d8;font:600 .72rem/1.4 \"Archivo\",system-ui,sans-serif}\n.wp-nav__group a{display:block;padding:.42rem .7rem;border-radius:8px;color:#13233f;font:400 .9rem/1.3 \"Archivo\",system-ui,sans-serif;text-decoration:none}\n.wp-nav__group a:hover{background:rgba(0,0,0,.05)}\n.wp-nav__group a[aria-current=page]{background:#13233f;color:#fff;font-weight:500}\n.wp-nav__user{display:flex;align-items:center;justify-content:space-between;gap:.6rem;margin-top:auto;padding-top:1rem;border-top:1px solid rgba(19,35,63,.09);font-size:.88rem}\n.wp-nav__user span{display:flex;flex-direction:column}\n.wp-nav__user small{color:#56617a;font-size:.8rem}\n.wp-nav__user button{padding:0;border:0;background:none;color:inherit;font:inherit;text-decoration:underline;text-underline-offset:3px;cursor:pointer}\n.wp-nav__site{color:#56617a;font-size:.8rem;text-decoration:none}\n.wp-nav__site:hover{color:#0a63d8}",
+   "js": ""
+  },
+  {
+   "id": "wp-cabecera-pagina",
+   "nombre": "Cabecera de página con antetítulo, título serif y acciones",
+   "categoria": "navegacion",
+   "proyecto": "Mar de Dunas (web-playa)",
+   "stack": "astro",
+   "archivos": [
+    "/Users/lolyfernandezrodriguez/Desktop/web-playa/src/layouts/AdminLayout.astro:115",
+    "/Users/lolyfernandezrodriguez/Desktop/web-playa/src/components/ui/Title.astro:1",
+    "/Users/lolyfernandezrodriguez/Desktop/web-playa/src/layouts/AdminLayout.astro:1301"
+   ],
+   "descripcion": "Antetítulo azul con la sección del menú, título en Instrument Serif mayúsculas (lo que va entre *asteriscos* sale en cursiva azul), subtítulo gris y botones a la derecha.",
+   "cuando_usar": "Arriba de cada página del panel para orientar (en qué grupo estoy) y concentrar las acciones principales.",
+   "reglas": [
+    "Código en el historial: git show 0fa3a82^:<ruta> (el panel pasó a reservas.majosoft.es en 0fa3a82).",
+    "El antetítulo se deduce solo del grupo del menú en que está la página.",
+    "El subtítulo explica qué se puede hacer aquí («Pulsa un día libre para crear una reserva…»), no repite el título.",
+    "En móvil las acciones pasan a ocupar todo el ancho bajo el título."
+   ],
+   "html": "<header class=\"wp-top\">\n  <div class=\"wp-top__title\">\n    <p class=\"wp-top__eyebrow\">Día a día</p>\n    <h1>Hola de <em>nuevo</em></h1>\n    <p class=\"wp-top__sub\">3 resultados · busca, filtra y abre cualquier reserva o bloqueo</p>\n  </div>\n  <div class=\"wp-top__actions\"><a href=\"#\" class=\"wp-top__btn\">Nueva reserva</a></div>\n</header>",
+   "css": ".wp-top{display:flex;align-items:flex-end;gap:1.2rem;flex-wrap:wrap;padding:2.6rem 2.6rem 1.2rem;background:#f3f6fa;font-family:\"Archivo Variable\",\"Archivo\",system-ui,sans-serif;color:#13233f}\n.wp-top__title{flex:1;min-width:0}\n.wp-top__eyebrow{margin:0 0 .3rem;color:#0a63d8;font:600 .85rem/1.4 \"Archivo\",system-ui,sans-serif}\n.wp-top h1{margin:0;font:400 2.7rem/1 \"Instrument Serif\",Georgia,serif;text-transform:uppercase;letter-spacing:.01em;color:#13233f}\n.wp-top h1 em{font:italic 400 1em/1 \"Instrument Serif\",Georgia,serif;text-transform:none;color:#0a63d8}\n.wp-top__sub{margin:.4rem 0 0;color:#56617a;font-size:1rem}\n.wp-top__actions{display:flex;flex-wrap:wrap;gap:.5rem}\n.wp-top__btn{padding:.62rem 1.2rem;border-radius:980px;background:#13233f;color:#fff;font:500 .9rem/1.2 \"Archivo\",system-ui,sans-serif;text-decoration:none}\n.wp-top__btn:hover{background:#0a63d8}\n@media (max-width:700px){.wp-top{padding:1.2rem 1rem}.wp-top h1{font-size:1.9rem}.wp-top__actions{width:100%}}",
+   "js": ""
+  },
+  {
+   "id": "wp-kpi-cifras",
+   "nombre": "Cifras destacadas (Stat) con tonos",
+   "categoria": "estadisticas",
+   "proyecto": "Mar de Dunas (web-playa)",
+   "stack": "astro",
+   "archivos": [
+    "/Users/lolyfernandezrodriguez/Desktop/web-playa/src/components/ui/Stat.astro:1",
+    "/Users/lolyfernandezrodriguez/Desktop/web-playa/src/pages/admin/index.astro:82",
+    "/Users/lolyfernandezrodriguez/Desktop/web-playa/src/layouts/AdminLayout.astro:1147"
+   ],
+   "descripcion": "Tarjetas blancas redondeadas (18px) con etiqueta gris, número grande en serif y nota; tonos marino, cielo y sol para distinguir las tres cifras del día.",
+   "cuando_usar": "Portada del panel: 3-4 números que responden «¿qué pasa hoy/este mes?», opcionalmente enlazados a su listado.",
+   "reglas": [
+    "Código en el historial: git show 0fa3a82^:<ruta> (el panel pasó a reservas.majosoft.es en 0fa3a82).",
+    "Si la tarjeta lleva href se convierte en enlace y al pasar marca el borde.",
+    "La nota da contexto del número («12 de 30 noches», «pendiente total: …») en vez de otra cifra suelta.",
+    "Las cifras del mes llevan su propio navegador ← mes → con «Mes actual» (6031276 «meses en Hoy»).",
+    "Variantes: Santana (sm-kpi-tienda, la cifra se tiñe de naranja/rojo si hay algo que hacer), Fichaje resumen-tile (--aviso en rojo), Rocío ro-kpi-en-vivo."
+   ],
+   "html": "<div class=\"wp-stats\">\n  <div class=\"wp-stat wp-stat--blue\"><span class=\"wp-stat__label\">Llegan hoy</span><strong class=\"wp-stat__value\">2</strong></div>\n  <div class=\"wp-stat wp-stat--sky\"><span class=\"wp-stat__label\">Se van hoy</span><strong class=\"wp-stat__value\">1</strong></div>\n  <a href=\"#\" class=\"wp-stat wp-stat--sun\"><span class=\"wp-stat__label\">Ocupación</span><strong class=\"wp-stat__value\">68 %</strong><span class=\"wp-stat__note\">21 de 31 noches</span></a>\n</div>",
+   "css": ".wp-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:.8rem;padding:1rem;background:#f3f6fa;font-family:\"Archivo Variable\",\"Archivo\",system-ui,sans-serif}\n.wp-stat{display:flex;flex-direction:column;gap:.45rem;padding:1.1rem 1.2rem;border:1px solid rgba(19,35,63,.09);border-radius:18px;background:#fff;box-shadow:0 1px 2px rgba(19,35,63,.04),0 10px 30px -12px rgba(19,35,63,.12);color:#13233f;text-decoration:none}\na.wp-stat:hover{border-color:#13233f}\n.wp-stat__label{color:#56617a;font:500 .82rem/1.4 \"Archivo\",system-ui,sans-serif}\n.wp-stat__value{font:400 2.5rem/1 \"Instrument Serif\",Georgia,serif;letter-spacing:.01em}\n.wp-stat__note{font-size:.8rem;color:#56617a}\n.wp-stat--sky{background:#e7f0f6}\n.wp-stat--sun{background:#fff6e5}\n.wp-stat--blue{background:#13233f;color:#fff}\n.wp-stat--blue .wp-stat__label,.wp-stat--blue .wp-stat__note{color:rgba(255,255,255,.8)}\n@media (max-width:700px){.wp-stats{grid-template-columns:1fr 1fr}}",
+   "js": ""
+  },
+  {
+   "id": "wp-aviso-tonos",
+   "nombre": "Aviso en línea con tonos (info/ok/aviso/error)",
+   "categoria": "avisos",
+   "proyecto": "Mar de Dunas (web-playa)",
+   "stack": "astro",
+   "archivos": [
+    "/Users/lolyfernandezrodriguez/Desktop/web-playa/src/components/ui/Notice.astro:1",
+    "/Users/lolyfernandezrodriguez/Desktop/web-playa/src/layouts/AdminLayout.astro:566"
+   ],
+   "descripcion": "Bloque de texto sobre fondo suave del tono, con enlaces en negrita del mismo color; el de error lleva role=alert automáticamente.",
+   "cuando_usar": "Mensajes persistentes de página: resultado de guardar, «Todo al día», errores de acceso, advertencias de configuración.",
+   "reglas": [
+    "Código en el historial: git show 0fa3a82^:<ruta> (el panel pasó a reservas.majosoft.es en 0fa3a82).",
+    "Primera versión con raya de color a la izquierda («sin cajas llamativas»); el tema Apple (033197c) la quita y redondea a 12px.",
+    "tone=bad pone role=alert solo; los demás no interrumpen al lector de pantalla.",
+    "Variante Rocío: .msg info/error (verde/naranja suaves, 12px)."
+   ],
+   "html": "<div class=\"wp-notice wp-notice--ok\">Todo al día: no hay nada pendiente.</div>\n<div class=\"wp-notice wp-notice--warn\">El calendario de Booking lleva 4 horas sin actualizarse. <a href=\"#\">Revisar canales</a></div>\n<div class=\"wp-notice wp-notice--bad\" role=\"alert\">Email o contraseña incorrectos.</div>\n<div class=\"wp-notice wp-notice--info\">Las fechas se guardan unos minutos; si no se confirman, se liberan solas.</div>",
+   "css": ".wp-notice{margin:0 0 1rem;padding:.9rem 1.1rem;border-radius:12px;font:400 .93rem/1.5 \"Archivo Variable\",\"Archivo\",system-ui,sans-serif;max-width:560px}\n.wp-notice a{color:inherit;font-weight:600}\n.wp-notice--info{background:#d3e3ec;color:#13233f}\n.wp-notice--ok{background:#eaf5ee;color:#1b4d33}\n.wp-notice--warn{background:#fff4d9;color:#6b4300}\n.wp-notice--bad{background:#fbeceb;color:#7a1f1f}",
+   "js": ""
+  },
+  {
+   "id": "wp-calendario-ocupacion",
+   "nombre": "Calendario mensual de ocupación con barras continuas",
+   "categoria": "calendarios",
+   "proyecto": "Mar de Dunas (web-playa)",
+   "stack": "astro",
+   "archivos": [
+    "/Users/lolyfernandezrodriguez/Desktop/web-playa/src/pages/admin/calendario.astro:83",
+    "/Users/lolyfernandezrodriguez/Desktop/web-playa/src/pages/admin/calendario.astro:242"
+   ],
+   "descripcion": "Rejilla lunes-domingo con precio de cada noche libre; cada estancia es una barra que va de la mitad del día de llegada a la mitad del de salida, coloreada por estado, con el nombre y nº de personas; leyenda y % de ocupación arriba.",
+   "cuando_usar": "Disponibilidad de alojamientos, salas o recursos por noches/días donde se necesita ver huecos y solapes de un vistazo.",
+   "reglas": [
+    "Código en el historial: git show 0fa3a82^:<ruta> (el panel pasó a reservas.majosoft.es en 0fa3a82).",
+    "5a872c1 «Calendario del panel por meses: precio de cada noche y estancias como barras continuas»: rejilla sin huecos (líneas de 1px) para que las barras se lean seguidas.",
+    "La barra con el nombre va por encima de las siguientes (z-index) para que el nombre se lea entero.",
+    "Un día libre futuro es un enlace invisible a toda la celda: al pasar aparece «+ Reservar» y crea la reserva con esa fecha de llegada.",
+    "Los bloqueos/portales llevan rayado diagonal; el precio de temporada sale en ámbar.",
+    "Debajo, la misma información como lista («Estancias de noviembre») para móvil y lectores de pantalla; en ≤800px los días de la semana pasan a una letra y la barra adelgaza a 22px."
+   ],
+   "html": "<div class=\"wp-cal\">\n  <header class=\"wp-cal__head\"><div><h2>Noviembre 2026</h2><p>9 de 30 noches ocupadas · 30 %</p></div>\n    <nav class=\"wp-cal__nav\"><a href=\"#\" class=\"wp-cal__arrow\">←</a><a href=\"#\" class=\"wp-cal__today\">Hoy</a><a href=\"#\" class=\"wp-cal__arrow\">→</a></nav></header>\n  <div class=\"wp-cal__grid\">\n    <div class=\"wp-cal__dow\">Lun</div><div class=\"wp-cal__dow\">Mar</div><div class=\"wp-cal__dow\">Mié</div><div class=\"wp-cal__dow\">Jue</div><div class=\"wp-cal__dow\">Vie</div><div class=\"wp-cal__dow\">Sáb</div><div class=\"wp-cal__dow\">Dom</div>\n    <div class=\"wp-cal__day\"><span class=\"wp-cal__num\">9</span><span class=\"wp-cal__price\">180 €</span></div>\n    <div class=\"wp-cal__day wp-cal__day--today\"><span class=\"wp-cal__num\">10</span><a class=\"wp-cal__bar wp-cal__bar--in\" data-st=\"confirmada\"><span class=\"wp-cal__who\">Laura M.<small>4 pax</small></span></a></div>\n    <div class=\"wp-cal__day\"><span class=\"wp-cal__num\">11</span><a class=\"wp-cal__bar\" data-st=\"confirmada\"></a></div>\n    <div class=\"wp-cal__day\"><span class=\"wp-cal__num\">12</span><a class=\"wp-cal__bar wp-cal__bar--out\" data-st=\"confirmada\"></a><a class=\"wp-cal__bar wp-cal__bar--in\" data-st=\"pendiente\"><span class=\"wp-cal__who\">Jordi P.<small>2 pax</small></span></a></div>\n    <div class=\"wp-cal__day\"><span class=\"wp-cal__num\">13</span><a class=\"wp-cal__bar wp-cal__bar--out\" data-st=\"pendiente\"></a><span class=\"wp-cal__price\">180 €</span></div>\n    <div class=\"wp-cal__day wp-cal__day--we\"><span class=\"wp-cal__num\">14</span><a class=\"wp-cal__bar wp-cal__bar--in\" data-st=\"bloqueo\"><span class=\"wp-cal__who\">Airbnb</span></a></div>\n    <div class=\"wp-cal__day wp-cal__day--we\"><span class=\"wp-cal__num\">15</span><a class=\"wp-cal__bar\" data-st=\"bloqueo\"></a></div>\n  </div>\n  <ul class=\"wp-cal__legend\"><li><span data-st=\"confirmada\"></span>Confirmada</li><li><span data-st=\"encurso\"></span>Alojados</li><li><span data-st=\"pendiente\"></span>Pendiente de pago o solicitud</li><li><span data-st=\"bloqueo\"></span>Bloqueo o portal</li></ul>\n</div>",
+   "css": ".wp-cal{padding:1.6rem 1.8rem 1.4rem;border:1px solid rgba(19,35,63,.09);border-radius:20px;background:#fff;box-shadow:0 1px 2px rgba(19,35,63,.04),0 10px 30px -12px rgba(19,35,63,.12);font-family:\"Archivo Variable\",\"Archivo\",system-ui,sans-serif;color:#13233f}\n.wp-cal [data-st]{--bar:#dfe6ee;--ink:#13233f}\n.wp-cal [data-st=confirmada]{--bar:#13233f;--ink:#fff}\n.wp-cal [data-st=encurso]{--bar:#1f7a4d;--ink:#fff}\n.wp-cal [data-st=pendiente]{--bar:#ffcf66;--ink:#4d3200}\n.wp-cal [data-st=bloqueo]{--bar:repeating-linear-gradient(-45deg,#c9d3df 0 6px,#dde4ec 6px 12px);--ink:#13233f}\n.wp-cal__head{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:1rem;margin-bottom:1.4rem}\n.wp-cal__head h2{margin:0;font:400 2.4rem/1 \"Instrument Serif\",Georgia,serif;text-transform:uppercase}\n.wp-cal__head p{margin:.45rem 0 0;color:#56617a;font-size:.92rem}\n.wp-cal__nav{display:flex;gap:.5rem}\n.wp-cal__arrow,.wp-cal__today{display:grid;place-items:center;min-width:42px;height:42px;padding:0 .9rem;border-radius:999px;background:#fff;box-shadow:inset 0 0 0 1px rgba(19,35,63,.18);color:#13233f;text-decoration:none;font-weight:500;box-sizing:border-box}\n.wp-cal__arrow{padding:0}\n.wp-cal__arrow:hover,.wp-cal__today:hover{background:#13233f;color:#fff;box-shadow:none}\n.wp-cal__grid{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));border-top:1px solid rgba(19,35,63,.09);border-left:1px solid rgba(19,35,63,.09);border-radius:14px;overflow:hidden}\n.wp-cal__dow{padding:.6rem .7rem;border-right:1px solid rgba(19,35,63,.09);border-bottom:1px solid rgba(19,35,63,.09);background:#f3f6fa;color:#56617a;font-size:.8rem;font-weight:500}\n.wp-cal__day{position:relative;min-height:112px;padding:.55rem .65rem;border-right:1px solid rgba(19,35,63,.09);border-bottom:1px solid rgba(19,35,63,.09);background:#fff}\n.wp-cal__day--we{background:#fafbfd}\n.wp-cal__num{display:inline-grid;place-items:center;min-width:28px;height:28px;border-radius:999px;font:400 1.15rem/1 \"Instrument Serif\",Georgia,serif}\n.wp-cal__day--today .wp-cal__num{background:#0a63d8;color:#fff}\n.wp-cal__price{position:absolute;top:.75rem;right:.7rem;color:#56617a;font-size:.8rem;font-variant-numeric:tabular-nums}\n.wp-cal__bar{position:absolute;left:-1px;right:-1px;top:46px;height:44px;display:flex;align-items:center;background:var(--bar);color:var(--ink);z-index:1}\n.wp-cal__bar--in{left:50%;border-radius:999px 0 0 999px;z-index:2}\n.wp-cal__bar--out{right:50%;border-radius:0 999px 999px 0}\n.wp-cal__who{display:flex;flex-direction:column;padding:0 .7rem;font-size:.85rem;font-weight:600;line-height:1.2;white-space:nowrap}\n.wp-cal__who small{font-weight:400;font-size:.75rem;opacity:.85}\n.wp-cal__legend{display:flex;flex-wrap:wrap;gap:.6rem 1.6rem;margin:1.2rem 0 0;padding:0;list-style:none;color:#56617a;font-size:.85rem}\n.wp-cal__legend li{display:flex;align-items:center;gap:.5rem}\n.wp-cal__legend span{width:22px;height:12px;border-radius:999px;background:var(--bar)}\n@media (max-width:800px){.wp-cal{padding:1rem .8rem}.wp-cal__day{min-height:76px;padding:.35rem}.wp-cal__bar{top:34px;height:22px}.wp-cal__who{font-size:.68rem}.wp-cal__who small{display:none}.wp-cal__price{top:auto;bottom:.3rem;right:.3rem;font-size:.66rem}}",
+   "js": ""
+  },
+  {
+   "id": "wp-etiqueta-estado",
+   "nombre": "Pastilla de estado con tokens por data-status",
+   "categoria": "estados",
+   "proyecto": "Mar de Dunas (web-playa)",
+   "stack": "astro",
+   "archivos": [
+    "/Users/lolyfernandezrodriguez/Desktop/web-playa/src/components/admin/StatusBadge.astro:1",
+    "/Users/lolyfernandezrodriguez/Desktop/web-playa/src/layouts/AdminLayout.astro:663",
+    "/Users/lolyfernandezrodriguez/Desktop/web-playa/src/layouts/AdminLayout.astro:1259"
+   ],
+   "descripcion": "Pastilla suave cuyo color sale de dos variables (--st-bg / --st-ink) asignadas por [data-status]; los mismos tokens pintan las barras del calendario y la leyenda.",
+   "cuando_usar": "Cualquier listado con estados de flujo (solicitud, pendiente de pago, confirmada, en curso, cancelada, bloqueo).",
+   "reglas": [
+    "Código en el historial: git show 0fa3a82^:<ruta> (el panel pasó a reservas.majosoft.es en 0fa3a82).",
+    "Un único mapa estado→color para todo el panel: pastilla, barra de calendario y leyenda leen el mismo data-status.",
+    "Antes era texto en mayúsculas con un punto de color; con el tema Apple pasa a pastilla sin punto (033197c).",
+    "Un bloqueo se etiqueta «Bloqueo» o «Bloqueo quitado», nunca con estados de reserva.",
+    "Variantes: Fichaje .estado-badge (pendiente lima / aprobada verde / rechazada roja), Santana Badge (orange/blue/green/grey), Rocío .chip, Bambina is-active/is-inactive."
+   ],
+   "html": "<div class=\"wp-estados\">\n  <span class=\"wp-status\" data-status=\"solicitud\">Solicitud</span>\n  <span class=\"wp-status\" data-status=\"pendiente_pago\">Pendiente de pago</span>\n  <span class=\"wp-status\" data-status=\"confirmada\">Confirmada</span>\n  <span class=\"wp-status\" data-status=\"en_curso\">Alojados</span>\n  <span class=\"wp-status\" data-status=\"finalizada\">Finalizada</span>\n  <span class=\"wp-status\" data-status=\"cancelada\">Cancelada</span>\n</div>",
+   "css": ".wp-estados{display:flex;flex-wrap:wrap;gap:.5rem;padding:1rem;font-family:\"Archivo Variable\",\"Archivo\",system-ui,sans-serif}\n.wp-status{display:inline-flex;align-items:center;padding:.15rem .6rem;border-radius:980px;background:var(--st-bg);color:var(--st-ink);font:500 .78rem/1.4 \"Archivo\",system-ui,sans-serif;white-space:nowrap}\n.wp-status[data-status]{--st-bg:#f3f6fa;--st-ink:#56617a}\n.wp-status[data-status=solicitud],.wp-status[data-status=pendiente_pago]{--st-bg:#ffefc7;--st-ink:#8a5700}\n.wp-status[data-status=confirmada]{--st-bg:#d3e3ec;--st-ink:#0a63d8}\n.wp-status[data-status=en_curso]{--st-bg:#d7ecdf;--st-ink:#1f7a4d}\n.wp-status[data-status=cancelada],.wp-status[data-status=rechazada]{--st-bg:#f6e0dc;--st-ink:#c62f2f}",
+   "js": ""
+  },
+  {
+   "id": "wp-listado-reservas",
+   "nombre": "Listado con buscador, filtro segmentado y filas con avatar",
+   "categoria": "listados",
+   "proyecto": "Mar de Dunas (web-playa)",
+   "stack": "astro",
+   "archivos": [
+    "/Users/lolyfernandezrodriguez/Desktop/web-playa/src/pages/admin/reservas/index.astro:52",
+    "/Users/lolyfernandezrodriguez/Desktop/web-playa/src/pages/admin/reservas/index.astro:81",
+    "/Users/lolyfernandezrodriguez/Desktop/web-playa/src/layouts/AdminLayout.astro:599"
+   ],
+   "descripcion": "Barra con pestañas de filtro y buscador; tabla dentro de tarjeta blanca con iniciales en círculo, nombre + datos pequeños, estancia en dos líneas, estado y total alineado a la derecha; toda la fila abre el detalle; paginación «1–20 de 57».",
+   "cuando_usar": "Listados principales de entidades con persona asociada (reservas, clientes, pedidos).",
+   "reglas": [
+    "Código en el historial: git show 0fa3a82^:<ruta> (el panel pasó a reservas.majosoft.es en 0fa3a82).",
+    "Toda la fila es clicable (data-href) sin impedir los enlaces internos.",
+    "El placeholder dice por qué se puede buscar («nombre, email, teléfono o nº…»).",
+    "Sin resultados: estado vacío con enlace «Quitar la búsqueda».",
+    "En ≤800px se ocultan las columnas menos importantes (apartamento, origen) en vez de hacer scroll; alternativa más completa: ro-tabla-a-fichas.",
+    "Cifras con tabular-nums y alineadas a la derecha (.num)."
+   ],
+   "html": "<div class=\"wp-list\">\n  <div class=\"wp-list__toolbar\">\n    <nav class=\"wp-list__tabs\"><a href=\"#\" aria-current=\"page\">Próximas <span>4</span></a><a href=\"#\">Pendientes <span>1</span></a><a href=\"#\">Todas</a></nav>\n    <form class=\"wp-list__search\" onsubmit=\"return false\"><input type=\"search\" placeholder=\"Buscar por nombre, email, teléfono o nº…\"><button>Buscar</button></form>\n  </div>\n  <div class=\"wp-list__wrap\"><table>\n    <thead><tr><th>Huésped</th><th>Estancia</th><th>Estado</th><th class=\"num\">Total</th></tr></thead>\n    <tbody>\n      <tr><td><a class=\"wp-list__who\" href=\"#\"><span class=\"wp-list__av\">LM</span><div><strong>Laura Martín</strong><small>nº 128 · 4 pax</small></div></a></td><td>10 nov → 12 nov<small>2 noches</small></td><td><span class=\"wp-list__st wp-list__st--ok\">Confirmada</span></td><td class=\"num\">420 €</td></tr>\n      <tr><td><a class=\"wp-list__who\" href=\"#\"><span class=\"wp-list__av\">JP</span><div><strong>Jordi Puig</strong><small>nº 129 · 2 pax</small></div></a></td><td>12 nov → 13 nov<small>1 noche</small></td><td><span class=\"wp-list__st wp-list__st--warn\">Pendiente de pago</span></td><td class=\"num\">180 €</td></tr>\n    </tbody></table></div>\n  <nav class=\"wp-list__pag\"><span>1–20 de 57</span><div><a href=\"#\">Siguiente →</a></div></nav>\n</div>",
+   "css": ".wp-list{padding:1rem;background:#f3f6fa;font-family:\"Archivo Variable\",\"Archivo\",system-ui,sans-serif;color:#13233f}\n.wp-list__toolbar{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:.8rem;margin-bottom:1rem}\n.wp-list__tabs{display:inline-flex;gap:2px;padding:3px;border-radius:10px;background:#e4ebf2}\n.wp-list__tabs a{padding:.4rem .95rem;border-radius:8px;color:#13233f;font:500 .85rem/1.3 \"Archivo\",system-ui,sans-serif;text-decoration:none}\n.wp-list__tabs a span{color:#0a63d8;font-weight:600;margin-left:.3rem}\n.wp-list__tabs a[aria-current=page]{background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.12)}\n.wp-list__search{display:flex;gap:.5rem;flex:1 1 300px;max-width:520px}\n.wp-list__search input{flex:1;min-width:0;min-height:40px;padding:.5rem .85rem;border:1px solid #d2d2d7;border-radius:10px;font:400 .95rem \"Archivo\",system-ui,sans-serif}\n.wp-list__search input:focus{outline:none;border-color:#0a63d8;box-shadow:0 0 0 4px rgba(0,113,227,.18)}\n.wp-list__search button{padding:.42rem 1rem;border:0;border-radius:980px;background:#fff;box-shadow:inset 0 0 0 1px rgba(19,35,63,.18);font:500 .85rem \"Archivo\",system-ui,sans-serif;color:#13233f;cursor:pointer}\n.wp-list__wrap{overflow-x:auto;border:1px solid rgba(19,35,63,.09);border-radius:18px;background:#fff;box-shadow:0 1px 2px rgba(19,35,63,.04),0 10px 30px -12px rgba(19,35,63,.12)}\n.wp-list table{width:100%;border-collapse:collapse;font-size:.93rem}\n.wp-list th,.wp-list td{padding:.85rem .8rem;border-bottom:1px solid rgba(19,35,63,.09);text-align:left;vertical-align:middle;white-space:nowrap}\n.wp-list th{color:#56617a;font:500 .82rem/1.4 \"Archivo\",system-ui,sans-serif}\n.wp-list tbody tr{cursor:pointer;transition:background .15s}\n.wp-list tbody tr:hover{background:#f5f5f7}\n.wp-list td small{display:block;font-size:.78rem;color:#56617a}\n.wp-list .num{text-align:right;font-variant-numeric:tabular-nums}\n.wp-list__who{display:flex;align-items:center;gap:.7rem;color:inherit;text-decoration:none}\n.wp-list__who div{display:flex;flex-direction:column;line-height:1.3}\n.wp-list__av{display:inline-grid;place-items:center;flex-shrink:0;width:34px;height:34px;border-radius:50%;background:#e7f0f6;color:#13233f;font:400 1rem/1 \"Instrument Serif\",Georgia,serif}\n.wp-list__st{padding:.15rem .6rem;border-radius:980px;font-size:.78rem;font-weight:500}\n.wp-list__st--ok{background:#d3e3ec;color:#0a63d8}.wp-list__st--warn{background:#ffefc7;color:#8a5700}\n.wp-list__pag{display:flex;align-items:center;justify-content:space-between;margin-top:1.2rem;font-size:.9rem;color:#56617a}\n.wp-list__pag a{padding:.42rem .9rem;border-radius:980px;background:#fff;box-shadow:inset 0 0 0 1px rgba(19,35,63,.18);color:#13233f;text-decoration:none;font-size:.82rem}",
+   "js": ""
+  },
+  {
+   "id": "wp-confirmacion-propia",
+   "nombre": "Diálogo de confirmación propio (sustituye a confirm())",
+   "categoria": "detalle",
+   "proyecto": "Mar de Dunas (web-playa)",
+   "stack": "astro",
+   "archivos": [
+    "/Users/lolyfernandezrodriguez/Desktop/web-playa/src/components/ui/ConfirmDialog.astro:1"
+   ],
+   "descripcion": "<dialog> nativo con título serif, texto gris y botones «No, volver» / «Sí, seguir»; se activa en cualquier formulario con data-confirm y tiene tono peligro en rojo.",
+   "cuando_usar": "Antes de acciones irreversibles enviadas por formulario (cancelar reserva, borrar, devolver un pago).",
+   "reglas": [
+    "Código en el historial: git show 0fa3a82^:<ruta> (el panel pasó a reservas.majosoft.es en 0fa3a82).",
+    "8b43426 «confirmación propia»: se incluye una vez en el layout y escucha submit en fase de captura, así no hay que tocar cada página.",
+    "El foco va a «No, volver» (la opción segura).",
+    "Atributos del formulario: data-confirm, data-confirm-title, data-confirm-ok, data-confirm-tone=danger.",
+    "Fondo con blur(4px) y entrada de 0,18s.",
+    "Variante Arbitraje (ar-modal-icono): icono en cuadrado de color y zona de error dentro del modal."
+   ],
+   "html": "<form class=\"wp-confirm-demo\" data-confirm=\"Se avisará al huésped por email.\" data-confirm-title=\"¿Cancelar la reserva?\" data-confirm-ok=\"Sí, cancelar\" data-confirm-tone=\"danger\" onsubmit=\"return false\"><button type=\"submit\">Cancelar reserva</button></form>\n<dialog class=\"wp-confirm\"><form method=\"dialog\" class=\"wp-confirm__box\"><p class=\"wp-confirm__title\">¿Seguro?</p><p class=\"wp-confirm__text\"></p>\n  <div class=\"wp-confirm__buttons\"><button value=\"cancel\" class=\"wp-confirm__btn wp-confirm__btn--ghost\">No, volver</button><button value=\"ok\" class=\"wp-confirm__btn\">Sí, seguir</button></div></form></dialog>",
+   "css": ".wp-confirm-demo button{padding:.62rem 1.2rem;border:0;border-radius:980px;background:#fdeceb;color:#d70015;font:500 .9rem \"Archivo\",system-ui,sans-serif;cursor:pointer}\n.wp-confirm{width:min(440px,calc(100vw - 2rem));padding:0;border:0;border-radius:20px;background:#fff;color:#13233f;box-shadow:0 40px 80px -30px rgba(19,35,63,.5);font-family:\"Archivo Variable\",\"Archivo\",system-ui,sans-serif}\n.wp-confirm::backdrop{background:rgba(19,35,63,.35);backdrop-filter:blur(4px)}\n.wp-confirm[open]{animation:wp-confirm-in .18s ease-out}\n@keyframes wp-confirm-in{from{opacity:0;transform:translateY(8px) scale(.98)}}\n.wp-confirm__box{display:flex;flex-direction:column;gap:.8rem;padding:1.8rem 1.8rem 1.5rem}\n.wp-confirm__title{margin:0;font:400 1.7rem/1.1 \"Instrument Serif\",Georgia,serif;text-transform:uppercase;color:#13233f}\n.wp-confirm__text{margin:0;color:#56617a;line-height:1.5}\n.wp-confirm__text:empty{display:none}\n.wp-confirm__buttons{display:flex;justify-content:flex-end;gap:.6rem;margin-top:.8rem}\n.wp-confirm__btn{padding:.7rem 1.3rem;border:0;border-radius:999px;background:#13233f;color:#fff;font:500 .9rem/1.2 \"Archivo\",system-ui,sans-serif;cursor:pointer}\n.wp-confirm__btn:hover{background:#0a63d8}\n.wp-confirm__btn--ghost{background:#fff;color:#13233f;box-shadow:inset 0 0 0 1px rgba(19,35,63,.18)}\n.wp-confirm__btn--ghost:hover{background:#f3f6fa}\n.wp-confirm.is-danger .wp-confirm__btn:not(.wp-confirm__btn--ghost){background:#c62f2f}",
+   "js": "(function(){var d=document.querySelector('.wp-confirm');if(!d)return;var t=d.querySelector('.wp-confirm__title'),x=d.querySelector('.wp-confirm__text'),ok=d.querySelector('[value=ok]'),no=d.querySelector('[value=cancel]'),pend=null;\ndocument.addEventListener('submit',function(e){var f=e.target;if(!f.dataset||!f.dataset.confirm||f.dataset.confirmed==='1')return;e.preventDefault();e.stopImmediatePropagation();pend=f;t.textContent=f.dataset.confirmTitle||f.dataset.confirm;x.textContent=f.dataset.confirmTitle?f.dataset.confirm:'';ok.textContent=f.dataset.confirmOk||'Sí, seguir';d.classList.toggle('is-danger',f.dataset.confirmTone==='danger');d.showModal();no.focus();},true);\nd.addEventListener('close',function(){if(d.returnValue==='ok'&&pend){pend.dataset.confirmed='1';pend.requestSubmit();delete pend.dataset.confirmed;}pend=null;});})();"
+  },
+  {
+   "id": "wp-login-foto",
+   "nombre": "Acceso partido: foto a la izquierda y formulario",
+   "categoria": "acceso",
+   "proyecto": "Mar de Dunas (web-playa)",
+   "stack": "astro",
+   "archivos": [
+    "/Users/lolyfernandezrodriguez/Desktop/web-playa/src/pages/admin/entrar.astro:60",
+    "/Users/lolyfernandezrodriguez/Desktop/web-playa/src/pages/admin/entrar.astro:78"
+   ],
+   "descripcion": "Pantalla en dos columnas: foto del alojamiento con un rótulo pequeño en mayúsculas, y a la derecha logo, «Hola de nuevo» con la palabra en cursiva, aviso de error y campos email/contraseña.",
+   "cuando_usar": "Paneles de un negocio con identidad visual fuerte, para que el acceso ya se sienta de la marca.",
+   "reglas": [
+    "Código en el historial: git show 0fa3a82^:<ruta> (el panel pasó a reservas.majosoft.es en 0fa3a82).",
+    "6031276 «entrada con la marca».",
+    "Límite de intentos por IP y email con mensajes distintos («Demasiados intentos. Espera 15 minutos…»); cada intento queda en el registro de actividad.",
+    "En ≤800px la foto queda arriba con 30vh.",
+    "Variantes: Rocío (ro-acceso-caja, tarjeta centrada sobre menta), Bambina (bb-acceso-contrasena, solo contraseña), Fichaje (fi-teclado-pin)."
+   ],
+   "html": "<div class=\"wp-login\">\n  <div class=\"wp-login__photo\"><div class=\"wp-login__img\"></div><p>Primera línea de playa</p></div>\n  <div class=\"wp-login__side\">\n    <div class=\"wp-login__logo\">MAR DE DUNAS<small>Gestión de reservas</small></div>\n    <h1>Hola de <em>nuevo</em></h1>\n    <div class=\"wp-login__error\" role=\"alert\">Email o contraseña incorrectos.</div>\n    <form class=\"wp-login__form\" onsubmit=\"return false\">\n      <label>Email<input type=\"email\" placeholder=\"tu@email.com\"></label>\n      <label>Contraseña<input type=\"password\"></label>\n      <button>Entrar</button>\n    </form>\n  </div>\n</div>",
+   "css": ".wp-login{display:grid;grid-template-columns:1.1fr 1fr;min-height:520px;background:#f3f6fa;font-family:\"Archivo Variable\",\"Archivo\",system-ui,sans-serif;color:#13233f}\n.wp-login__photo{position:relative;overflow:hidden;background:#13233f}\n.wp-login__img{position:absolute;inset:0;background:linear-gradient(160deg,#7fb3d5 0%,#d3e3ec 45%,#e9d8b4 70%,#13233f 100%)}\n.wp-login__photo p{position:absolute;left:2rem;bottom:1.6rem;margin:0;color:#fff;font:500 .62rem/1.4 \"Archivo\",system-ui,sans-serif;font-stretch:125%;letter-spacing:.22em;text-transform:uppercase;text-shadow:0 1px 8px rgba(0,0,0,.4)}\n.wp-login__side{display:flex;flex-direction:column;justify-content:center;gap:1.8rem;width:100%;max-width:400px;margin:0 auto;padding:3rem 1.5rem;box-sizing:border-box}\n.wp-login__logo{font:400 1.4rem/1 \"Instrument Serif\",Georgia,serif;letter-spacing:.04em}\n.wp-login__logo small{display:block;font:400 .75rem \"Archivo\",sans-serif;color:#56617a;margin-top:.3rem;letter-spacing:0}\n.wp-login h1{margin:0;font:400 1.6rem/1 \"Instrument Serif\",Georgia,serif;text-transform:uppercase}\n.wp-login h1 em{font-style:italic;text-transform:none;color:#0a63d8}\n.wp-login__error{padding:.9rem 1.1rem;border-radius:12px;background:#fbeceb;color:#7a1f1f;font-size:.93rem}\n.wp-login__form{display:flex;flex-direction:column;gap:1.3rem}\n.wp-login__form label{display:flex;flex-direction:column;gap:.4rem;color:#56617a;font:500 .82rem/1.5 \"Archivo\",system-ui,sans-serif}\n.wp-login__form input{min-height:44px;padding:.65rem .85rem;border:1px solid #d2d2d7;border-radius:10px;background:#fff;font:400 .95rem \"Archivo\",system-ui,sans-serif;color:#13233f}\n.wp-login__form input:focus{outline:none;border-color:#0a63d8;box-shadow:0 0 0 4px rgba(0,113,227,.18)}\n.wp-login__form button{padding:.75rem 1.2rem;border:0;border-radius:980px;background:#13233f;color:#fff;font:500 .95rem \"Archivo\",system-ui,sans-serif;cursor:pointer}\n.wp-login__form button:hover{background:#0a63d8}\n@media (max-width:800px){.wp-login{grid-template-columns:1fr}.wp-login__photo{height:30vh}}",
+   "js": ""
+  },
+  {
+   "id": "wp-fila-ajuste",
+   "nombre": "Fila de ajuste estilo Ajustes de Apple (número + unidad)",
+   "categoria": "formularios",
+   "proyecto": "Mar de Dunas (web-playa)",
+   "stack": "astro",
+   "archivos": [
+    "/Users/lolyfernandezrodriguez/Desktop/web-playa/src/components/ui/SettingRow.astro:1"
+   ],
+   "descripcion": "Lista de filas separadas por línea fina: a la izquierda la etiqueta y una ayuda gris, a la derecha un campo numérico corto alineado a la derecha y su unidad («%», «días antes», «noches»).",
+   "cuando_usar": "Configuración de políticas numéricas (cancelación, pagos, estancias mínimas) que una persona no técnica tiene que entender.",
+   "reglas": [
+    "Código en el historial: git show 0fa3a82^:<ruta> (el panel pasó a reservas.majosoft.es en 0fa3a82).",
+    "Los importes usan type=text con inputmode=decimal (acepta 235,50) en vez de type=number.",
+    "8b43426 «condiciones y normas por grupos… y campos alineados»: la unidad tiene ancho mínimo para que todos los campos queden en la misma columna.",
+    "En ≤600px la fila se apila (etiqueta arriba, valor abajo)."
+   ],
+   "html": "<div class=\"wp-settings\">\n  <div class=\"wp-set\"><label class=\"wp-set__text\" for=\"wp-s1\"><span class=\"wp-set__label\">Señal al reservar</span><span class=\"wp-set__help\">Lo que se cobra al confirmar; el resto antes de llegar.</span></label><span class=\"wp-set__value\"><input id=\"wp-s1\" type=\"number\" value=\"30\"><span class=\"wp-set__unit\">%</span></span></div>\n  <div class=\"wp-set\"><label class=\"wp-set__text\" for=\"wp-s2\"><span class=\"wp-set__label\">Cancelación gratuita hasta</span><span class=\"wp-set__help\">Después se devuelve solo la parte indicada.</span></label><span class=\"wp-set__value\"><input id=\"wp-s2\" type=\"number\" value=\"14\"><span class=\"wp-set__unit\">días antes</span></span></div>\n  <div class=\"wp-set\"><label class=\"wp-set__text\" for=\"wp-s3\"><span class=\"wp-set__label\">Limpieza</span></label><span class=\"wp-set__value\"><input id=\"wp-s3\" type=\"text\" inputmode=\"decimal\" value=\"60,00\"><span class=\"wp-set__unit\">€</span></span></div>\n</div>",
+   "css": ".wp-settings{max-width:640px;padding:1.2rem 1.8rem;border:1px solid rgba(19,35,63,.09);border-radius:18px;background:#fff;box-shadow:0 1px 2px rgba(19,35,63,.04),0 10px 30px -12px rgba(19,35,63,.12);font-family:\"Archivo Variable\",\"Archivo\",system-ui,sans-serif;color:#13233f}\n.wp-set{display:flex;align-items:center;justify-content:space-between;gap:1.5rem;padding:.95rem 0}\n.wp-set+.wp-set{border-top:1px solid rgba(19,35,63,.09)}\n.wp-set__text{display:flex;flex-direction:column;gap:.2rem;min-width:0;cursor:pointer}\n.wp-set__label{font-size:.97rem}\n.wp-set__help{color:#56617a;font-size:.83rem;line-height:1.4}\n.wp-set__value{display:inline-flex;flex-shrink:0;align-items:center;gap:.55rem}\n.wp-set__value input{width:5.2rem;min-height:40px;padding:.45rem .6rem;text-align:right;font:400 .95rem \"Archivo\",system-ui,sans-serif;font-variant-numeric:tabular-nums;border:1px solid #d2d2d7;border-radius:10px;color:#13233f;box-sizing:border-box}\n.wp-set__value input:focus{outline:none;border-color:#0a63d8;box-shadow:0 0 0 4px rgba(0,113,227,.18)}\n.wp-set__unit{min-width:6.5rem;color:#56617a;font-size:.9rem}\n@media (max-width:600px){.wp-set{flex-direction:column;align-items:stretch;gap:.6rem}}",
+   "js": ""
+  },
+  {
+   "id": "wp-chat-reserva",
+   "nombre": "Conversación con el cliente (burbujas + caja de escribir)",
+   "categoria": "detalle",
+   "proyecto": "Mar de Dunas (web-playa)",
+   "stack": "astro",
+   "archivos": [
+    "/Users/lolyfernandezrodriguez/Desktop/web-playa/src/components/ui/ChatThread.astro:1"
+   ],
+   "descripcion": "Lista de burbujas con las propias a la derecha en marino y las del otro en gris claro, meta con nombre · hora · «Leído», y un cuadro de escribir redondo con botón Enviar.",
+   "cuando_usar": "Mensajería ligada a un registro (reserva, pedido, incidencia) que debe verse igual en el panel y en la página del cliente.",
+   "reglas": [
+    "Código en el historial: git show 0fa3a82^:<ruta> (el panel pasó a reservas.majosoft.es en 0fa3a82).",
+    "8429492 «Chat interno con el cliente»: el mismo componente sirve al huésped y al equipo; solo cambia quién va a la derecha (viewer).",
+    "Estado vacío con texto que explica qué pasa al escribir («le llega por email con un enlace para contestar»).",
+    "Las esquinas de la burbuja apuntan al autor (18 18 18 6 / 18 18 6 18).",
+    "Variante Rocío (Contestador de Instagram): burbuja blanca con nombre en melocotón."
+   ],
+   "html": "<div class=\"wp-chat\">\n  <ol class=\"wp-chat__list\">\n    <li class=\"wp-chat__msg\"><p class=\"wp-chat__bubble\">Hola, ¿podemos llegar sobre las 22:00?</p><small class=\"wp-chat__meta\">Laura · 9 nov, 18:02</small></li>\n    <li class=\"wp-chat__msg wp-chat__msg--mine\"><p class=\"wp-chat__bubble\">Sin problema, te dejamos las llaves en el cajetín.</p><small class=\"wp-chat__meta\">Ana · 9 nov, 18:10 · Leído</small></li>\n  </ol>\n  <form class=\"wp-chat__form\" onsubmit=\"return false\"><textarea rows=\"2\" placeholder=\"Escribe un mensaje…\"></textarea><button class=\"wp-chat__send\">Enviar</button></form>\n</div>",
+   "css": ".wp-chat{display:flex;flex-direction:column;gap:1rem;max-width:520px;padding:1rem;background:#fff;font-family:\"Archivo Variable\",\"Archivo\",system-ui,sans-serif}\n.wp-chat__list{display:flex;flex-direction:column;gap:.9rem;max-height:460px;margin:0;padding:.2rem;overflow-y:auto;list-style:none}\n.wp-chat__msg{display:flex;flex-direction:column;align-items:flex-start;gap:.25rem;max-width:78%}\n.wp-chat__msg--mine{align-self:flex-end;align-items:flex-end}\n.wp-chat__bubble{margin:0;padding:.7rem 1rem;border-radius:18px 18px 18px 6px;background:#f3f6fa;color:#13233f;font-size:.95rem;line-height:1.45;white-space:pre-wrap}\n.wp-chat__msg--mine .wp-chat__bubble{border-radius:18px 18px 6px 18px;background:#13233f;color:#fff}\n.wp-chat__meta{padding:0 .4rem;color:#56617a;font-size:.75rem}\n.wp-chat__form{display:flex;align-items:flex-end;gap:.6rem;padding:.5rem;border:1px solid rgba(19,35,63,.09);border-radius:22px;background:#fff}\n.wp-chat__form:focus-within{border-color:#0a63d8}\n.wp-chat__form textarea{flex:1;min-height:2.6rem;padding:.55rem .7rem;border:0;background:none;font:inherit;font-size:.95rem;resize:none}\n.wp-chat__form textarea:focus{outline:none}\n.wp-chat__send{flex-shrink:0;padding:.7rem 1.3rem;border:0;border-radius:999px;background:#13233f;color:#fff;font:500 .9rem \"Archivo\",system-ui,sans-serif;cursor:pointer}",
+   "js": ""
+  },
+  {
+   "id": "wp-vista-previa-email",
+   "nombre": "Vista previa de email (ordenador / móvil / texto)",
+   "categoria": "detalle",
+   "proyecto": "Mar de Dunas (web-playa)",
+   "stack": "astro",
+   "archivos": [
+    "/Users/lolyfernandezrodriguez/Desktop/web-playa/src/components/admin/EmailPreview.astro:1",
+    "/Users/lolyfernandezrodriguez/Desktop/web-playa/src/pages/admin/emails.astro:1"
+   ],
+   "descripcion": "El HTML del email en un iframe aislado que se ajusta a su altura; en modo «móvil» se enmarca en un teléfono de 390px con borde marino de 8px; en «texto», bloque monoespaciado.",
+   "cuando_usar": "Páginas que enseñan qué emails envía el sistema y cómo llegan, o el historial de emails de un registro.",
+   "reglas": [
+    "Código en el historial: git show 0fa3a82^:<ruta> (el panel pasó a reservas.majosoft.es en 0fa3a82).",
+    "80972a9 «Panel › Emails: todos los emails que envía la web con una reserva de ejemplo (cuándo sale cada uno y cómo se ve en ordenador, móvil y texto)».",
+    "iframe con sandbox sin scripts (solo allow-same-origin para medir la altura); se vuelve a medir al abrir un <details>.",
+    "Variantes: Rocío (vista previa de plantilla de novedades con «abrir en grande») y Arbitraje (columna de correos + iframe)."
+   ],
+   "html": "<div class=\"wp-email\">\n  <nav class=\"wp-email__tabs\"><a href=\"#\" aria-current=\"page\">Ordenador</a><a href=\"#\">Móvil</a><a href=\"#\">Texto</a></nav>\n  <div class=\"wp-email__frame wp-email__frame--movil\"><iframe title=\"Email de ejemplo\" srcdoc=\"<body style='margin:0;font-family:Georgia,serif;background:#f6f4ef'><div style='background:#13233f;color:#fff;padding:24px;text-align:center'>MAR DE DUNAS</div><div style='padding:24px'><h2 style='margin:0 0 8px'>¡Reserva confirmada!</h2><p style='font-family:Arial;color:#555'>Llegada: 10 nov · Salida: 12 nov</p><a style='display:inline-block;margin-top:12px;background:#13233f;color:#fff;padding:12px 20px;border-radius:999px;text-decoration:none;font-family:Arial'>Ver mi reserva</a></div></body>\"></iframe></div>\n  <pre class=\"wp-email__text\">¡Reserva confirmada!\nLlegada: 10 nov · Salida: 12 nov\nVer mi reserva: https://ejemplo.test/r/abc</pre>\n</div>",
+   "css": ".wp-email{display:grid;gap:1rem;padding:1rem;background:#f3f6fa;font-family:\"Archivo Variable\",\"Archivo\",system-ui,sans-serif;max-width:720px}\n.wp-email__tabs{display:inline-flex;justify-self:start;gap:2px;padding:3px;border-radius:10px;background:#e4ebf2}\n.wp-email__tabs a{padding:.4rem .95rem;border-radius:8px;color:#13233f;font:500 .85rem \"Archivo\",system-ui,sans-serif;text-decoration:none}\n.wp-email__tabs a[aria-current=page]{background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.12)}\n.wp-email__frame{overflow:hidden;border:1px solid rgba(19,35,63,.09);border-radius:18px;background:#f6f4ef}\n.wp-email__frame--movil{width:100%;max-width:390px;margin-inline:auto;border-radius:28px;border:8px solid #13233f;box-sizing:border-box}\n.wp-email__frame iframe{display:block;width:100%;height:320px;border:0}\n.wp-email__text{margin:0;padding:1.25rem;overflow-x:auto;border:1px solid rgba(19,35,63,.09);border-radius:18px;background:#fff;font:.85rem/1.6 ui-monospace,Menlo,monospace;white-space:pre-wrap}",
+   "js": ""
+  },
+  {
+   "id": "wp-botones-pildora",
+   "nombre": "Botones píldora (principal, secundario, peligro, enlace)",
+   "categoria": "otros",
+   "proyecto": "Mar de Dunas (web-playa)",
+   "stack": "astro",
+   "archivos": [
+    "/Users/lolyfernandezrodriguez/Desktop/web-playa/src/components/ui/Button.astro:1",
+    "/Users/lolyfernandezrodriguez/Desktop/web-playa/src/layouts/AdminLayout.astro:1121",
+    "/Users/lolyfernandezrodriguez/Desktop/web-playa/src/layouts/AdminLayout.astro:1379"
+   ],
+   "descripcion": "Un único componente Button que es <a> si lleva href y <button> si no; variantes primary (marino, hover azul), ghost (blanco con filo), danger (rosa pálido con texto rojo, se rellena al pasar), link (subrayado) y tamaño sm.",
+   "cuando_usar": "Todas las acciones del panel; un solo componente evita estilos sueltos por página.",
+   "reglas": [
+    "Código en el historial: git show 0fa3a82^:<ruta> (el panel pasó a reservas.majosoft.es en 0fa3a82).",
+    "020860f «Botones del panel con el componente Button».",
+    "type=submit por defecto, deshabilitado con opacidad .5 y cursor not-allowed.",
+    "Variantes de otros proyectos: Fichaje (principal lima que al pasar se invierte a negro con texto lima; ghost con borde explícito porque «solo con el fondo al 5% se confundía con deshabilitado»), Rocío (melocotón + .claro blanco + .peligro), Bambina (rosa con elevación), Santana (píldora blanca en oscuro / negra en claro)."
+   ],
+   "html": "<div class=\"wp-btns\">\n  <button class=\"wp-btn wp-btn--primary\">Guardar</button>\n  <button class=\"wp-btn wp-btn--ghost\">Cancelar</button>\n  <button class=\"wp-btn wp-btn--danger\">Cancelar reserva</button>\n  <button class=\"wp-btn wp-btn--primary wp-btn--sm\">Abrir</button>\n  <a href=\"#\" class=\"wp-btn wp-btn--link\">Quitar la búsqueda</a>\n  <button class=\"wp-btn wp-btn--primary\" disabled>Enviando…</button>\n</div>",
+   "css": ".wp-btns{display:flex;flex-wrap:wrap;align-items:center;gap:.6rem;padding:1rem;background:#f3f6fa;font-family:\"Archivo Variable\",\"Archivo\",system-ui,sans-serif}\n.wp-btn{display:inline-flex;align-items:center;justify-content:center;gap:.55em;padding:.62rem 1.2rem;border:0;border-radius:980px;font:500 .9rem/1.2 \"Archivo\",system-ui,sans-serif;text-decoration:none;white-space:nowrap;cursor:pointer;transition:background .25s,color .25s,box-shadow .25s}\n.wp-btn--primary{background:#13233f;color:#fff}\n.wp-btn--primary:hover{background:#0a63d8}\n.wp-btn--ghost{background:#fff;color:#13233f;box-shadow:inset 0 0 0 1px rgba(19,35,63,.18)}\n.wp-btn--ghost:hover{box-shadow:inset 0 0 0 1px #13233f}\n.wp-btn--danger{background:#fdeceb;color:#d70015}\n.wp-btn--danger:hover{background:#d70015;color:#fff}\n.wp-btn--sm{padding:.42rem .9rem;font-size:.82rem}\n.wp-btn--link{padding:0 0 .2em;border-radius:0;border-bottom:1px solid currentColor;background:none;color:#13233f}\n.wp-btn:disabled{opacity:.5;cursor:not-allowed}",
+   "js": ""
+  },
+  {
+   "id": "wp-atencion-hoy",
+   "nombre": "Bloque «Requiere tu atención» + llegadas de la semana",
+   "categoria": "estados",
+   "proyecto": "Mar de Dunas (web-playa)",
+   "stack": "astro",
+   "archivos": [
+    "/Users/lolyfernandezrodriguez/Desktop/web-playa/src/pages/admin/index.astro:106",
+    "/Users/lolyfernandezrodriguez/Desktop/web-playa/src/pages/admin/index.astro:163"
+   ],
+   "descripcion": "En la portada, lista de tareas pendientes coloreadas por gravedad (rojo urgente, ámbar, azul info) con enlace a cada caso; y la semana como filas con el día grande en serif, persona y estado.",
+   "cuando_usar": "Portadas de panel que deben responder «¿qué tengo que hacer ahora?» antes de enseñar cifras.",
+   "reglas": [
+    "Código en el historial: git show 0fa3a82^:<ruta> (el panel pasó a reservas.majosoft.es en 0fa3a82).",
+    "Si no hay nada pendiente se sustituye por un aviso verde «Todo al día» en lugar de un bloque vacío.",
+    "Los partes de viajeros con plazo legal (24 h) van primero y en rojo.",
+    "Variante más trabajada: ro-tareas-para-hoy (Rocío, con icono por tarea y CTA a la derecha)."
+   ],
+   "html": "<section class=\"wp-hoy\">\n  <p class=\"wp-hoy__eyebrow\">Pendiente</p><h2>Requiere tu atención</h2>\n  <ul class=\"wp-hoy__todo\">\n    <li class=\"wp-hoy__bad\"><span><strong>Parte de viajeros sin comunicar</strong> (plazo: 24 h desde la llegada): <a href=\"#\">#128 Laura Martín</a></span></li>\n    <li class=\"wp-hoy__warn\"><a href=\"#\">1 solicitud por responder →</a></li>\n    <li class=\"wp-hoy__info\"><a href=\"#\">2 reservas esperando pago →</a></li>\n  </ul>\n  <ul class=\"wp-hoy__week\">\n    <li><a href=\"#\"><span class=\"wp-hoy__day\"><strong>12</strong>jue</span><span class=\"wp-hoy__who\">Jordi Puig<small>2 pax · 1 noche</small></span><span class=\"wp-hoy__st\">Confirmada</span></a></li>\n    <li><a href=\"#\"><span class=\"wp-hoy__day\"><strong>15</strong>dom</span><span class=\"wp-hoy__who\">Nerea Sanz<small>3 pax · 4 noches</small></span><span class=\"wp-hoy__st\">Confirmada</span></a></li>\n  </ul>\n</section>",
+   "css": ".wp-hoy{max-width:560px;padding:1.6rem 1.8rem;border:1px solid rgba(19,35,63,.09);border-radius:18px;background:#fff;box-shadow:0 1px 2px rgba(19,35,63,.04),0 10px 30px -12px rgba(19,35,63,.12);font-family:\"Archivo Variable\",\"Archivo\",system-ui,sans-serif;color:#13233f}\n.wp-hoy__eyebrow{margin:0;color:#0a63d8;font:600 .8rem \"Archivo\",sans-serif}\n.wp-hoy h2{margin:0 0 1.2rem;padding-bottom:.9rem;border-bottom:1px solid rgba(19,35,63,.09);font:400 1.6rem/1.05 \"Instrument Serif\",Georgia,serif;text-transform:uppercase}\n.wp-hoy__todo{display:flex;flex-direction:column;gap:.5rem;margin:0 0 1.2rem;padding:0;list-style:none}\n.wp-hoy__todo li{padding:.75rem 1rem;border-left:3px solid;border-radius:0 6px 6px 0;font-size:.93rem}\n.wp-hoy__todo a{color:inherit;font-weight:600}\n.wp-hoy__bad{color:#7a1f1f;background:#fbeceb;border-color:#c62f2f}\n.wp-hoy__warn{color:#6b4300;background:#fff4d9;border-color:#ffb400}\n.wp-hoy__info{color:#13233f;background:#d3e3ec;border-color:#0a63d8}\n.wp-hoy__week{margin:0;padding:0;list-style:none}\n.wp-hoy__week a{display:grid;grid-template-columns:4rem 1fr auto;align-items:center;gap:.9rem;padding:.75rem 0;border-bottom:1px solid rgba(19,35,63,.09);color:inherit;text-decoration:none}\n.wp-hoy__week li:last-child a{border-bottom:0}\n.wp-hoy__week a:hover .wp-hoy__who{color:#0a63d8}\n.wp-hoy__day{display:flex;flex-direction:column;align-items:center;font-size:.75rem;color:#56617a}\n.wp-hoy__day strong{font:400 1.6rem/1 \"Instrument Serif\",Georgia,serif;color:#13233f}\n.wp-hoy__who small{display:block;font-size:.8rem;color:#56617a}\n.wp-hoy__st{padding:.15rem .6rem;border-radius:980px;background:#d3e3ec;color:#0a63d8;font-size:.78rem;font-weight:500}",
+   "js": ""
+  },
+  {
+   "id": "wp-estado-vacio",
+   "nombre": "Estado vacío en una frase serif",
+   "categoria": "estados",
+   "proyecto": "Mar de Dunas (web-playa)",
+   "stack": "astro",
+   "archivos": [
+    "/Users/lolyfernandezrodriguez/Desktop/web-playa/src/components/ui/Empty.astro:1"
+   ],
+   "descripcion": "Una sola frase centrada en serif gris, sin iconos ni ilustraciones («No hay estancias este mes.»), con un enlace de salida cuando aplica.",
+   "cuando_usar": "Listas y bloques sin resultados; siempre que el vacío sea normal y no un error.",
+   "reglas": [
+    "Código en el historial: git show 0fa3a82^:<ruta> (el panel pasó a reservas.majosoft.es en 0fa3a82).",
+    "Comentario del componente: «Estado vacío: una frase en serif, sin iconos».",
+    "Si el vacío viene de un filtro, se ofrece deshacerlo («Quitar la búsqueda»).",
+    "Variantes: Santana (título «Todo al día» + frase), Rocío (.doc-vacio con borde discontinuo y un ejemplo de qué pedir), Fichaje (empty states con reintento)."
+   ],
+   "html": "<div class=\"wp-empty\">No hay estancias este mes.<a href=\"#\">Crear una reserva</a></div>",
+   "css": ".wp-empty{padding:2rem 1rem;text-align:center;font:400 1.3rem/1.3 \"Instrument Serif\",Georgia,serif;color:#56617a;background:#fff;border-radius:18px;max-width:480px}\n.wp-empty a{display:block;margin-top:.6rem;font:500 .85rem \"Archivo\",system-ui,sans-serif;color:#13233f}",
+   "js": ""
+  },
+  {
+   "id": "sm-tema-menu-negro",
+   "nombre": "Tema de marca sobre un panel de terceros: menú negro, zona de trabajo clara",
+   "categoria": "navegacion",
+   "proyecto": "Santana Motors (panel Medusa)",
+   "stack": "react",
+   "archivos": [
+    "/Users/lolyfernandezrodriguez/Desktop/santana motors/apps/backend/src/admin/theme/santana.css:1",
+    "/Users/lolyfernandezrodriguez/Desktop/santana motors/apps/backend/src/admin/theme/santana.css:252",
+    "/Users/lolyfernandezrodriguez/Desktop/santana motors/apps/backend/src/admin/widgets/tema-santana.tsx:1"
+   ],
+   "descripcion": "Re-tematiza el admin de Medusa solo redefiniendo sus variables de color: lateral en negro Santana (#020203) con texto blanco y zona de trabajo en gris muy claro con tarjetas blancas; sin color de acento (lo azul pasa a negro/blanco).",
+   "cuando_usar": "Cuando se adopta un panel ya hecho (Medusa, etc.) y hay que vestirlo con la marca sin bifurcarlo.",
+   "reglas": [
+    "Solo se tocan variables y unos pocos selectores, así sobrevive a las actualizaciones de Medusa (cabecera de santana.css).",
+    "0dc808c «Panel: menú lateral en negro Santana y zona de trabajo en claro (por defecto en todos los navegadores)»: ni todo negro ni todo blanco.",
+    "31a94c6: se ocultan del menú opciones que confunden (Borradores de pedido, Listas de precios) con :has() y la portada «Inicio · Tienda Santana» sube a la primera posición con order.",
+    "Logo de la marca en login con mask-image sobre el hueco del logo de Medusa; botones de @medusajs/ui convertidos en píldora."
+   ],
+   "html": "<div class=\"sm-shell\">\n  <aside class=\"sm-shell__side\">\n    <div class=\"sm-shell__logo\">SANTANA ★</div>\n    <a href=\"#\" class=\"on\">Inicio · Tienda Santana</a><a href=\"#\">Pedidos</a><a href=\"#\">Productos</a><a href=\"#\">Clientes</a><a href=\"#\">Promociones</a><a href=\"#\">Ajustes</a>\n  </aside>\n  <main class=\"sm-shell__main\"><div class=\"sm-shell__card\"><h1>Tienda Santana</h1><p>Pedidos, productos y promociones de la tienda. Lo que cambies aquí se ve en la tienda al momento.</p><button>Ver la tienda</button></div></main>\n</div>",
+   "css": ".sm-shell{display:grid;grid-template-columns:220px 1fr;min-height:360px;font-family:Manrope,ui-sans-serif,system-ui,-apple-system,'Segoe UI',Arial,sans-serif;-webkit-font-smoothing:antialiased}\n.sm-shell__side{background:#020203;color:#fff;padding:16px 10px;display:flex;flex-direction:column;gap:2px;color-scheme:dark}\n.sm-shell__logo{font:400 15px/1.6 \"Krona One\",\"Manrope\",Arial,sans-serif;letter-spacing:-.02em;padding:6px 10px 16px}\n.sm-shell__side a{padding:7px 10px;border-radius:8px;color:#a9a9a9;font-size:13px;font-weight:500;text-decoration:none}\n.sm-shell__side a:hover{background:#141416;color:#fff}\n.sm-shell__side a.on{background:#1b1b1d;color:#fff;font-weight:600}\n.sm-shell__main{background:#f5f5f5;padding:16px}\n.sm-shell__card{background:#fff;border-radius:12px;box-shadow:0 0 0 1px rgba(2,2,3,.07),0 1px 2px rgba(2,2,3,.04);padding:24px;color:#020203}\n.sm-shell__card h1{margin:0 0 4px;font:400 17px/1.6 \"Krona One\",\"Manrope\",Arial,sans-serif;letter-spacing:-.02em}\n.sm-shell__card p{margin:0 0 16px;color:#55555a;font-size:14px}\n.sm-shell__card button{padding:6px 15px;border:0;border-radius:999px;background:#fff;box-shadow:0 0 0 1px rgba(2,2,3,.16);font:500 13px Manrope,system-ui,sans-serif;cursor:pointer}",
+   "js": ""
+  },
+  {
+   "id": "sm-kpi-tienda",
+   "nombre": "Cifras de la tienda con tono de alerta",
+   "categoria": "estadisticas",
+   "proyecto": "Santana Motors (panel Medusa)",
+   "stack": "react",
+   "archivos": [
+    "/Users/lolyfernandezrodriguez/Desktop/santana motors/apps/backend/src/admin/routes/tienda/page.tsx:17",
+    "/Users/lolyfernandezrodriguez/Desktop/santana motors/apps/backend/src/admin/routes/tienda/page.tsx:66"
+   ],
+   "descripcion": "Cuatro recuadros grises (Pedidos por preparar, Ventas del mes, Productos publicados, Promociones activas) con etiqueta pequeña, valor grande y pista; el valor se pone naranja o rojo cuando hay algo que hacer.",
+   "cuando_usar": "Cabecera de una portada operativa donde cada cifra lleva a una pestaña.",
+   "reglas": [
+    "La pista dice qué hacer o confirma calma: «Pestaña Pedidos» si hay pendientes, «Todo al día» si no; «2 agotados» / «Ninguno agotado».",
+    "dce7d54 «panel más intuitivo»: la portada del panel es esta pantalla (se entra aquí al iniciar sesión).",
+    "Rejilla 2 columnas en móvil, 4 en md."
+   ],
+   "html": "<div class=\"sm-kpis\">\n  <div class=\"sm-kpi\"><span>Pedidos por preparar</span><b class=\"warn\">3</b><span>Pestaña Pedidos</span></div>\n  <div class=\"sm-kpi\"><span>Ventas este mes</span><b>842 €</b><span>14 pedidos</span></div>\n  <div class=\"sm-kpi\"><span>Productos publicados</span><b class=\"err\">11 de 13</b><span>2 agotados</span></div>\n  <div class=\"sm-kpi\"><span>Promociones activas</span><b>1</b></div>\n</div>",
+   "css": ".sm-kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;padding:24px;background:#fff;font-family:Manrope,ui-sans-serif,system-ui,-apple-system,'Segoe UI',Arial,sans-serif}\n.sm-kpi{display:flex;flex-direction:column;gap:2px;background:#f5f5f5;border-radius:8px;padding:12px 16px}\n.sm-kpi span{font-size:12px;color:#8f8f90}\n.sm-kpi b{font-size:18px;font-weight:600;color:#020203}\n.sm-kpi b.warn{color:#c2410c}\n.sm-kpi b.err{color:#e11d48}\n@media (max-width:768px){.sm-kpis{grid-template-columns:repeat(2,1fr)}}",
+   "js": ""
+  },
+  {
+   "id": "sm-tarjeta-producto",
+   "nombre": "Tarjeta de producto con foto arrastrable, interruptor y accesos rápidos",
+   "categoria": "listados",
+   "proyecto": "Santana Motors (panel Medusa)",
+   "stack": "react",
+   "archivos": [
+    "/Users/lolyfernandezrodriguez/Desktop/santana motors/apps/backend/src/admin/components/tienda/products-panel.tsx:28",
+    "/Users/lolyfernandezrodriguez/Desktop/santana motors/apps/backend/src/admin/components/tienda/products-panel.tsx:96"
+   ],
+   "descripcion": "Foto 4:3 que es zona de soltar (al pasar: «Cambiar foto»; al arrastrar: «Suelta para subir»), título, categoría y nº de variantes, interruptor Publicado/Oculto, selector de línea en píldoras, recuadros Precio/Stock (stock naranja <10, rojo agotado) y botones Cambiar precio / Cambiar stock / Ficha completa / Ver.",
+   "cuando_usar": "Gestión de catálogo por personas sin formación: cada acción frecuente a un clic dentro de la propia tarjeta.",
+   "reglas": [
+    "Pensado «para usar sin formación» (comentario de page.tsx): todo lo frecuente en una pantalla, lo demás queda en las pantallas estándar.",
+    "La foto nueva pasa a ser la principal y las anteriores se conservan en la galería.",
+    "Cada cambio confirma con un toast en lenguaje de tienda («“Gorra” ya se ve en la tienda» / «queda oculto»).",
+    "Si el producto no sale en la tienda, una etiqueta naranja explica por qué.",
+    "Variante sencilla: bb-tarjeta-producto-estado (Bambina)."
+   ],
+   "html": "<div class=\"sm-prod\">\n  <label class=\"sm-prod__foto\"><div class=\"sm-prod__img\"></div><span class=\"sm-prod__over\">Cambiar foto</span><input type=\"file\" accept=\"image/*\" hidden></label>\n  <div class=\"sm-prod__body\">\n    <div class=\"sm-prod__head\"><div><h3>Gorra clásica</h3><p>Merchandising · 2 variantes</p></div>\n      <label class=\"sm-prod__switch\"><span>Publicado</span><button type=\"button\" role=\"switch\" aria-checked=\"true\"><i></i></button></label></div>\n    <div class=\"sm-prod__linea\"><span>Línea</span><div class=\"sm-prod__seg\"><button aria-checked=\"true\">Logo nuevo</button><button aria-checked=\"false\">Logo clásico</button></div></div>\n    <div class=\"sm-prod__datos\"><div><span>Precio (IVA incl.)</span><b>24,90 €</b></div><div><span>Stock</span><b class=\"warn\">6 uds</b></div></div>\n    <div class=\"sm-prod__acc\"><button>Cambiar precio</button><button>Cambiar stock</button><a href=\"#\">Ficha completa</a></div>\n  </div>\n</div>",
+   "css": ".sm-prod{display:flex;flex-direction:column;width:300px;overflow:hidden;background:#fff;border-radius:12px;box-shadow:0 0 0 1px rgba(2,2,3,.07),0 1px 2px rgba(2,2,3,.04);font-family:Manrope,ui-sans-serif,system-ui,-apple-system,'Segoe UI',Arial,sans-serif;color:#020203}\n.sm-prod__foto{position:relative;display:block;aspect-ratio:4/3;background:#f5f5f5;cursor:pointer;overflow:hidden}\n.sm-prod__img{position:absolute;inset:0;background:linear-gradient(135deg,#2a2a2c,#8f8f90)}\n.sm-prod__over{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);padding:6px 12px;border-radius:999px;background:#fff;color:#000;font-size:13px;font-weight:600;opacity:0;transition:opacity .2s}\n.sm-prod__foto:hover::after{content:\"\";position:absolute;inset:0;background:rgba(0,0,0,.45)}\n.sm-prod__foto:hover .sm-prod__over{opacity:1;z-index:1}\n.sm-prod__foto.is-over{box-shadow:inset 0 0 0 2px #020203}\n.sm-prod__body{display:flex;flex-direction:column;gap:16px;padding:16px}\n.sm-prod__head{display:flex;justify-content:space-between;gap:12px}\n.sm-prod__head h3{margin:0;font-size:15px;font-weight:600}\n.sm-prod__head p{margin:0;font-size:13px;color:#55555a}\n.sm-prod__switch{display:flex;align-items:center;gap:8px;font-size:12px;color:#55555a}\n.sm-prod__switch button{width:32px;height:18px;border-radius:999px;border:0;background:#020203;padding:2px;cursor:pointer;display:flex;justify-content:flex-end}\n.sm-prod__switch button[aria-checked=false]{background:#d4d4d8;justify-content:flex-start}\n.sm-prod__switch i{width:14px;height:14px;border-radius:50%;background:#fff}\n.sm-prod__linea{display:flex;align-items:center;justify-content:space-between;font-size:12px;color:#8f8f90}\n.sm-prod__seg{display:flex;gap:4px;padding:4px;border-radius:999px;background:#f5f5f5}\n.sm-prod__seg button{padding:4px 10px;border:0;border-radius:999px;background:none;font:600 12px Manrope,sans-serif;color:#55555a;cursor:pointer}\n.sm-prod__seg button[aria-checked=true]{background:#fff;color:#020203;box-shadow:0 0 0 1px rgba(2,2,3,.07),0 1px 2px rgba(2,2,3,.04)}\n.sm-prod__datos{display:grid;grid-template-columns:1fr 1fr;gap:12px}\n.sm-prod__datos div{background:#f5f5f5;border-radius:8px;padding:8px 12px}\n.sm-prod__datos span{display:block;font-size:12px;color:#8f8f90}\n.sm-prod__datos b{font-size:14px}\n.sm-prod__datos b.warn{color:#c2410c}\n.sm-prod__acc{display:flex;flex-wrap:wrap;gap:8px}\n.sm-prod__acc button,.sm-prod__acc a{padding:5px 13px;border:0;border-radius:999px;background:#fff;box-shadow:0 0 0 1px rgba(2,2,3,.16);font:500 13px Manrope,sans-serif;color:#020203;text-decoration:none;cursor:pointer}\n.sm-prod__acc a{box-shadow:none}",
+   "js": "document.querySelectorAll('.sm-prod__foto').forEach(function(z){var o=z.querySelector('.sm-prod__over');z.addEventListener('dragover',function(e){e.preventDefault();z.classList.add('is-over');o.textContent='Suelta para subir';o.style.opacity=1;});z.addEventListener('dragleave',function(){z.classList.remove('is-over');o.textContent='Cambiar foto';o.style.opacity='';});z.addEventListener('drop',function(e){e.preventDefault();z.classList.remove('is-over');o.textContent='Subiendo foto…';});});\ndocument.querySelectorAll('.sm-prod__switch button').forEach(function(b){b.addEventListener('click',function(){var on=b.getAttribute('aria-checked')!=='true';b.setAttribute('aria-checked',on);b.previousElementSibling.textContent=on?'Publicado':'Oculto';});});"
+  },
+  {
+   "id": "sm-fila-pedido",
+   "nombre": "Pedido como tarjeta-fila con artículos y acción principal",
+   "categoria": "listados",
+   "proyecto": "Santana Motors (panel Medusa)",
+   "stack": "react",
+   "archivos": [
+    "/Users/lolyfernandezrodriguez/Desktop/santana motors/apps/backend/src/admin/components/tienda/orders-panel.tsx:59",
+    "/Users/lolyfernandezrodriguez/Desktop/santana motors/apps/backend/src/admin/components/tienda/orders-panel.tsx:91"
+   ],
+   "descripcion": "Filtro en píldoras (Por preparar · 3 / Enviados / Todos) y cada pedido como tarjeta en tres columnas: nº + estado + cliente/ciudad/fecha; lista «2× Camiseta · M»; total y botón «Preparar» (primario) o «Abrir».",
+   "cuando_usar": "Colas de trabajo donde lo importante es qué hay que preparar y qué lleva cada pedido, sin abrirlo.",
+   "reglas": [
+    "El estado se dice como lo diría la tienda (orderState): Por preparar / Enviado / Entregado / Cancelado, no los estados internos de Medusa.",
+    "El filtro por defecto es «Por preparar» y su contador va dentro de la píldora.",
+    "Instrucción corta junto al filtro: «ábrelo, pulsa “Preparar envío” y después “Marcar como enviado”».",
+    "Vacío con mensaje según filtro: «Todo al día · No hay pedidos pendientes de preparar»."
+   ],
+   "html": "<div class=\"sm-orders\">\n  <div class=\"sm-orders__bar\"><div class=\"sm-orders__seg\"><button class=\"on\">Por preparar <span>2</span></button><button>Enviados</button><button>Todos</button></div><small>Para enviar un pedido: ábrelo y pulsa «Preparar envío».</small></div>\n  <div class=\"sm-order\"><div><div class=\"sm-order__n\">Pedido #1043 <span class=\"sm-order__badge\">Por preparar</span></div><small>Pablo Ruiz · Linares · 24 nov 2026</small></div>\n    <ul><li><span>1×</span> Camiseta logo clásico <em>· M</em></li><li><span>2×</span> Llavero estrella</li></ul>\n    <div class=\"sm-order__end\"><b>39,80 €</b><a href=\"#\" class=\"sm-order__btn primary\">Preparar ↗</a></div></div>\n  <div class=\"sm-order\"><div><div class=\"sm-order__n\">Pedido #1041 <span class=\"sm-order__badge blue\">Enviado</span></div><small>Elena Mora · Jaén · 22 nov 2026</small></div>\n    <ul><li><span>1×</span> Gorra clásica</li></ul>\n    <div class=\"sm-order__end\"><b>24,90 €</b><a href=\"#\" class=\"sm-order__btn\">Abrir ↗</a></div></div>\n</div>",
+   "css": ".sm-orders{display:flex;flex-direction:column;gap:12px;padding:16px;background:#f5f5f5;font-family:Manrope,ui-sans-serif,system-ui,-apple-system,'Segoe UI',Arial,sans-serif;color:#020203;max-width:820px}\n.sm-orders__bar{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px}\n.sm-orders__bar small{font-size:13px;color:#8f8f90}\n.sm-orders__seg{display:flex;gap:4px;padding:4px;border-radius:999px;background:#ececec}\n.sm-orders__seg button{padding:6px 12px;border:0;border-radius:999px;background:none;font:600 13px Manrope,sans-serif;color:#55555a;cursor:pointer}\n.sm-orders__seg button.on{background:#fff;color:#020203;box-shadow:0 0 0 1px rgba(2,2,3,.07),0 1px 2px rgba(2,2,3,.04)}\n.sm-orders__seg span{color:#8f8f90;margin-left:6px}\n.sm-order{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,2fr) auto;align-items:center;gap:16px;padding:16px;background:#fff;border-radius:12px;box-shadow:0 0 0 1px rgba(2,2,3,.07),0 1px 2px rgba(2,2,3,.04)}\n.sm-order__n{display:flex;align-items:center;gap:8px;font-weight:600;font-size:14px}\n.sm-order small{font-size:13px;color:#55555a}\n.sm-order__badge{padding:1px 6px;border-radius:6px;font-size:11px;font-weight:500;background:#ffedd5;color:#c2410c}\n.sm-order__badge.blue{background:#dbeafe;color:#1d4ed8}\n.sm-order ul{margin:0;padding:0;list-style:none;font-size:13px}\n.sm-order ul span{color:#8f8f90}\n.sm-order ul em{font-style:normal;color:#55555a}\n.sm-order__end{display:flex;align-items:center;gap:16px;justify-content:flex-end}\n.sm-order__end b{font-size:14px}\n.sm-order__btn{padding:5px 13px;border-radius:999px;background:#fff;box-shadow:0 0 0 1px rgba(2,2,3,.16);font:500 13px Manrope,sans-serif;color:#020203;text-decoration:none}\n.sm-order__btn.primary{background:#020203;color:#fff}\n@media (max-width:768px){.sm-order{grid-template-columns:1fr}.sm-order__end{justify-content:space-between}}",
+   "js": ""
+  },
+  {
+   "id": "sm-panel-lateral-precio",
+   "nombre": "Panel lateral de edición con «Ahora → nuevo»",
+   "categoria": "formularios",
+   "proyecto": "Santana Motors (panel Medusa)",
+   "stack": "react",
+   "archivos": [
+    "/Users/lolyfernandezrodriguez/Desktop/santana motors/apps/backend/src/admin/components/tienda/price-drawer.tsx:60",
+    "/Users/lolyfernandezrodriguez/Desktop/santana motors/apps/backend/src/admin/components/tienda/stock-drawer.tsx:1"
+   ],
+   "descripcion": "Drawer derecho con título y descripción; bloque gris «Mismo precio para todas las tallas» + «Aplicar a todas»; cada variante con su campo alineado a la derecha y € dentro, y debajo «Ahora: 29 € → 32 €» en color cuando cambia.",
+   "cuando_usar": "Ediciones rápidas y acotadas de un dato (precio, stock) sin salir del listado.",
+   "reglas": [
+    "Se muestra el valor actual y el nuevo para que se vea exactamente qué cambia antes de guardar.",
+    "Campos con inputMode=decimal (aceptan coma); el botón Guardar se desactiva si algún valor no es >0.",
+    "Al guardar: toast «Precio actualizado. Ya se ve en la tienda.» o «No había cambios».",
+    "Variante del mismo patrón antes→después: Fichaje .cambio (hora tachada → nueva con flecha lima) en las solicitudes de corrección."
+   ],
+   "html": "<aside class=\"sm-drawer\">\n  <header><h2>Cambiar precio</h2><p>Camiseta logo clásico · precios con IVA incluido, en euros</p></header>\n  <div class=\"sm-drawer__body\">\n    <div class=\"sm-drawer__todas\"><label>Mismo precio para todas las tallas y colores</label><div><input placeholder=\"Ej.: 39,90\"><button>Aplicar a todas</button></div></div>\n    <div class=\"sm-drawer__fila\"><div><label>Talla S</label><small>Ahora: 29 €</small></div><div class=\"sm-drawer__eur\"><input value=\"29\"><span>€</span></div></div>\n    <div class=\"sm-drawer__fila\"><div><label>Talla M</label><small>Ahora: 29 € <em>→ 32 €</em></small></div><div class=\"sm-drawer__eur\"><input value=\"32\"><span>€</span></div></div>\n  </div>\n  <footer><button>Cancelar</button><button class=\"primary\">Guardar precio</button></footer>\n</aside>",
+   "css": ".sm-drawer{display:flex;flex-direction:column;width:380px;max-width:100%;min-height:420px;background:#fff;border-radius:12px;box-shadow:0 0 0 1px rgba(2,2,3,.1),0 8px 24px rgba(2,2,3,.08);font-family:Manrope,ui-sans-serif,system-ui,-apple-system,'Segoe UI',Arial,sans-serif;color:#020203}\n.sm-drawer header{padding:16px 24px;border-bottom:1px solid rgba(2,2,3,.09)}\n.sm-drawer h2{margin:0;font:400 15px/1.6 \"Krona One\",\"Manrope\",Arial,sans-serif}\n.sm-drawer header p{margin:0;font-size:13px;color:#55555a}\n.sm-drawer__body{flex:1;display:flex;flex-direction:column;gap:16px;padding:24px}\n.sm-drawer__todas{display:flex;flex-direction:column;gap:12px;background:#f5f5f5;border-radius:8px;padding:16px}\n.sm-drawer__todas label,.sm-drawer__fila label{font-size:13px;font-weight:600}\n.sm-drawer__todas div{display:flex;gap:8px}\n.sm-drawer input{flex:1;min-width:0;padding:6px 10px;border:0;border-radius:8px;box-shadow:0 0 0 1px rgba(2,2,3,.1);font:400 13px Manrope,sans-serif;background:#fff}\n.sm-drawer button{padding:6px 15px;border:0;border-radius:999px;background:#fff;box-shadow:0 0 0 1px rgba(2,2,3,.16);font:500 13px Manrope,sans-serif;cursor:pointer;color:#020203}\n.sm-drawer button.primary{background:#020203;color:#fff}\n.sm-drawer__fila{display:grid;grid-template-columns:1fr 9rem;align-items:center;gap:16px}\n.sm-drawer__fila small{display:block;font-size:12px;color:#8f8f90}\n.sm-drawer__fila em{font-style:normal;color:#020203;font-weight:600}\n.sm-drawer__eur{position:relative;display:flex}\n.sm-drawer__eur input{text-align:right;padding-right:28px}\n.sm-drawer__eur span{position:absolute;right:12px;top:50%;transform:translateY(-50%);font-size:13px;color:#8f8f90;pointer-events:none}\n.sm-drawer footer{display:flex;justify-content:flex-end;gap:8px;padding:16px 24px;border-top:1px solid rgba(2,2,3,.09)}",
+   "js": ""
+  },
+  {
+   "id": "sm-tarjeta-promocion",
+   "nombre": "Tarjeta de código de descuento con vista previa en vivo",
+   "categoria": "detalle",
+   "proyecto": "Santana Motors (panel Medusa)",
+   "stack": "react",
+   "archivos": [
+    "/Users/lolyfernandezrodriguez/Desktop/santana motors/apps/backend/src/admin/components/tienda/promotions-panel.tsx:62",
+    "/Users/lolyfernandezrodriguez/Desktop/santana motors/apps/backend/src/admin/components/tienda/promotions-panel.tsx:229",
+    "/Users/lolyfernandezrodriguez/Desktop/santana motors/apps/backend/src/admin/components/tienda/format.ts:91"
+   ],
+   "descripcion": "El código se pinta como cupón (monoespaciado, borde discontinuo), con estado real (Activa/Programada/Caducada/Pausada), resumen legible («-10 % en toda la tienda») e interruptor; al crear, una vista previa muestra «29 € → 26,10 €» mientras se escribe.",
+   "cuando_usar": "Gestión de cupones o reglas de descuento por personas no técnicas.",
+   "reglas": [
+    "22f9d4e «códigos de descuento»: el estado se calcula con las fechas de la campaña, no solo con el campo status (promoState).",
+    "Resumen en español natural generado (promoSummary) en vez de mostrar la configuración.",
+    "Errores de la API traducidos («Ya existe una promoción con ese código.»).",
+    "Borrar pide confirmación con textos propios (confirmText «Borrar»)."
+   ],
+   "html": "<div class=\"sm-promo\">\n  <div class=\"sm-promo__head\"><div><span class=\"sm-promo__code\">INVIERNO10</span><span class=\"sm-promo__auto\">Automática</span></div><span class=\"sm-promo__st\">Activa</span></div>\n  <p class=\"sm-promo__sum\">-10 % en toda la tienda · hasta el 31 dic 2026</p>\n  <div class=\"sm-promo__prev\"><b>Ejemplo:</b> <s>29 €</s> → <strong>26,10 €</strong></div>\n  <div class=\"sm-promo__pie\"><label><button type=\"button\" role=\"switch\" aria-checked=\"true\"><i></i></button>Activa</label><button class=\"sm-promo__del\">Borrar</button></div>\n</div>",
+   "css": ".sm-promo{display:flex;flex-direction:column;gap:12px;width:340px;padding:16px;background:#fff;border-radius:12px;box-shadow:0 0 0 1px rgba(2,2,3,.07),0 1px 2px rgba(2,2,3,.04);font-family:Manrope,ui-sans-serif,system-ui,-apple-system,'Segoe UI',Arial,sans-serif;color:#020203}\n.sm-promo__head{display:flex;justify-content:space-between;align-items:flex-start;gap:12px}\n.sm-promo__head>div{display:flex;flex-wrap:wrap;align-items:center;gap:8px}\n.sm-promo__code{padding:4px 10px;border:1px dashed rgba(2,2,3,.16);border-radius:6px;background:#f5f5f5;font:600 14px ui-monospace,Menlo,monospace;letter-spacing:.08em}\n.sm-promo__auto{padding:1px 6px;border-radius:6px;background:#f3e8ff;color:#7e22ce;font-size:11px;font-weight:500}\n.sm-promo__st{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:500;color:#020203}\n.sm-promo__st::before{content:\"\";width:8px;height:8px;border-radius:2px;background:#10b981}\n.sm-promo__sum{margin:0;font-size:13px;color:#55555a}\n.sm-promo__prev{font-size:13px;color:#55555a;background:#f5f5f5;border-radius:8px;padding:8px 12px}\n.sm-promo__prev strong{color:#020203}\n.sm-promo__pie{display:flex;justify-content:space-between;align-items:center;font-size:13px}\n.sm-promo__pie label{display:flex;align-items:center;gap:8px}\n.sm-promo__pie [role=switch]{width:32px;height:18px;border-radius:999px;border:0;background:#020203;padding:2px;display:flex;justify-content:flex-end;cursor:pointer}\n.sm-promo__pie [role=switch] i{width:14px;height:14px;border-radius:50%;background:#fff}\n.sm-promo__del{padding:5px 13px;border:0;border-radius:999px;background:none;color:#e11d48;font:500 13px Manrope,sans-serif;cursor:pointer}",
+   "js": ""
+  },
+  {
+   "id": "ro-menu-lateral-iconos",
+   "nombre": "Menú lateral agrupado con iconos y contadores de novedades",
+   "categoria": "navegacion",
+   "proyecto": "Panel de Rocío (web_rocio_nueva)",
+   "stack": "php",
+   "archivos": [
+    "/Users/lolyfernandezrodriguez/Desktop/web_rocio_nueva/public/admin/index.php:615",
+    "/Users/lolyfernandezrodriguez/Desktop/web_rocio_nueva/public/admin/index.php:865",
+    "/Users/lolyfernandezrodriguez/Desktop/web_rocio_nueva/public/admin/index.php:861"
+   ],
+   "descripcion": "Menú sticky con grupos en mayúsculas pequeñas (Mensajes, Instagram, Novedades, Diseño, Web, Seguridad), icono de trazo por sección y un contador en píldora melocotón solo cuando hay algo nuevo desde la última visita (rojo si son intentos de acceso fallidos).",
+   "cuando_usar": "Paneles con muchas secciones de bandeja de entrada donde importa saber dónde hay novedades sin entrar.",
+   "reglas": [
+    "286a40b «menú lateral agrupado con iconos y contadores».",
+    "10/11: el número solo sale si hay algo nuevo desde tu última visita (o algo que te toca hacer); con title y texto oculto que explica qué cuenta.",
+    "18/11: el menú es más alto que la pantalla: scroll propio (max-height + overscroll-behavior: contain).",
+    "La sección activa es una tarjeta blanca con sombra suave y el icono pasa a melocotón.",
+    "Variante: wp-menu-lateral-grupos (sin iconos, filtrado por rol)."
+   ],
+   "html": "<nav class=\"ro-menu\">\n  <a href=\"#\" class=\"on\"><svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.8\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"m3 10 9-7 9 7v10a2 2 0 0 1-2 2h-4v-7H9v7H5a2 2 0 0 1-2-2z\"/></svg><span>Inicio</span></a>\n  <p class=\"ro-menu__grupo\">Mensajes</p>\n  <a href=\"#\"><svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.8\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><rect x=\"3\" y=\"4\" width=\"18\" height=\"18\" rx=\"2\"/><path d=\"M16 2v4M8 2v4M3 10h18M9 16l2 2 4-4\"/></svg><span>Reservas</span><b class=\"ro-menu__n\">3</b></a>\n  <a href=\"#\"><svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.8\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M4 19.5A2.5 2.5 0 0 1 6.5 17H20V3H6.5A2.5 2.5 0 0 0 4 5.5z\"/></svg><span>Pidieron los temas</span></a>\n  <p class=\"ro-menu__grupo\">Seguridad</p>\n  <a href=\"#\"><svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.8\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><rect x=\"3\" y=\"11\" width=\"18\" height=\"11\" rx=\"2\"/><path d=\"M7 11V7a5 5 0 0 1 10 0v4\"/></svg><span>Accesos</span><b class=\"ro-menu__n alerta\">2</b></a>\n</nav>",
+   "css": ".ro-menu{display:flex;flex-direction:column;gap:2px;width:268px;box-sizing:border-box;padding:24px 8px 24px 24px;background:#f1f7f5;font-family:'DM Sans',system-ui,-apple-system,'Segoe UI',sans-serif}\n.ro-menu__grupo{margin:18px 0 6px 12px;font-size:11px;font-weight:600;letter-spacing:.09em;text-transform:uppercase;color:#8aa39b}\n.ro-menu a{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:12px;text-decoration:none;font-size:14.5px;font-weight:600;color:#2e4a42;transition:background .2s,color .2s}\n.ro-menu a svg{width:19px;height:19px;flex:none;color:#7fa69a;transition:color .2s}\n.ro-menu a span{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}\n.ro-menu a:hover{background:#fff}.ro-menu a:hover svg{color:#f59a89}\n.ro-menu a.on{background:#fff;color:#000;box-shadow:0 2px 10px rgba(20,40,35,.07)}.ro-menu a.on svg{color:#f59a89}\n.ro-menu__n{min-width:26px;padding:2px 8px;border-radius:999px;background:#ffb5a7;color:#fff;font-size:12px;font-weight:600;text-align:center;box-sizing:border-box}\n.ro-menu__n.alerta{background:#c2410c}",
+   "js": ""
+  },
+  {
+   "id": "ro-menu-movil-desplegable",
+   "nombre": "Menú en móvil: botón con la sección actual que se despliega",
+   "categoria": "movil",
+   "proyecto": "Panel de Rocío (web_rocio_nueva)",
+   "stack": "php",
+   "archivos": [
+    "/Users/lolyfernandezrodriguez/Desktop/web_rocio_nueva/public/admin/index.php:657",
+    "/Users/lolyfernandezrodriguez/Desktop/web_rocio_nueva/public/admin/index.php:889"
+   ],
+   "descripcion": "Por debajo de 860px el menú lateral se sustituye por un botón ancho con el icono y nombre de la sección actual, el total de novedades y «Menú ▾»; al pulsar se abre el menú completo en una tarjeta blanca.",
+   "cuando_usar": "Paneles con menú lateral largo que deben funcionar en el móvil sin un menú hamburguesa anónimo.",
+   "reglas": [
+    "10/11: «en tablet en vertical y en móvil, el menú es un botón que se despliega».",
+    "El botón dice dónde estás (no solo «Menú») y suma las novedades de todas las secciones.",
+    "Variantes: web-playa (menú fuera de pantalla con velo oscuro), Arbitraje (la barra pasa a rejilla de 4 iconos con texto debajo)."
+   ],
+   "html": "<div class=\"ro-movil\">\n  <button type=\"button\" class=\"ro-movil__btn\" aria-expanded=\"false\"><svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.8\"><rect x=\"3\" y=\"4\" width=\"18\" height=\"18\" rx=\"2\"/><path d=\"M16 2v4M8 2v4M3 10h18\"/></svg><span>Reservas</span><b class=\"ro-movil__n\">5</b><span class=\"ro-movil__flecha\">Menú ▾</span></button>\n  <nav class=\"ro-movil__menu\"><p>Mensajes</p><a href=\"#\" class=\"on\">Reservas <b>3</b></a><a href=\"#\">Pidieron los temas</a><p>Web</p><a href=\"#\">Estadísticas</a></nav>\n</div>",
+   "css": ".ro-movil{max-width:380px;background:#f1f7f5;padding:2px 0 16px;font-family:'DM Sans',system-ui,-apple-system,'Segoe UI',sans-serif}\n.ro-movil__btn{display:flex;align-items:center;gap:10px;width:calc(100% - 32px);margin:14px 16px 0;padding:12px 16px;background:#fff;border:1px solid #d6e3df;border-radius:14px;font:inherit;font-weight:600;font-size:15px;color:#000;cursor:pointer;text-align:left;-webkit-tap-highlight-color:transparent}\n.ro-movil__btn svg{width:19px;height:19px;flex:none;color:#f59a89}\n.ro-movil__n{min-width:26px;padding:2px 8px;border-radius:999px;background:#ffb5a7;color:#fff;font-size:12px;text-align:center}\n.ro-movil__flecha{margin-left:auto;color:#5f7f76;font-size:14px}\n.ro-movil__menu{display:none;flex-direction:column;gap:2px;margin:8px 16px 0;padding:12px;background:#fff;border-radius:16px;box-shadow:0 8px 24px rgba(20,40,35,.1)}\n.ro-movil__menu.abierto{display:flex}\n.ro-movil__menu p{margin:12px 0 4px 12px;font-size:11px;font-weight:600;letter-spacing:.09em;text-transform:uppercase;color:#8aa39b}\n.ro-movil__menu a{display:flex;justify-content:space-between;padding:10px 12px;border-radius:12px;text-decoration:none;font-size:14.5px;font-weight:600;color:#2e4a42}\n.ro-movil__menu a.on{background:#f1f7f5}\n.ro-movil__menu a b{padding:2px 8px;border-radius:999px;background:#ffb5a7;color:#fff;font-size:12px}",
+   "js": "document.querySelectorAll('.ro-movil__btn').forEach(function(b){b.addEventListener('click',function(){var m=b.nextElementSibling,a=m.classList.toggle('abierto');b.setAttribute('aria-expanded',a);});});"
+  },
+  {
+   "id": "ro-tabla-a-fichas",
+   "nombre": "Tabla que en móvil se convierte en fichas",
+   "categoria": "listados",
+   "proyecto": "Panel de Rocío (web_rocio_nueva)",
+   "stack": "php",
+   "archivos": [
+    "/Users/lolyfernandezrodriguez/Desktop/web_rocio_nueva/public/admin/index.php:689",
+    "/Users/lolyfernandezrodriguez/Desktop/web_rocio_nueva/public/admin/index.php:713"
+   ],
+   "descripcion": "Tabla limpia en tarjeta blanca redondeada (cabecera gris pequeña sticky, filas con hover menta, persona con iniciales en círculo, chips); por debajo de 1180px cada fila se vuelve una ficha con los datos en cuadrícula y la etiqueta de cada celda tomada de data-col.",
+   "cuando_usar": "Listados de mensajes/registros con muchas columnas que hay que leer completos en tablet y móvil.",
+   "reglas": [
+    "06/11: «tablas más limpias; en móvil, una ficha por fila».",
+    "10/11: hasta tablet apaisada, una ficha por fila con los datos en cuadrícula: «nada escondido a la derecha».",
+    "Las filas nuevas desde la última visita llevan raya melocotón a la izquierda (es-nueva) y chip «nueva».",
+    "La papelera es un botón icono gris que se pone rojo al pasar; en la ficha va arriba a la derecha.",
+    "Mensajes largos (td.largo) ocupan toda la fila de la ficha.",
+    "Variante: wp-listado-reservas (oculta columnas en móvil)."
+   ],
+   "html": "<div class=\"ro-tabla\"><table>\n  <thead><tr><th>Fecha</th><th>Persona</th><th>Email</th><th>Origen</th><th>Mensaje</th><th></th></tr></thead>\n  <tbody>\n    <tr class=\"es-nueva\"><td data-col=\"Fecha\"><span class=\"dia\">24/11/2026</span><span class=\"hora\">10:42</span><span class=\"chip nueva\">nueva</span></td><td data-col=\"Persona\"><span class=\"persona\"><i>CL</i><b>Carmen López</b></span></td><td data-col=\"Email\"><a href=\"#\">carmen@ejemplo.test</a></td><td data-col=\"Origen\"><span class=\"chip web\">web</span></td><td data-col=\"Mensaje\" class=\"largo\">Me gustaría reservar plaza para el grupo de enero.</td><td class=\"acciones\"><button class=\"papelera\" aria-label=\"Borrar\"><svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\"><path d=\"M3 6h18M8 6V4h8v2M6 6l1 14h10l1-14\"/></svg></button></td></tr>\n    <tr><td data-col=\"Fecha\"><span class=\"dia\">21/11/2026</span><span class=\"hora\">18:05</span></td><td data-col=\"Persona\"><span class=\"persona\"><i>JR</i><b>Javier Ramos</b></span></td><td data-col=\"Email\"><a href=\"#\">javi@ejemplo.test</a></td><td data-col=\"Origen\"><span class=\"chip a-mano\">a mano</span></td><td data-col=\"Mensaje\" class=\"largo\">—</td><td class=\"acciones\"><button class=\"papelera\" aria-label=\"Borrar\"><svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\"><path d=\"M3 6h18M8 6V4h8v2M6 6l1 14h10l1-14\"/></svg></button></td></tr>\n  </tbody></table></div>",
+   "css": ".ro-tabla{background:#fff;border-radius:20px;overflow:auto;box-shadow:0 2px 10px rgba(20,40,35,.05);padding:6px 10px;font-family:'DM Sans',system-ui,-apple-system,'Segoe UI',sans-serif;color:#000}\n.ro-tabla table{border-collapse:separate;border-spacing:0;width:100%;font-size:14.5px}\n.ro-tabla th,.ro-tabla td{padding:14px;text-align:left;vertical-align:middle}\n.ro-tabla th{font-size:12px;font-weight:600;letter-spacing:.03em;color:#8a9b96;background:#fff;position:sticky;top:0;border-bottom:1px solid #eef4f2;white-space:nowrap}\n.ro-tabla tbody td{border-bottom:1px solid #f3f7f6}.ro-tabla tbody tr:last-child td{border-bottom:0}\n.ro-tabla tbody tr{transition:background .15s}.ro-tabla tbody tr:hover{background:#f6fbf9}\n.ro-tabla tbody tr.es-nueva td:first-child{box-shadow:inset 3px 0 0 #f59a89}\n.ro-tabla td a{color:inherit;text-decoration:none;border-bottom:1px solid #b3e8da}\n.ro-tabla td.largo{max-width:360px;white-space:pre-wrap;line-height:1.45}\n.ro-tabla .dia{display:block;font-weight:600;white-space:nowrap}.ro-tabla .hora{display:block;font-size:12.5px;color:#8a9b96}\n.ro-tabla .persona{display:flex;align-items:center;gap:10px}\n.ro-tabla .persona i{flex:none;width:34px;height:34px;border-radius:50%;background:#def1ec;color:#2e6b5b;display:grid;place-items:center;font-style:normal;font-size:12.5px;font-weight:600}\n.ro-tabla .chip{display:inline-block;padding:2px 10px;border-radius:999px;font-size:12px;font-weight:600;background:#eef4f2;color:#555}\n.ro-tabla .chip.nueva{background:#ffe9e3;color:#ec8573;margin-top:4px}.ro-tabla .chip.web{background:#def1ec;color:#2e6b5b}.ro-tabla .chip.a-mano{background:#ffe9e3;color:#ec8573}\n.ro-tabla td.acciones{width:44px;text-align:right}\n.ro-tabla .papelera{background:none;border:0;padding:8px;border-radius:10px;color:#7d918b;cursor:pointer;line-height:0}\n.ro-tabla .papelera svg{width:18px;height:18px}.ro-tabla .papelera:hover{color:#c2410c;background:#fdeee8}\n@media (max-width:1180px){\n.ro-tabla{background:none;box-shadow:none;padding:0;overflow:visible}\n.ro-tabla table,.ro-tabla tbody{display:block;width:100%}.ro-tabla thead{display:none}\n.ro-tabla tbody tr{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:12px 20px;background:#fff;border-radius:16px;padding:16px 56px 16px 18px;margin-bottom:10px;box-shadow:0 2px 8px rgba(20,40,35,.05);position:relative}\n.ro-tabla tbody tr.es-nueva{box-shadow:inset 4px 0 0 #f59a89,0 2px 8px rgba(20,40,35,.05)}.ro-tabla tbody tr.es-nueva td:first-child{box-shadow:none}\n.ro-tabla td{display:block;border:0!important;padding:0;min-width:0;max-width:none!important;overflow-wrap:anywhere}\n.ro-tabla td[data-col]::before{content:attr(data-col);display:block;font-size:11px;color:#8a9b96;letter-spacing:.03em;margin-bottom:3px}\n.ro-tabla td.largo{grid-column:1/-1}\n.ro-tabla td.acciones{position:absolute;top:8px;right:8px;width:auto}\n.ro-tabla .hora{display:inline;margin-left:6px}}\n@media (max-width:600px){.ro-tabla tbody tr{grid-template-columns:1fr;gap:8px}}",
+   "js": ""
+  },
+  {
+   "id": "ro-acceso-caja",
+   "nombre": "Acceso en tarjeta centrada con logo redondo y título caligráfico",
+   "categoria": "acceso",
+   "proyecto": "Panel de Rocío (web_rocio_nueva)",
+   "stack": "php",
+   "archivos": [
+    "/Users/lolyfernandezrodriguez/Desktop/web_rocio_nueva/public/admin/index.php:593",
+    "/Users/lolyfernandezrodriguez/Desktop/web_rocio_nueva/public/admin/index.php:812"
+   ],
+   "descripcion": "Fondo menta con brillo radial y tarjeta blanca de 28px de radio: logo circular, «Mi panel» en caligrafía melocotón, subtítulo, campos con etiqueta melocotón y botón píldora a todo el ancho; nota «Los intentos quedan registrados».",
+   "cuando_usar": "Paneles de marca personal donde el acceso debe sentirse cercano y no técnico.",
+   "reglas": [
+    "5c6b741 «Seguridad de los formularios y del panel»: token CSRF, intentos registrados (sección Accesos con contador rojo).",
+    "Si no hay usuarios, el propio acceso explica cómo crear la contraseña (?crear-contrasena genera el hash para config.php y no guarda nada).",
+    "Variante: wp-login-foto (dos columnas con foto)."
+   ],
+   "html": "<div class=\"ro-acceso\"><form class=\"ro-acceso__caja\" onsubmit=\"return false\">\n  <div class=\"ro-acceso__logo\">MP</div>\n  <h1>Mi panel</h1><p class=\"ro-acceso__sub\">Mensajes de la web · Academia de ejemplo</p>\n  <p class=\"ro-acceso__msg\">Usuario o contraseña incorrectos.</p>\n  <div class=\"ro-acceso__campo\"><label>Usuario</label><input autocomplete=\"username\"></div>\n  <div class=\"ro-acceso__campo\"><label>Contraseña</label><input type=\"password\"></div>\n  <button class=\"ro-acceso__btn\">Entrar</button>\n  <p class=\"ro-acceso__pie\">Acceso privado. Los intentos quedan registrados.</p>\n</form></div>",
+   "css": ".ro-acceso{min-height:520px;display:grid;place-items:center;padding:24px;background:#def1ec radial-gradient(60% 50% at 80% 10%,rgba(255,255,255,.6),transparent 70%);font-family:'DM Sans',system-ui,-apple-system,'Segoe UI',sans-serif}\n.ro-acceso__caja{width:100%;max-width:400px;box-sizing:border-box;background:#fff;border-radius:28px;padding:36px 32px;box-shadow:0 20px 50px rgba(20,40,35,.12);text-align:center}\n.ro-acceso__logo{width:84px;height:84px;margin:0 auto 8px;border-radius:50%;background:#ffb5a7;color:#fff;display:grid;place-items:center;font-weight:600;font-size:24px}\n.ro-acceso h1{font-family:\"Taberna Script\",\"Pinyon Script\",cursive;font-weight:400;font-size:44px;line-height:1;margin:4px 0 2px;color:#f59a89}\n.ro-acceso__sub{margin:0 0 24px;color:#555;font-size:15px}\n.ro-acceso__msg{border-radius:12px;padding:10px 14px;margin:0 0 16px;font-size:14px;text-align:left;background:#fdeee8;color:#c2410c}\n.ro-acceso__campo{text-align:left;margin-bottom:14px}\n.ro-acceso__campo label{display:block;font-size:13px;font-weight:600;color:#f59a89;margin-bottom:6px}\n.ro-acceso__campo input{width:100%;box-sizing:border-box;padding:13px 16px;border:1px solid #d6e3df;border-radius:14px;background:#f1f7f5;font:inherit}\n.ro-acceso__campo input:focus{outline:2px solid #ffb5a7;outline-offset:1px;background:#fff}\n.ro-acceso__btn{width:100%;background:#f59a89;color:#fff;border:0;border-radius:999px;padding:12px 22px;font:inherit;font-weight:600;font-size:15px;cursor:pointer;transition:background .2s}\n.ro-acceso__btn:hover{background:#ec8573}\n.ro-acceso__pie{margin-top:18px;font-size:13px;color:#555}",
+   "js": ""
+  },
+  {
+   "id": "ro-tareas-para-hoy",
+   "nombre": "Inicio «Hola, …»: tareas para hoy con acción",
+   "categoria": "estados",
+   "proyecto": "Panel de Rocío (web_rocio_nueva)",
+   "stack": "php",
+   "archivos": [
+    "/Users/lolyfernandezrodriguez/Desktop/web_rocio_nueva/public/admin/inicio.php:60",
+    "/Users/lolyfernandezrodriguez/Desktop/web_rocio_nueva/public/admin/inicio.php:118",
+    "/Users/lolyfernandezrodriguez/Desktop/web_rocio_nueva/public/admin/inicio.php:46"
+   ],
+   "descripcion": "Saludo con la fecha en píldora a la derecha y debajo una lista de tareas en tarjetas: icono de la sección, frase con la cifra en negrita y una acción «Contestar →»; las urgentes (accesos fallidos, envío a medias) en fondo rojizo. Si no hay nada: banda verde «Nada pendiente…».",
+   "cuando_usar": "Portada de paneles para personas no técnicas: lo primero que ven es qué les toca hacer.",
+   "reglas": [
+    "a782738 «Panel: Inicio rediseñado»: arriba lo que toca hacer; luego la web ahora mismo, los mensajes nuevos, el calendario y lo demás.",
+    "Solo entra en la lista lo que pide hacer algo (comentario «Para hoy»: solo lo que pide hacer algo).",
+    "El subtítulo cambia: «Esto es lo que te toca ahora.» / «Todo al día desde tu última visita.»",
+    "Variante: wp-atencion-hoy."
+   ],
+   "html": "<div class=\"ro-ini\">\n  <div class=\"ro-ini__cab\"><div><h1>Hola, Marta</h1><p>Esto es lo que te toca ahora.</p></div><span class=\"ro-ini__fecha\">Miércoles 25 de noviembre</span></div>\n  <ul class=\"ro-ini__tareas\">\n    <li class=\"alerta\"><a href=\"#\"><svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.8\"><rect x=\"3\" y=\"11\" width=\"18\" height=\"11\" rx=\"2\"/><path d=\"M7 11V7a5 5 0 0 1 10 0v4\"/></svg><span>Ha habido <b>2</b> intentos de entrar en el panel con una contraseña equivocada</span><span class=\"ir\">Ver los accesos →</span></a></li>\n    <li><a href=\"#\"><svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.8\"><rect x=\"2\" y=\"2\" width=\"20\" height=\"20\" rx=\"5\"/><circle cx=\"12\" cy=\"12\" r=\"4\"/></svg><span><b>4</b> mensajes de Instagram te tocan contestar a ti</span><span class=\"ir\">Contestar →</span></a></li>\n    <li><a href=\"#\"><svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.8\"><rect x=\"3\" y=\"4\" width=\"18\" height=\"18\" rx=\"2\"/><path d=\"M16 2v4M8 2v4M3 10h18\"/></svg><span><b>2</b> publicaciones de esta semana están sin programar todavía</span><span class=\"ir\">Ver el calendario →</span></a></li>\n  </ul>\n  <p class=\"ro-ini__todo\">Nada pendiente: ni mensajes nuevos, ni Instagram por contestar, ni publicaciones por preparar esta semana.</p>\n</div>",
+   "css": ".ro-ini{max-width:760px;padding:24px;background:#f1f7f5;font-family:'DM Sans',system-ui,-apple-system,'Segoe UI',sans-serif;color:#000}\n.ro-ini__cab{display:flex;align-items:flex-end;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:18px}\n.ro-ini__cab h1{font-size:28px;margin:0;font-weight:600}\n.ro-ini__cab p{margin:4px 0 0;color:#555;font-size:14.5px}\n.ro-ini__fecha{font-size:14px;color:#2e4a42;background:#fff;border-radius:999px;padding:6px 14px;border:1px solid #e3eeea}\n.ro-ini__tareas{list-style:none;margin:0 0 20px;padding:0;display:grid;gap:8px}\n.ro-ini__tareas a{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:14px;align-items:center;background:#fff;border:1px solid #e3eeea;border-radius:14px;padding:12px 16px;text-decoration:none;color:inherit;font-size:14.5px;transition:box-shadow .2s}\n.ro-ini__tareas a:hover{box-shadow:0 4px 14px rgba(20,40,35,.08)}\n.ro-ini__tareas svg{width:20px;height:20px;color:#f59a89}\n.ro-ini__tareas .ir{font-size:13px;font-weight:600;color:#ec8573;white-space:nowrap}\n.ro-ini__tareas li.alerta a{background:#fdeee8;border-color:#f8d3c6}.ro-ini__tareas li.alerta svg{color:#c2410c}\n.ro-ini__todo{display:flex;align-items:center;gap:12px;background:#e6f5f0;border:1px solid #c7e7dd;border-radius:14px;padding:14px 18px;margin:0;font-size:15px;color:#2e4a42}\n@media (max-width:640px){.ro-ini__cab h1{font-size:23px}.ro-ini__tareas a{grid-template-columns:auto 1fr}.ro-ini__tareas .ir{grid-column:2}}",
+   "js": ""
+  },
+  {
+   "id": "ro-kpi-en-vivo",
+   "nombre": "Cifras de la web con «personas ahora» en vivo",
+   "categoria": "estadisticas",
+   "proyecto": "Panel de Rocío (web_rocio_nueva)",
+   "stack": "php",
+   "archivos": [
+    "/Users/lolyfernandezrodriguez/Desktop/web_rocio_nueva/public/admin/inicio.php:67",
+    "/Users/lolyfernandezrodriguez/Desktop/web_rocio_nueva/public/admin/inicio.php:127",
+    "/Users/lolyfernandezrodriguez/Desktop/web_rocio_nueva/public/admin/estadisticas.php:85"
+   ],
+   "descripcion": "Fila de tarjetas: la primera, más ancha y en verde suave, con un punto verde que late y «3 personas en la web ahora · En: Inicio · Temas»; las demás con cifra grande y «ayer: 41» debajo; la de descargas en melocotón.",
+   "cuando_usar": "Resumen de analítica propia en la portada del panel, comparando con ayer.",
+   "reglas": [
+    "bc29a5c «Estadísticas rediseñada con “en la web ahora”».",
+    "77c41e9 (panel Majosoft): estadísticas sin cookies ni IPs; quien entra al panel no cuenta.",
+    "Si no hay nadie, el punto se apaga a gris y no late («Nadie en los últimos 5 minutos»); con prefers-reduced-motion no hay animación.",
+    "Cada cifra lleva la de ayer para dar contexto, no porcentajes.",
+    "Variantes: wp-kpi-cifras, sm-kpi-tienda, Fichaje resumen-tile."
+   ],
+   "html": "<div class=\"ro-web\">\n  <a href=\"#\" class=\"vivo\"><b>3</b><span>personas en la web ahora</span><small>En: Inicio · Temas 2026</small></a>\n  <a href=\"#\"><b>48</b><span>visitas hoy</span><small>ayer: 41</small></a>\n  <a href=\"#\"><b>35</b><span>personas hoy</span><small>ayer: 30</small></a>\n  <a href=\"#\" class=\"desc\"><b>7</b><span>descargas hoy</span><small>ayer: 9</small></a>\n</div>",
+   "css": ".ro-web{display:grid;grid-template-columns:minmax(0,1.3fr) repeat(3,minmax(0,1fr));gap:12px;padding:16px;background:#f1f7f5;font-family:'DM Sans',system-ui,-apple-system,'Segoe UI',sans-serif;max-width:820px}\n.ro-web a{display:block;background:#fff;border:1px solid #e3eeea;border-radius:16px;padding:14px 16px;text-decoration:none;color:#000}\n.ro-web a:hover{box-shadow:0 4px 14px rgba(20,40,35,.08)}\n.ro-web b{display:block;font-size:28px;line-height:1.15;font-weight:600}\n.ro-web span{font-size:13px;color:#555}\n.ro-web small{display:block;font-size:12px;color:#555;margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}\n.ro-web .vivo{background:#e6f5f0;border-color:#c7e7dd}\n.ro-web .vivo b{display:flex;align-items:center;gap:10px}\n.ro-web .vivo b::before{content:\"\";width:10px;height:10px;border-radius:50%;background:#5fae97;box-shadow:0 0 0 0 rgba(95,174,151,.6);animation:ro-latido 2s infinite}\n.ro-web .vivo.nadie b::before{background:#a9bdb6;animation:none}\n.ro-web .desc b{color:#ec8573}\n@keyframes ro-latido{70%{box-shadow:0 0 0 8px rgba(95,174,151,0)}100%{box-shadow:0 0 0 0 rgba(95,174,151,0)}}\n@media (prefers-reduced-motion:reduce){.ro-web .vivo b::before{animation:none}}\n@media (max-width:860px){.ro-web{grid-template-columns:repeat(2,minmax(0,1fr))}.ro-web .vivo{grid-column:1/-1}}",
+   "js": ""
+  },
+  {
+   "id": "ro-grafica-barras",
+   "nombre": "Gráfica de 14 días y listas con barra (CSS puro)",
+   "categoria": "estadisticas",
+   "proyecto": "Panel de Rocío (web_rocio_nueva)",
+   "stack": "php",
+   "archivos": [
+    "/Users/lolyfernandezrodriguez/Desktop/web_rocio_nueva/public/admin/estadisticas.php:98",
+    "/Users/lolyfernandezrodriguez/Desktop/web_rocio_nueva/public/admin/estadisticas.php:112"
+   ],
+   "descripcion": "Columnas verdes de 14 días hechas con divs (altura por estilo en línea), con la cifra al pasar el ratón y el día de hoy atenuado; debajo, ranking de páginas/orígenes con nombre, número y una barra fina proporcional.",
+   "cuando_usar": "Estadísticas sencillas sin librería de gráficas: tendencia diaria y top N.",
+   "reglas": [
+    "Sin librerías ni JS: cada barra es <i> con height en % y la etiqueta <em> se muestra en hover.",
+    "Las descargas usan la misma gráfica en bajo y en melocotón (.bajo) para no confundirlas con visitas.",
+    "Variante: barras de Instagram (.ig-barras) y barra de carga en Arbitraje."
+   ],
+   "html": "<div class=\"ro-est\">\n  <p class=\"ro-est__tit\">Visitas <small>· últimos 14 días</small></p>\n  <div class=\"ro-est__graf\">\n    <div class=\"ro-est__col\"><i style=\"height:30%\"></i><em>12</em></div><div class=\"ro-est__col\"><i style=\"height:45%\"></i><em>18</em></div><div class=\"ro-est__col\"><i style=\"height:38%\"></i><em>15</em></div><div class=\"ro-est__col\"><i style=\"height:60%\"></i><em>24</em></div><div class=\"ro-est__col\"><i style=\"height:52%\"></i><em>21</em></div><div class=\"ro-est__col\"><i style=\"height:20%\"></i><em>8</em></div><div class=\"ro-est__col\"><i style=\"height:25%\"></i><em>10</em></div><div class=\"ro-est__col\"><i style=\"height:70%\"></i><em>28</em></div><div class=\"ro-est__col\"><i style=\"height:66%\"></i><em>26</em></div><div class=\"ro-est__col\"><i style=\"height:80%\"></i><em>32</em></div><div class=\"ro-est__col\"><i style=\"height:58%\"></i><em>23</em></div><div class=\"ro-est__col\"><i style=\"height:40%\"></i><em>16</em></div><div class=\"ro-est__col\"><i style=\"height:90%\"></i><em>36</em></div><div class=\"ro-est__col hoy\"><i style=\"height:48%\"></i><em>19</em></div>\n  </div>\n  <ul class=\"ro-est__barras\">\n    <li><span class=\"nom\">Temas 2026</span><span class=\"num\">124<small>38 %</small></span><span class=\"barra\"><i style=\"width:100%\"></i></span></li>\n    <li><span class=\"nom\">Inicio</span><span class=\"num\">86<small>26 %</small></span><span class=\"barra\"><i style=\"width:69%\"></i></span></li>\n    <li><span class=\"nom\">Regalos</span><span class=\"num\">41<small>12 %</small></span><span class=\"barra\"><i style=\"width:33%\"></i></span></li>\n  </ul>\n</div>",
+   "css": ".ro-est{max-width:520px;background:#fff;border:1px solid #e3eeea;border-radius:18px;padding:18px 20px;font-family:'DM Sans',system-ui,-apple-system,'Segoe UI',sans-serif;color:#000}\n.ro-est__tit{font-size:13px;color:#2e4a42;font-weight:600;margin:0}.ro-est__tit small{font-weight:400;color:#555}\n.ro-est__graf{display:grid;grid-template-columns:repeat(14,minmax(0,1fr));gap:6px;align-items:end;height:130px;border-bottom:1px solid #e3eeea;padding-top:20px}\n.ro-est__col{position:relative;height:100%;display:flex;align-items:flex-end;justify-content:center}\n.ro-est__col i{display:block;width:100%;max-width:30px;min-height:2px;background:#5fae97;border-radius:4px 4px 0 0}\n.ro-est__col.hoy i{opacity:.75}\n.ro-est__col em{position:absolute;top:-18px;font-style:normal;font-size:11.5px;font-weight:600;color:#2e4a42;opacity:0;transition:opacity .15s}\n.ro-est__col:hover em{opacity:1}.ro-est__col:hover i{filter:brightness(.92)}\n.ro-est__barras{list-style:none;margin:16px 0 0;padding:0}\n.ro-est__barras li{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:2px 12px;padding:8px 0;border-top:1px solid #eef3f1}\n.ro-est__barras li:first-child{border-top:0}\n.ro-est__barras .nom{font-size:14px}\n.ro-est__barras .num{font-size:14px;font-weight:600;text-align:right}.ro-est__barras .num small{font-weight:400;color:#555;margin-left:6px}\n.ro-est__barras .barra{grid-column:1/-1;height:6px;background:#eef3f1;border-radius:4px;overflow:hidden}\n.ro-est__barras .barra i{display:block;height:100%;background:#5fae97;border-radius:4px}",
+   "js": ""
+  },
+  {
+   "id": "ro-calendario-publicaciones",
+   "nombre": "Calendario de publicaciones con leyenda-filtro por estado",
+   "categoria": "calendarios",
+   "proyecto": "Panel de Rocío (web_rocio_nueva)",
+   "stack": "php",
+   "archivos": [
+    "/Users/lolyfernandezrodriguez/Desktop/web_rocio_nueva/public/admin/calendario.php:24",
+    "/Users/lolyfernandezrodriguez/Desktop/web_rocio_nueva/public/admin/calendario.php:28"
+   ],
+   "descripcion": "Mes en rejilla de tarjetas (hoy en amarillo), cada publicación como bloque del color de lo que le falta (programado, falta grabar, falta maquetar…; «por decidir» con borde discontinuo); la leyenda son botones-píldora con contador que filtran; al tocar una publicación se abre una ficha flotante con la imagen.",
+   "cuando_usar": "Calendarios editoriales o de tareas donde el color expresa el estado de preparación.",
+   "reglas": [
+    "«El color dice qué le falta a cada publicación. Toca un color para ver solo esas» (texto de ayuda de la página).",
+    "La leyenda es el filtro (aria-pressed) y muestra cuántas hay de cada estado.",
+    "Solo el mes actual y los dos siguientes, y solo si tienen algo.",
+    "En ≤860px la rejilla pasa a una columna sin días vacíos y la ficha se ancla abajo como hoja.",
+    "Mismo esquema de colores en el panel Majosoft (67d3045 «una sola regla de colores… y de estado»).",
+    "Variante para reservas: wp-calendario-ocupacion."
+   ],
+   "html": "<div class=\"ro-cal\">\n  <div class=\"ro-cal__ley\"><button aria-pressed=\"true\"><i style=\"background:#5B57D9\"></i>Programado <b>4</b></button><button aria-pressed=\"false\"><i style=\"background:#D9822B\"></i>Falta que grabe <b>2</b></button><button aria-pressed=\"false\"><i style=\"background:#CF5F7C\"></i>Falta maquetar <b>1</b></button><button aria-pressed=\"false\"><i style=\"background:#8F8BA8\"></i>Por decidir <b>1</b></button></div>\n  <div class=\"ro-cal__mes\">\n    <div class=\"ro-cal__cab\">Lun</div><div class=\"ro-cal__cab\">Mar</div><div class=\"ro-cal__cab\">Mié</div><div class=\"ro-cal__cab\">Jue</div>\n    <div class=\"ro-cal__dia\"><div class=\"ro-cal__num\">23 <span>lun</span></div><div class=\"ro-cal__p\" style=\"background:#5B57D9\"><small>Reel · 18:00</small>5 errores en la defensa</div></div>\n    <div class=\"ro-cal__dia hoy\"><div class=\"ro-cal__num\">24 <span>mar</span></div><div class=\"ro-cal__p\" style=\"background:#D9822B\"><small>Historia</small>Encuesta de temas</div></div>\n    <div class=\"ro-cal__dia\"><div class=\"ro-cal__num\">25 <span>mié</span></div><div class=\"ro-cal__p decidir\"><small>Reel</small>Idea por decidir</div></div>\n    <div class=\"ro-cal__dia\"><div class=\"ro-cal__num\">26 <span>jue</span></div></div>\n  </div>\n</div>",
+   "css": ".ro-cal{max-width:720px;padding:16px;background:#f1f7f5;font-family:'DM Sans',system-ui,-apple-system,'Segoe UI',sans-serif;color:#000}\n.ro-cal__ley{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 12px}\n.ro-cal__ley button{border:2px solid #e3eeea;background:#fff;border-radius:999px;padding:7px 13px;font:inherit;font-weight:600;font-size:14px;cursor:pointer;display:flex;gap:8px;align-items:center}\n.ro-cal__ley button[aria-pressed=true]{border-color:#000}\n.ro-cal__ley i{width:11px;height:11px;border-radius:3px;display:inline-block}\n.ro-cal__mes{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px}\n.ro-cal__cab{font-size:12px;font-weight:700;color:#555;text-transform:uppercase;letter-spacing:.05em;padding:0 4px}\n.ro-cal__dia{background:#fff;border:1px solid #e3eeea;border-radius:12px;min-height:108px;padding:6px;display:flex;flex-direction:column;gap:4px}\n.ro-cal__dia.hoy{background:#fff6d6;border-color:#f3dc8a}\n.ro-cal__num{font-size:13px;font-weight:700;display:flex;justify-content:space-between}.ro-cal__num span{font-weight:600;color:#555;font-size:11px}\n.ro-cal__p{border-radius:8px;padding:5px 7px;font-size:12px;line-height:1.25;color:#fff;cursor:pointer}\n.ro-cal__p small{display:block;opacity:.92;font-weight:600;font-size:10.5px}\n.ro-cal__p.decidir{background:transparent;color:#000;border:2px dashed #8F8BA8}\n@media (max-width:860px){.ro-cal__mes{grid-template-columns:1fr}.ro-cal__cab{display:none}.ro-cal__dia{min-height:auto}}",
+   "js": "document.querySelectorAll('.ro-cal__ley').forEach(function(l){l.addEventListener('click',function(e){var b=e.target.closest('button');if(!b)return;b.setAttribute('aria-pressed',b.getAttribute('aria-pressed')!=='true');});});"
+  },
+  {
+   "id": "ro-agenda-dias",
+   "nombre": "Agenda de próximos días con fecha en cuadrado",
+   "categoria": "calendarios",
+   "proyecto": "Panel de Rocío (web_rocio_nueva)",
+   "stack": "php",
+   "archivos": [
+    "/Users/lolyfernandezrodriguez/Desktop/web_rocio_nueva/public/admin/inicio.php:90",
+    "/Users/lolyfernandezrodriguez/Desktop/web_rocio_nueva/public/admin/inicio.php:93"
+   ],
+   "descripcion": "Lista compacta: a la izquierda un cuadrado menta de 52px con día de la semana y número (hoy en melocotón), a la derecha título y una línea con hora y estado con punto de color.",
+   "cuando_usar": "Resumen de próximas publicaciones/citas en una tarjeta de portada o en móvil (vista agenda).",
+   "reglas": [
+    "Solo lo que no está publicado y desde hoy; ordenado por fecha y hora.",
+    "El punto de estado usa la variable --c con el mismo color del calendario grande.",
+    "Panel Majosoft 310f666: en el móvil, agenda (solo los días con algo, desde hoy) en lugar del mes."
+   ],
+   "html": "<ul class=\"ro-agenda\">\n  <li><span class=\"dia hoy\">mar<b>24</b></span><div><span class=\"t\">Encuesta de temas</span><span class=\"m\">Historia · 19:00 <span class=\"est\" style=\"--c:#D9822B\">Falta que grabe</span></span></div></li>\n  <li><span class=\"dia\">mié<b>25</b></span><div><span class=\"t\">5 errores en la defensa</span><span class=\"m\">Reel · 18:00 <span class=\"est\" style=\"--c:#5B57D9\">Programado</span></span></div></li>\n  <li><span class=\"dia\">vie<b>27</b></span><div><span class=\"t\">Recurso gratis de diciembre</span><span class=\"m\">Carrusel <span class=\"est\" style=\"--c:#2E9E7E\">Falta programar</span></span></div></li>\n</ul>",
+   "css": ".ro-agenda{list-style:none;margin:0;padding:18px 22px;max-width:420px;background:#fff;border-radius:18px;box-shadow:0 2px 8px rgba(20,40,35,.05);font-family:'DM Sans',system-ui,-apple-system,'Segoe UI',sans-serif;color:#000}\n.ro-agenda li{display:grid;grid-template-columns:52px minmax(0,1fr);gap:12px;align-items:center;padding:8px 0;border-top:1px solid #f0f5f3}\n.ro-agenda li:first-child{border-top:0;padding-top:0}\n.ro-agenda .dia{display:flex;flex-direction:column;align-items:center;justify-content:center;height:52px;border-radius:12px;background:#def1ec;font-size:11px;color:#2e4a42;text-transform:uppercase;line-height:1.1}\n.ro-agenda .dia b{font-size:19px}\n.ro-agenda .dia.hoy{background:#ffb5a7;color:#fff}\n.ro-agenda .t{font-weight:600;font-size:14.5px;display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}\n.ro-agenda .m{font-size:12.5px;color:#555;display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:2px}\n.ro-agenda .est{display:inline-flex;align-items:center;gap:5px;font-weight:600}\n.ro-agenda .est::before{content:\"\";width:8px;height:8px;border-radius:50%;background:var(--c)}",
+   "js": ""
+  },
+  {
+   "id": "ro-desplegable-acordeon",
+   "nombre": "Desplegable y acordeón con flecha propia",
+   "categoria": "formularios",
+   "proyecto": "Panel de Rocío (web_rocio_nueva)",
+   "stack": "php",
+   "archivos": [
+    "/Users/lolyfernandezrodriguez/Desktop/web_rocio_nueva/public/admin/index.php:672",
+    "/Users/lolyfernandezrodriguez/Desktop/web_rocio_nueva/public/admin/index.php:679"
+   ],
+   "descripcion": "<select> con appearance:none, misma forma que los campos y chevron SVG melocotón propio; <details> con borde fino, título en negrita y el mismo chevron que gira 180º al abrir.",
+   "cuando_usar": "Formularios del panel para que desplegables y «ver más» no tengan el aspecto por defecto del sistema.",
+   "reglas": [
+    "286a40b «desplegables y acordeón con estilo propio».",
+    "El chevron va como data-URI en background, así no hace falta HTML extra.",
+    "Variantes: Arbitraje select.pill (píldora con flecha gris y aire a la derecha porque «la del navegador queda pegada al borde»), Fichaje --icono-chevron con color por tema."
+   ],
+   "html": "<div class=\"ro-form\">\n  <label for=\"ro-lista\">A quién</label>\n  <select id=\"ro-lista\" class=\"ro-select\"><option>Lista de reservas (128)</option><option>Pidieron los temas (342)</option></select>\n  <details class=\"ro-acordeon\"><summary>Ver quiénes son</summary><ul><li>persona1@ejemplo.test</li><li>persona2@ejemplo.test</li></ul></details>\n</div>",
+   "css": ".ro-form{max-width:420px;padding:22px;background:#fff;border-radius:18px;font-family:'DM Sans',system-ui,-apple-system,'Segoe UI',sans-serif}\n.ro-form label{display:block;font-size:13px;font-weight:600;color:#f59a89;margin:0 0 6px}\n.ro-select{width:100%;appearance:none;-webkit-appearance:none;padding:12px 44px 12px 14px;margin-bottom:14px;border:1px solid #d6e3df;border-radius:12px;background:#f1f7f5 url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23f59a89' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E\") no-repeat right 14px center/18px;font:inherit;font-size:15px;color:#000;cursor:pointer;transition:border-color .2s,background-color .2s}\n.ro-select:hover{border-color:#b3e8da}\n.ro-select:focus{outline:2px solid #ffb5a7;outline-offset:1px;background-color:#fff}\n.ro-acordeon{border:1px solid #eef4f2;border-radius:12px;padding:0 14px;margin:4px 0 14px}\n.ro-acordeon summary{list-style:none;display:flex;align-items:center;justify-content:space-between;padding:11px 0;cursor:pointer;font-size:14px;font-weight:600}\n.ro-acordeon summary::-webkit-details-marker{display:none}\n.ro-acordeon summary::after{content:\"\";width:18px;height:18px;background:url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23f59a89' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E\") center/18px no-repeat;transition:transform .2s}\n.ro-acordeon[open] summary::after{transform:rotate(180deg)}\n.ro-acordeon ul{margin:0 0 12px;font-size:13px;color:#555;columns:2;padding-left:18px}",
+   "js": ""
+  },
+  {
+   "id": "ro-envio-destinatarios",
+   "nombre": "Envío masivo: «A quién le llega» y barra de progreso",
+   "categoria": "formularios",
+   "proyecto": "Panel de Rocío (web_rocio_nueva)",
+   "stack": "php",
+   "archivos": [
+    "/Users/lolyfernandezrodriguez/Desktop/web_rocio_nueva/public/admin/index.php:746",
+    "/Users/lolyfernandezrodriguez/Desktop/web_rocio_nueva/public/admin/index.php:952",
+    "/Users/lolyfernandezrodriguez/Desktop/web_rocio_nueva/public/admin/index.php:757"
+   ],
+   "descripcion": "Tarjeta a la derecha del editor de correo: banda menta con el nombre de la lista y el número grande de personas, frase de quién entra, tabla con scroll de destinatarios y lo último que recibió cada uno, y el botón «Enviar a «Lista» (128)»; durante el envío, barra de progreso melocotón y «Detener».",
+   "cuando_usar": "Cualquier acción masiva (newsletter, avisos) donde hay que ver exactamente a quién afecta antes de lanzarla.",
+   "reglas": [
+    "23a78d4 «“A quién le llega” a la vista y “Envíos hechos” rediseñado».",
+    "5713a62: envío por tandas, prueba, vista previa y bajas firmadas; el botón dice a qué lista y cuántos («Enviar a … (128)»).",
+    "Quien ya recibió ese asunto se excluye y se avisa con cuántos son y un «Ver quiénes son».",
+    "Se puede detener y retomar sin repetir a nadie; si quedó a medias aparece como tarea urgente en Inicio.",
+    "Antes de enviar: «mándate una prueba» (39756ce: elegir a quién va la prueba)."
+   ],
+   "html": "<div class=\"ro-dest\">\n  <h2>A quién le llega</h2>\n  <div class=\"ro-dest__banda\"><span class=\"ro-dest__lista\">Lista de reservas</span><span class=\"ro-dest__n\"><b>128</b> personas</span></div>\n  <p class=\"ro-dest__quien\">Personas de tu lista de reservas que dejaron su email. Sin repetir y sin las bajas.</p>\n  <div class=\"ro-dest__personas\"><table><thead><tr><th>Lo recibirá</th><th>Lo último que le mandaste</th></tr></thead><tbody>\n    <tr><td><b>Sara Gil</b><br><span>sara@ejemplo.test</span></td><td>«Abierta la inscripción» · 3 nov</td></tr>\n    <tr><td><span>luis@ejemplo.test</span></td><td>—</td></tr></tbody></table></div>\n  <div class=\"ro-dest__prog\"><span style=\"width:42%\"></span></div><p class=\"ro-dest__estado\">Enviando… 54 de 128</p>\n  <button class=\"ro-dest__btn\">Enviar a «Lista de reservas» (128)</button>\n</div>",
+   "css": ".ro-dest{max-width:440px;background:#fff;border-radius:18px;padding:22px;box-shadow:0 2px 8px rgba(20,40,35,.05);font-family:'DM Sans',system-ui,-apple-system,'Segoe UI',sans-serif;color:#000}\n.ro-dest h2{font-size:18px;margin:0 0 12px}\n.ro-dest__banda{display:flex;align-items:baseline;justify-content:space-between;gap:12px;flex-wrap:wrap;background:#def1ec;border-radius:14px;padding:14px 16px;margin-bottom:10px}\n.ro-dest__lista{font-weight:600;font-size:16px;color:#2e4a42}\n.ro-dest__n{font-size:14px;color:#2e4a42;white-space:nowrap}.ro-dest__n b{font-size:26px;color:#ec8573;margin-right:2px}\n.ro-dest__quien{font-size:13.5px;margin:0 0 12px;color:#555;line-height:1.5}\n.ro-dest__personas{max-height:320px;overflow:auto;border:1px solid #e3eeea;border-radius:12px}\n.ro-dest__personas table{width:100%;border-collapse:collapse;font-size:13.5px}\n.ro-dest__personas th{position:sticky;top:0;background:#f7fbfa;text-align:left;font-size:12px;font-weight:600;color:#6c8a81;padding:8px 12px;border-bottom:1px solid #e3eeea}\n.ro-dest__personas td{padding:8px 12px;border-bottom:1px solid #eef3f1;vertical-align:top;line-height:1.45}\n.ro-dest__personas td span{color:#555}\n.ro-dest__prog{height:12px;background:#f1f7f5;border-radius:999px;overflow:hidden;margin:14px 0 6px}\n.ro-dest__prog span{display:block;height:100%;background:#f59a89;transition:width .4s}\n.ro-dest__estado{margin:0 0 12px;font-size:14px}\n.ro-dest__btn{background:#f59a89;color:#fff;border:0;border-radius:999px;padding:12px 22px;font:inherit;font-weight:600;font-size:15px;cursor:pointer}\n.ro-dest__btn:hover{background:#ec8573}",
+   "js": ""
+  },
+  {
+   "id": "ro-galeria-documentos",
+   "nombre": "Galería de documentos con miniatura viva y filtros con contador",
+   "categoria": "listados",
+   "proyecto": "Panel de Rocío (web_rocio_nueva)",
+   "stack": "php",
+   "archivos": [
+    "/Users/lolyfernandezrodriguez/Desktop/web_rocio_nueva/public/admin/documentos-lista.php:17",
+    "/Users/lolyfernandezrodriguez/Desktop/web_rocio_nueva/public/admin/documentos-lista.php:25"
+   ],
+   "descripcion": "Filtros en píldora con número (Todos 12 · Temario 7 · Infografía 3) y rejilla de tarjetas: miniatura de la primera hoja (iframe escalado al 24% sobre menta), título, chip del estilo y «4 hojas · 20 nov · Claude».",
+   "cuando_usar": "Bibliotecas de documentos/diseños generados donde la miniatura real ayuda más que un icono.",
+   "reglas": [
+    "La miniatura es el propio documento en un iframe reducido con transform:scale(.24), sin pointer-events ni foco (tabindex=-1).",
+    "Solo aparecen los filtros de estilos que se usan.",
+    "Estado vacío con un ejemplo de qué pedir («hazme el tema 14 con mi estilo de temario»).",
+    "Al borrar: «queda en la papelera del servidor, se puede recuperar»."
+   ],
+   "html": "<div class=\"ro-docs\">\n  <nav class=\"ro-docs__filtros\"><a href=\"#\" class=\"on\">Todos <b>5</b></a><a href=\"#\">Temario <b>3</b></a><a href=\"#\">Infografía <b>2</b></a></nav>\n  <div class=\"ro-docs__rej\">\n    <a class=\"ro-docs__card\" href=\"#\"><div class=\"ro-docs__mini\"><div class=\"ro-docs__hoja\"><i></i><i></i><i></i></div></div><div class=\"ro-docs__info\"><h2>Tema 14: la evaluación</h2><span class=\"ro-docs__chip\">Temario</span><span class=\"ro-docs__dato\">8 hojas · 20 nov · Claude</span></div></a>\n    <a class=\"ro-docs__card\" href=\"#\"><div class=\"ro-docs__mini\"><div class=\"ro-docs__hoja\"><i></i><i></i></div></div><div class=\"ro-docs__info\"><h2>Checklist de la introducción</h2><span class=\"ro-docs__chip\">Infografía</span><span class=\"ro-docs__dato\">1 hoja · 18 nov · tú</span></div></a>\n  </div>\n</div>",
+   "css": ".ro-docs{padding:16px;background:#f1f7f5;font-family:'DM Sans',system-ui,-apple-system,'Segoe UI',sans-serif;color:#000;max-width:720px}\n.ro-docs__filtros{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 18px}\n.ro-docs__filtros a{border:2px solid #e3eeea;background:#fff;border-radius:999px;padding:7px 13px;font-weight:600;font-size:14px;text-decoration:none;color:#2e4a42}\n.ro-docs__filtros a.on{border-color:#000;color:#000}\n.ro-docs__filtros b{font-weight:600;color:#555;margin-left:4px}\n.ro-docs__rej{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:18px}\n.ro-docs__card{background:#fff;border:1px solid #e3eeea;border-radius:20px;overflow:hidden;display:flex;flex-direction:column;text-decoration:none;color:inherit;transition:box-shadow .2s,transform .2s}\n.ro-docs__card:hover{box-shadow:0 10px 28px rgba(20,40,35,.12);transform:translateY(-2px)}\n.ro-docs__mini{position:relative;height:230px;background:#def1ec;overflow:hidden;border-bottom:1px solid #e3eeea}\n.ro-docs__hoja{position:absolute;left:50%;top:14px;width:150px;height:212px;transform:translateX(-50%);background:#fff;box-shadow:0 6px 30px rgba(0,0,0,.18);padding:14px;box-sizing:border-box;display:flex;flex-direction:column;gap:8px}\n.ro-docs__hoja i{display:block;height:28px;border-radius:6px;background:#ffe9e3}.ro-docs__hoja i:nth-child(2){background:#def1ec}.ro-docs__hoja i:nth-child(3){background:#fff3d6}\n.ro-docs__info{padding:14px 16px 16px;display:flex;flex-direction:column;gap:6px;flex:1}\n.ro-docs__info h2{font-size:15.5px;line-height:1.3;margin:0;font-weight:600}\n.ro-docs__chip{align-self:flex-start;background:#def1ec;color:#2e4a42;border-radius:999px;padding:3px 10px;font-size:12px;font-weight:600}\n.ro-docs__dato{font-size:13px;color:#555}",
+   "js": ""
+  },
+  {
+   "id": "ro-editor-lateral",
+   "nombre": "Editor visual: lienzo + barra superior + panel lateral de propiedades",
+   "categoria": "otros",
+   "proyecto": "Panel de Rocío (web_rocio_nueva)",
+   "stack": "php",
+   "archivos": [
+    "/Users/lolyfernandezrodriguez/Desktop/web_rocio_nueva/public/admin/documentos.php:108",
+    "/Users/lolyfernandezrodriguez/Desktop/web_rocio_nueva/public/admin/documentos.php:144",
+    "/Users/lolyfernandezrodriguez/Desktop/web_rocio_nueva/public/admin/documentos.php:124"
+   ],
+   "descripcion": "Cabecera sticky menta con volver, título, deshacer/rehacer, «+ Añadir texto», zoom (− Ajustar +), estado «Sin cambios»/«Guardado», Guardar, PDF y Borrar; lienzo en iframe sobre gris y panel derecho de 320px con secciones en tarjetas (elemento elegido: tamaño, girar, mover, capa, letra, color en círculos, tipo de letra; título; compartir).",
+   "cuando_usar": "Retoques de documentos/plantillas generados (texto, imágenes, posición) por una persona no técnica.",
+   "reglas": [
+    "b777553/11-13 nov: sustituto de Canva: se escribe directamente sobre la página; clic en una imagen para cambiarla.",
+    "13/11: los tiradores (mover/redimensionar) viven en la página del panel, nunca dentro del documento.",
+    "Aviso si una imagen se ve más grande que su tamaño real («puede salir borrosa en el PDF»).",
+    "Cada guardado deja la versión anterior en el historial; se puede recuperar.",
+    "Atajos visibles en el propio panel (flechas, Supr, Esc).",
+    "En ≤860px el panel pasa debajo del lienzo."
+   ],
+   "html": "<div class=\"ro-ed\">\n  <header class=\"ro-ed__top\"><a href=\"#\">← Documentos</a><span class=\"ro-ed__tit\">Tema 14: la evaluación</span><span class=\"ro-ed__sp\"></span>\n    <span class=\"ro-ed__grupo\"><button class=\"cl z\" disabled>↶</button><button class=\"cl z\">↷</button></span><button class=\"cl\">+ Añadir texto</button>\n    <span class=\"ro-ed__grupo\"><button class=\"cl z\">−</button><button class=\"cl z\">Ajustar</button><button class=\"cl z\">+</button></span>\n    <span class=\"ro-ed__estado\">Cambios sin guardar</span><button class=\"pr\">Guardar</button></header>\n  <div class=\"ro-ed__cuerpo\">\n    <div class=\"ro-ed__lienzo\"><div class=\"ro-ed__hoja\"><h3 contenteditable=\"true\">La evaluación</h3><p contenteditable=\"true\">Escribe aquí directamente sobre la hoja.</p></div></div>\n    <aside class=\"ro-ed__lat\">\n      <section><h4>Elemento elegido</h4>\n        <div class=\"ro-ed__ctrl\"><span>Tamaño</span><button class=\"cl z\">−</button><button class=\"cl z\">+</button></div>\n        <div class=\"ro-ed__ctrl\"><span>Color</span><div class=\"ro-ed__col\"><button style=\"background:#f59a89\" class=\"si\"></button><button style=\"background:#5fae97\"></button><button style=\"background:#5B57D9\"></button><button style=\"background:#000\"></button></div></div>\n      </section>\n      <section><h4>Compartir</h4><p>Enlace privado de solo lectura:</p><input readonly value=\"https://ejemplo.test/ver/abc123\"></section>\n    </aside>\n  </div>\n</div>",
+   "css": ".ro-ed{font-family:'DM Sans',system-ui,-apple-system,'Segoe UI',sans-serif;font-size:15px;color:#000;border:1px solid #e3eeea;border-radius:12px;overflow:hidden;max-width:900px}\n.ro-ed__top{background:#def1ec;padding:12px 20px;display:flex;align-items:center;gap:10px;flex-wrap:wrap}\n.ro-ed__top a{font-weight:600;text-decoration:none;color:inherit}\n.ro-ed__tit{font-weight:600;color:#2e4a42;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:40%}\n.ro-ed__sp{flex:1}\n.ro-ed__grupo{display:inline-flex;gap:4px}\n.ro-ed button{display:inline-flex;align-items:center;justify-content:center;gap:6px;border-radius:999px;padding:9px 18px;font:inherit;font-weight:600;font-size:14.5px;cursor:pointer}\n.ro-ed .pr{background:#f59a89;color:#fff;border:0}.ro-ed .pr:hover{background:#ec8573}\n.ro-ed .cl{background:#fff;color:#000;border:1px solid #d6e3df}.ro-ed .cl:hover{background:#f1f7f5}\n.ro-ed .z{padding:7px 12px;min-width:38px}\n.ro-ed button:disabled{opacity:.5;cursor:default}\n.ro-ed__estado{font-size:13.5px;color:#2e4a42}\n.ro-ed__cuerpo{display:grid;grid-template-columns:minmax(0,1fr) 320px;height:420px}\n.ro-ed__lienzo{background:#9a9aa2;display:grid;place-items:start center;padding:24px;overflow:auto}\n.ro-ed__hoja{width:280px;min-height:360px;background:#fff;padding:24px;box-shadow:0 6px 30px rgba(0,0,0,.18)}\n.ro-ed__hoja [contenteditable]:hover{box-shadow:0 0 0 1px rgba(107,63,200,.35)}\n.ro-ed__hoja h3{margin:0 0 8px;color:#ec8573}\n.ro-ed__lat{background:#fff;border-left:1px solid #e3eeea;overflow:auto;padding:18px;display:flex;flex-direction:column;gap:16px}\n.ro-ed__lat section{background:#f1f7f5;border-radius:16px;padding:14px}\n.ro-ed__lat h4{font-size:14px;margin:0 0 6px;font-weight:600;color:#2e4a42}\n.ro-ed__lat p{margin:0 0 6px;color:#555;font-size:13.5px}\n.ro-ed__lat input{width:100%;box-sizing:border-box;font:inherit;font-size:14px;padding:10px 12px;border:1px solid #d6e3df;border-radius:12px;background:#fff}\n.ro-ed__ctrl{display:flex;align-items:center;gap:4px;margin-top:6px;flex-wrap:wrap}.ro-ed__ctrl span{width:52px;font-size:13px;color:#2e4a42;font-weight:600}\n.ro-ed__col{display:flex;gap:6px}.ro-ed__col button{width:26px;height:26px;padding:0;border-radius:50%;border:2px solid #fff;box-shadow:0 0 0 1px #d6e3df}.ro-ed__col button.si{box-shadow:0 0 0 2px #ec8573}\n@media (max-width:860px){.ro-ed__cuerpo{grid-template-columns:1fr;height:auto}.ro-ed__lat{border-left:0;border-top:1px solid #e3eeea}}",
+   "js": ""
+  },
+  {
+   "id": "ar-barra-superior-lima",
+   "nombre": "Barra superior oscura con secciones e indicador lima deslizante",
+   "categoria": "navegacion",
+   "proyecto": "Arbitraje (y Designaciones, su prototipo)",
+   "stack": "html+js",
+   "archivos": [
+    "/Users/lolyfernandezrodriguez/Desktop/Arbitraje/public/admin.html:108",
+    "/Users/lolyfernandezrodriguez/Desktop/Arbitraje/public/admin.html:393",
+    "/Users/lolyfernandezrodriguez/Desktop/Arbitraje/public/admin.html:702"
+   ],
+   "descripcion": "Franja oscura redondeada con la marca (punto lima), secciones con icono en una pista translúcida donde una pastilla lima se desliza hasta la activa, contador en la sección de árbitros y botón Salir con borde.",
+   "cuando_usar": "Paneles de 3-5 secciones donde un menú lateral sobra y se quiere aspecto de aplicación.",
+   "reglas": [
+    "a19a860 «Menú del panel como barra de la aplicación: franja oscura, secciones con icono y la activa en lima».",
+    "El indicador se mide con offsetLeft/offsetWidth y se mueve con transform (transición cubic-bezier .3,.9,.3,1); se recalcula en resize.",
+    "5ce5e54: número de registrados en el menú (nav-num).",
+    "En ≤860px las secciones pasan a una rejilla de 4 con el icono encima del texto y Salir solo con icono."
+   ],
+   "html": "<div class=\"ar-barra\">\n  <div class=\"ar-barra__marca\"><i></i>Designa<span>panel</span></div>\n  <nav class=\"ar-barra__pages\"><span class=\"ar-barra__ind\"></span>\n    <a href=\"#\" class=\"on\">Partidos</a><a href=\"#\">Árbitros <b>24</b></a><a href=\"#\">Correos</a><a href=\"#\">Localidades</a></nav>\n  <button class=\"ar-barra__salir\">Salir</button>\n</div>",
+   "css": ".ar-barra{display:flex;align-items:center;gap:14px;background:#16160f;color:#f4f3ee;border-radius:18px;padding:8px 8px 8px 18px;border:1px solid rgba(244,243,238,.08);box-shadow:0 8px 24px -16px rgba(0,0,0,.5);font-family:Inter,system-ui,-apple-system,sans-serif;font-size:14px;max-width:820px}\n.ar-barra__marca{display:flex;align-items:center;gap:8px;font-weight:800;letter-spacing:-.02em;font-size:15px;flex:none}\n.ar-barra__marca i{width:10px;height:10px;border-radius:50%;background:#d4ec3a;box-shadow:0 0 0 3px #f4f3ee}\n.ar-barra__marca span{color:rgba(244,243,238,.55);font-weight:600}\n.ar-barra__pages{position:relative;display:inline-flex;gap:2px;background:rgba(244,243,238,.07);border-radius:999px;padding:4px;margin:0 auto 0 8px}\n.ar-barra__pages a{position:relative;z-index:1;display:inline-flex;align-items:center;gap:8px;padding:8px 16px;border-radius:999px;color:rgba(244,243,238,.68);font-weight:600;text-decoration:none;transition:color .25s}\n.ar-barra__pages a:hover{color:#f4f3ee}.ar-barra__pages a.on{color:#1d2400}\n.ar-barra__pages b{font-size:11px;padding:0 6px;border-radius:999px;background:rgba(244,243,238,.15)}\n.ar-barra__ind{position:absolute;top:4px;bottom:4px;left:0;border-radius:999px;background:#d4ec3a;box-shadow:0 2px 10px -2px rgba(212,236,58,.6);transition:transform .35s cubic-bezier(.3,.9,.3,1),width .35s cubic-bezier(.3,.9,.3,1)}\n.ar-barra__salir{flex:none;font:inherit;font-size:13px;font-weight:600;cursor:pointer;color:rgba(244,243,238,.75);background:none;border:1px solid rgba(244,243,238,.18);border-radius:999px;padding:8px 14px}\n.ar-barra__salir:hover{color:#f4f3ee;border-color:rgba(244,243,238,.4)}",
+   "js": "document.querySelectorAll('.ar-barra__pages').forEach(function(n){var ind=n.querySelector('.ar-barra__ind');function mv(){var a=n.querySelector('a.on');if(!a)return;ind.style.width=a.offsetWidth+'px';ind.style.transform='translateX('+(a.offsetLeft-4)+'px)';}n.addEventListener('click',function(e){var a=e.target.closest('a');if(!a)return;e.preventDefault();n.querySelectorAll('a').forEach(function(x){x.classList.toggle('on',x===a)});mv();});mv();window.addEventListener('resize',mv);});"
+  },
+  {
+   "id": "ar-pestanas-progreso",
+   "nombre": "Pestañas de franjas con progreso y pastilla negra",
+   "categoria": "navegacion",
+   "proyecto": "Arbitraje (y Designaciones, su prototipo)",
+   "stack": "html+js",
+   "archivos": [
+    "/Users/lolyfernandezrodriguez/Desktop/Arbitraje/public/admin.html:54",
+    "/Users/lolyfernandezrodriguez/Desktop/Arbitraje/public/admin.html:138",
+    "/Users/lolyfernandezrodriguez/Desktop/Arbitraje/public/admin.html:563"
+   ],
+   "descripcion": "Tarjeta con pestañas anchas por franja (Sábado mañana, Sábado tarde…): título en negrita, «5 / 8 · 12 disp.» y una barra fina lima de cuánto está completo; la activa es una pastilla negra que se desliza.",
+   "cuando_usar": "Trabajo repartido en bloques (días, turnos, lotes) donde interesa ver cuánto falta en cada uno sin entrar.",
+   "reglas": [
+    "eda3332: franjas según los partidos de cada semana (lunes a domingo, mañana y tarde).",
+    "Un ✓ delante del contador cuando la franja está completa.",
+    "6d1d6c3: al cambiar de pestaña el contenido entra desde el lado hacia el que vas (entraD/entraI).",
+    "52372ec: cambiar de filtro no mueve la página."
+   ],
+   "html": "<nav class=\"ar-tabs\"><span class=\"ar-tabs__ind\"></span>\n  <button class=\"ar-tab on\"><b>Sábado mañana</b><small>✓ 6 / 6 · 9 disp.</small><div class=\"ar-tab__bar\"><i style=\"width:100%\"></i></div></button>\n  <button class=\"ar-tab\"><b>Sábado tarde</b><small>3 / 8 · 11 disp.</small><div class=\"ar-tab__bar\"><i style=\"width:37%\"></i></div></button>\n  <button class=\"ar-tab\"><b>Domingo mañana</b><small>0 / 5 · 7 disp.</small><div class=\"ar-tab__bar\"><i style=\"width:0\"></i></div></button>\n</nav>",
+   "css": ".ar-tabs{position:relative;display:flex;gap:4px;background:#fff;border:1px solid #e6e4dd;border-radius:14px;padding:6px;overflow-x:auto;font-family:Inter,system-ui,-apple-system,sans-serif;font-size:14px;color:#111;max-width:720px}\n.ar-tab{position:relative;z-index:1;flex:1;min-width:112px;text-align:left;border:0;background:none;padding:10px 12px;border-radius:10px;cursor:pointer;font:inherit;color:inherit;transition:color .3s}\n.ar-tab b{display:block;font-weight:600;white-space:nowrap}.ar-tab small{color:#6b6b66}\n.ar-tab.on{color:#f3f2ee}.ar-tab.on small{color:inherit;opacity:.7}\n.ar-tab__bar{height:4px;background:#e6e4dd;border-radius:4px;margin-top:8px;overflow:hidden}.ar-tab__bar i{display:block;height:100%;background:#d4ec3a;transition:width .4s}\n.ar-tabs__ind{position:absolute;left:0;top:0;border-radius:10px;background:#111;pointer-events:none;transition:transform .38s cubic-bezier(.3,.9,.3,1),width .38s cubic-bezier(.3,.9,.3,1),height .38s cubic-bezier(.3,.9,.3,1)}",
+   "js": "document.querySelectorAll('.ar-tabs').forEach(function(n){var ind=n.querySelector('.ar-tabs__ind');function mv(){var a=n.querySelector('.ar-tab.on');ind.style.width=a.offsetWidth+'px';ind.style.height=a.offsetHeight+'px';ind.style.transform='translate('+a.offsetLeft+'px,'+a.offsetTop+'px)';}n.addEventListener('click',function(e){var a=e.target.closest('.ar-tab');if(!a)return;n.querySelectorAll('.ar-tab').forEach(function(x){x.classList.toggle('on',x===a)});mv();});mv();});"
+  },
+  {
+   "id": "ar-asignar-arrastrando",
+   "nombre": "Fila de partido con huecos para asignar arrastrando",
+   "categoria": "otros",
+   "proyecto": "Arbitraje (y Designaciones, su prototipo)",
+   "stack": "html+js",
+   "archivos": [
+    "/Users/lolyfernandezrodriguez/Desktop/Arbitraje/public/admin.html:77",
+    "/Users/lolyfernandezrodriguez/Desktop/Arbitraje/public/admin.html:86",
+    "/Users/lolyfernandezrodriguez/Desktop/Designaciones/index.html:48"
+   ],
+   "descripcion": "Cada partido es una fila hora / equipos y lugar / huecos en píldora discontinua («+ Árbitro», «+ Asistente»); se rellenan pulsando o arrastrando a una persona desde la lista lateral; el hueco relleno muestra avatar y nombre, una × al pasar, y se marca en rojo si hay conflicto.",
+   "cuando_usar": "Asignar personas a plazas (árbitros, turnos, monitores) con arrastrar y soltar y alternativa por clic.",
+   "reglas": [
+    "0474bba «mejoras al arrastrar»: el hueco destino crece, se pone lima y dice «Soltar aquí»; mientras se arrastra todos los huecos libres se resaltan.",
+    "Alternativa sin arrastre: pulsar el hueco lo activa («Árbitro · elige →») y luego se pulsa a la persona.",
+    "Aviso de conflicto en el propio hueco (.warn) con title explicativo («no marcó esta franja o tiene otro partido cerca»).",
+    "Partido completo: ✓ lima junto a la hora.",
+    "Designaciones/index.html es el prototipo de un solo archivo con las mismas clases."
+   ],
+   "html": "<div class=\"ar-match-list\">\n  <div class=\"ar-match full\"><div class=\"ar-match__time\">10:00</div><div><div class=\"ar-match__teams\">CD Norte <span>vs</span> UD Sur</div><div class=\"ar-match__meta\">Alevín · Campo Municipal</div></div>\n    <div class=\"ar-slots\"><button class=\"ar-slot filled\"><span class=\"ar-av\" style=\"background:#6b8afd\">AR</span>A. Ruiz<span class=\"x\">✕</span></button></div></div>\n  <div class=\"ar-match\"><div class=\"ar-match__time\">12:30</div><div><div class=\"ar-match__teams\">Atlético Río <span>vs</span> CF Sierra</div><div class=\"ar-match__meta\">Sénior · Polideportivo</div></div>\n    <div class=\"ar-slots\"><button class=\"ar-slot filled warn\"><span class=\"ar-av\" style=\"background:#e0795b\">MG</span>M. Gómez<span class=\"x\">✕</span></button><button class=\"ar-slot drop\">+ Asistente</button><button class=\"ar-slot\">+ Asistente</button></div></div>\n</div>",
+   "css": ".ar-match-list{background:#fff;border:1px solid #e6e4dd;border-radius:14px;overflow:hidden;font-family:Inter,system-ui,-apple-system,sans-serif;font-size:14px;color:#111;max-width:760px}\n.ar-match{display:grid;grid-template-columns:60px 1fr auto;gap:12px;align-items:center;padding:14px 18px;border-bottom:1px solid #e6e4dd;transition:background .2s}\n.ar-match:hover{background:rgba(239,238,233,.55)}\n.ar-match__time{font-weight:700;font-size:15px}\n.ar-match.full .ar-match__time::after{content:'✓';display:inline-grid;place-items:center;width:16px;height:16px;margin-left:6px;border-radius:50%;background:#d4ec3a;color:#1d2400;font-size:10px;vertical-align:2px}\n.ar-match__teams{font-weight:700;font-size:13px}.ar-match__teams span{color:#6b6b66;font-weight:400;margin:0 4px}\n.ar-match__meta{color:#6b6b66;font-size:12.5px;margin-top:3px}\n.ar-slots{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end}\n.ar-slot{border:1.5px dashed rgba(107,107,102,.45);border-radius:999px;padding:6px 12px;background:none;cursor:pointer;white-space:nowrap;font:500 14px Inter,system-ui,sans-serif;color:#6b6b66;display:inline-flex;align-items:center;gap:6px;transition:background .15s,border-color .15s,color .15s,transform .15s,box-shadow .15s}\n.ar-slot:hover{border-color:#111;color:#111}\n.ar-slot.filled{border-style:solid;border-color:#e6e4dd;background:#efeee9;color:#111;padding-left:4px;cursor:grab}\n.ar-slot.warn{border-color:#a3352b;color:#a3352b}\n.ar-slot .x{opacity:0;width:0;overflow:hidden;transition:opacity .15s,width .15s;color:#6b6b66}\n.ar-slot.filled:hover .x{opacity:1;width:12px}\n.ar-slot.drop{border-style:solid;border-color:#9fb81a;background:rgba(212,236,58,.35);color:#111;transform:scale(1.06);box-shadow:0 4px 14px rgba(0,0,0,.12)}\n.ar-slot.drop::after{content:'Soltar aquí';margin-left:4px;font-size:11px;font-weight:800;color:#1d2400}\n.ar-av{width:22px;height:22px;border-radius:50%;display:inline-grid;place-items:center;font-size:10px;font-weight:700;color:#fff;flex:none}\n@media (max-width:600px){.ar-match{grid-template-columns:50px 1fr}.ar-slots{grid-column:1/-1;justify-content:flex-start}}",
+   "js": ""
+  },
+  {
+   "id": "ar-modal-icono",
+   "nombre": "Modal con icono de tono y error dentro",
+   "categoria": "detalle",
+   "proyecto": "Arbitraje (y Designaciones, su prototipo)",
+   "stack": "html+js",
+   "archivos": [
+    "/Users/lolyfernandezrodriguez/Desktop/Arbitraje/public/admin.html:189",
+    "/Users/lolyfernandezrodriguez/Desktop/Arbitraje/public/admin.html:443"
+   ],
+   "descripcion": "Velo con blur(3px) y tarjeta de 440px que entra con un pequeño rebote: cuadrado de 40px con icono teñido (lima normal, rojo peligro, verde ok), título, cuerpo gris alineado con el título, zona de error y botones a la derecha (lima o rojo).",
+   "cuando_usar": "Confirmaciones y resultados en paneles JS donde el modal también puede mostrar el error de la acción sin cerrarse.",
+   "reglas": [
+    "El error de la acción se pinta dentro del modal (.modal-error) y el botón vuelve a habilitarse, en vez de cerrar y avisar fuera.",
+    "Botón principal lima, o rojo si el tipo es peligro.",
+    "Variante: wp-confirmacion-propia (dialog nativo enganchado a formularios)."
+   ],
+   "html": "<div class=\"ar-modal-fondo on\"><div class=\"ar-modal\" role=\"dialog\" aria-modal=\"true\">\n  <div class=\"ar-modal__cab\"><div class=\"ar-modal__ico peligro\">!</div><h3>¿Quitar a este árbitro?</h3></div>\n  <div class=\"ar-modal__cuerpo\">Se le quitará de los 2 partidos que tiene esta semana:<ul><li>Sábado 10:00 · CD Norte vs UD Sur</li><li>Domingo 12:30 · Atlético Río vs CF Sierra</li></ul></div>\n  <div class=\"ar-modal__pie\"><button class=\"ar-btn\">Cancelar</button><button class=\"ar-btn peligro\">Quitar</button></div>\n</div></div>",
+   "css": ".ar-modal-fondo{position:relative;min-height:340px;background:rgba(17,17,17,.45);backdrop-filter:blur(3px);display:grid;place-items:center;padding:16px;opacity:0;transition:opacity .18s;font-family:Inter,system-ui,-apple-system,sans-serif;font-size:14px}\n.ar-modal-fondo.on{opacity:1}\n.ar-modal{background:#fff;color:#111;border-radius:18px;width:100%;max-width:440px;box-shadow:0 24px 60px rgba(0,0,0,.25);overflow:hidden;transform:translateY(12px) scale(.97);transition:transform .22s cubic-bezier(.2,.9,.3,1.2)}\n.ar-modal-fondo.on .ar-modal{transform:none}\n.ar-modal__cab{display:flex;gap:12px;align-items:flex-start;padding:22px 22px 0}\n.ar-modal__ico{width:40px;height:40px;border-radius:12px;display:grid;place-items:center;font-size:19px;font-weight:700;flex:none;background:rgba(212,236,58,.45)}\n.ar-modal__ico.peligro{background:rgba(163,53,43,.16);color:#a3352b}\n.ar-modal h3{margin:2px 0 0;font-size:17px;letter-spacing:-.01em}\n.ar-modal__cuerpo{padding:10px 22px 4px 74px;color:#6b6b66;line-height:1.55}\n.ar-modal__cuerpo ul{margin:8px 0 0;padding-left:18px}\n.ar-modal__pie{display:flex;justify-content:flex-end;gap:8px;padding:18px 22px 20px}\n.ar-btn{border:1px solid #e6e4dd;background:#fff;border-radius:999px;padding:9px 18px;font:600 14px Inter,system-ui,sans-serif;cursor:pointer}\n.ar-btn.peligro{background:#a3352b;color:#fff;border-color:#a3352b}",
+   "js": ""
+  },
+  {
+   "id": "ar-semana-selector",
+   "nombre": "Tarjeta de semana: título que es un selector + progreso + acciones",
+   "categoria": "navegacion",
+   "proyecto": "Arbitraje (y Designaciones, su prototipo)",
+   "stack": "html+js",
+   "archivos": [
+    "/Users/lolyfernandezrodriguez/Desktop/Arbitraje/public/admin.html:21",
+    "/Users/lolyfernandezrodriguez/Desktop/Arbitraje/public/admin.html:398"
+   ],
+   "descripcion": "Tarjeta horizontal con el título de la semana grande (al pulsarlo se abre un <select> invisible superpuesto para cambiar de semana), subtítulo con ▾, progreso «18 / 25 designados» con barra lima y botones icono con un menú «Más».",
+   "cuando_usar": "Paneles organizados por periodos (semana, jornada) donde el periodo es el contexto principal de todo lo que se ve.",
+   "reglas": [
+    "El select real va encima con opacity:0, así el título se ve como texto pero es accesible y nativo en móvil.",
+    "25b71c6: el botón dice exactamente lo que hace («Subir partidos de esta semana» en vez de «Subir CSV»).",
+    "En ≤1100px los botones icono ocultan su texto; en ≤700px todo se apila."
+   ],
+   "html": "<div class=\"ar-semana\">\n  <div class=\"ar-semana__izq\"><div class=\"ar-semana__tit\"><h1>Semana del 23 al 29 nov</h1><div class=\"ar-semana__sub\">Jornada 11 <span>▾</span></div>\n    <select aria-label=\"Cambiar de semana\"><option>Semana del 23 al 29 nov</option><option>Semana del 30 nov al 6 dic</option></select></div></div>\n  <div class=\"ar-semana__der\"><div class=\"ar-semana__prog\"><b>18</b> <span>/ 25 designados</span><div class=\"ar-semana__bar\"><i style=\"width:72%\"></i></div></div>\n    <button class=\"ar-semana__btn\">⬆ <span>Subir partidos de esta semana</span></button><button class=\"ar-semana__btn\">⋯</button></div>\n</div>",
+   "css": ".ar-semana{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;background:#fff;border:1px solid #e6e4dd;border-radius:18px;padding:14px 16px;font-family:Inter,system-ui,-apple-system,sans-serif;font-size:14px;color:#111;max-width:820px}\n.ar-semana__izq{display:flex;align-items:center;gap:10px;min-width:0}\n.ar-semana__tit{position:relative;padding:4px 10px;border-radius:12px;cursor:pointer;transition:background .15s;min-width:0}\n.ar-semana__tit:hover{background:#efeee9}\n.ar-semana__tit h1{margin:0;font-size:22px;letter-spacing:-.03em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}\n.ar-semana__sub{display:flex;align-items:center;gap:6px;color:#6b6b66;font-size:13px}.ar-semana__sub span{font-size:11px}\n.ar-semana__tit select{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;font-size:16px}\n.ar-semana__der{display:flex;align-items:center;gap:8px;flex-wrap:wrap}\n.ar-semana__prog{min-width:130px;margin-right:6px;font-size:13px}.ar-semana__prog span{color:#6b6b66}.ar-semana__prog b{font-size:15px}\n.ar-semana__bar{height:4px;background:#e6e4dd;border-radius:4px;margin-top:8px;overflow:hidden}.ar-semana__bar i{display:block;height:100%;background:#d4ec3a}\n.ar-semana__btn{display:inline-flex;align-items:center;gap:6px;border:1px solid #e6e4dd;background:#fff;border-radius:999px;padding:8px 12px;font:600 14px Inter,system-ui,sans-serif;cursor:pointer}\n@media (max-width:1100px){.ar-semana__btn span{display:none}}",
+   "js": ""
+  },
+  {
+   "id": "fi-segmentado-pastilla",
+   "nombre": "Control segmentado con pastilla deslizante",
+   "categoria": "navegacion",
+   "proyecto": "Fichaje",
+   "stack": "html+js",
+   "archivos": [
+    "/Users/lolyfernandezrodriguez/Desktop/Fichaje/public/css/styles.css:858",
+    "/Users/lolyfernandezrodriguez/Desktop/Fichaje/public/css/styles.css:888"
+   ],
+   "descripcion": "Pestañas tipo iOS en una pista beige: una sola pastilla blanca se desplaza a la pestaña activa (medida por JS); si el JS no llega, la pestaña activa conserva su propio fondo. Admite badge rojo con número.",
+   "cuando_usar": "Pestañas o filtros de 2-5 opciones en cualquier panel; es la mejor versión del patrón entre todos los proyectos.",
+   "reglas": [
+    "Sin transición hasta la primera medición, «para no verla venir desde la esquina superior izquierda al cargar» (clase tabs--pastilla-lista).",
+    "Degradación: si el JS no se ejecuta, .tab.active mantiene su fondo y no se pierde qué está seleccionado.",
+    "Badge rojo en la pestaña para pendientes (tab-badge).",
+    "Variantes: web-playa Tabs (#e4ebf2, sin deslizar), Santana filtro en píldora, Arbitraje .seg con ind-seg negra (52372ec «la pastilla se desliza como en las pestañas»), Bambina subrayado."
+   ],
+   "html": "<div class=\"fi-tabs\"><span class=\"fi-tabs__pastilla\"></span>\n  <button class=\"fi-tab active\">Personal</button><button class=\"fi-tab\">Registros</button><button class=\"fi-tab\">Correcciones<span class=\"fi-tab__badge\">2</span></button><button class=\"fi-tab\">Empresa</button>\n</div>",
+   "css": ".fi-tabs{position:relative;display:inline-flex;gap:2px;padding:3px;background:#ece9de;border-radius:9999px;font-family:-apple-system,BlinkMacSystemFont,Inter,'SF Pro Text',ui-sans-serif,system-ui,sans-serif}\n.fi-tab{position:relative;z-index:1;padding:.5rem 1.15rem;border-radius:9999px;font-size:.85rem;font-weight:600;cursor:pointer;border:none;background:transparent;color:#3a3a33;font-family:inherit;transition:background .25s cubic-bezier(.16,1,.3,1),color .25s,box-shadow .25s}\n.fi-tab.active{background:#fff;color:#15161a;box-shadow:0 1px 2px rgba(21,22,26,.04)}\n.fi-tabs__pastilla{position:absolute;top:0;left:0;z-index:0;border-radius:9999px;background:#fff;box-shadow:0 1px 2px rgba(21,22,26,.04),0 1px 3px rgba(21,22,26,.08);pointer-events:none;transition:none}\n.fi-tabs--lista .fi-tabs__pastilla{transition:transform .34s cubic-bezier(.16,1,.3,1),width .34s cubic-bezier(.16,1,.3,1),height .34s cubic-bezier(.16,1,.3,1)}\n.fi-tabs--con-pastilla .fi-tab.active{background:transparent;box-shadow:none}\n.fi-tab__badge{display:inline-flex;align-items:center;justify-content:center;min-width:18px;height:18px;padding:0 5px;border-radius:9999px;background:#a3352b;color:#fff;font-size:.68rem;font-weight:700;margin-left:.3rem;box-sizing:border-box}",
+   "js": "document.querySelectorAll('.fi-tabs').forEach(function(t){var p=t.querySelector('.fi-tabs__pastilla');function mv(){var a=t.querySelector('.fi-tab.active');p.style.width=a.offsetWidth+'px';p.style.height=a.offsetHeight+'px';p.style.transform='translate('+a.offsetLeft+'px,'+a.offsetTop+'px)';}t.classList.add('fi-tabs--con-pastilla');mv();requestAnimationFrame(function(){t.classList.add('fi-tabs--lista')});t.addEventListener('click',function(e){var b=e.target.closest('.fi-tab');if(!b)return;t.querySelectorAll('.fi-tab').forEach(function(x){x.classList.toggle('active',x===b)});mv();});});"
+  },
+  {
+   "id": "fi-avisos-toast",
+   "nombre": "Avisos flotantes (toasts) apilados con punto de color y cierre",
+   "categoria": "avisos",
+   "proyecto": "Fichaje",
+   "stack": "html+js",
+   "archivos": [
+    "/Users/lolyfernandezrodriguez/Desktop/Fichaje/public/css/styles.css:1088",
+    "/Users/lolyfernandezrodriguez/Desktop/Fichaje/public/css/styles.css:1120"
+   ],
+   "descripcion": "Pila abajo a la derecha de tarjetas blancas con sombra grande: punto de color según tipo (éxito verde, error rojo, info lima), texto y × para cerrar; entran y salen con un pequeño desplazamiento y escala.",
+   "cuando_usar": "Confirmaciones de acciones («Fichaje guardado», «Deshacer») y errores no bloqueantes.",
+   "reglas": [
+    "Los de error no se autodestruyen: deben poder cerrarse a mano (comentario del CSS).",
+    "Los puntos usan la variante de color pensada para leerse sobre la superficie de la tarjeta, no sobre bloque sólido.",
+    "Pueden llevar un botón de acción («Deshacer» tras fichar).",
+    "Variantes: Arbitraje (una píldora negra centrada abajo que dura 3,2 s, roja si es error), Santana (toast de Medusa con frases de tienda)."
+   ],
+   "html": "<div class=\"fi-toasts\">\n  <div class=\"fi-toast fi-toast--ok\"><span class=\"fi-toast__dot\"></span><span class=\"fi-toast__texto\">Entrada registrada a las 08:02. <button class=\"fi-toast__acc\">Deshacer</button></span><button class=\"fi-toast__x\" aria-label=\"Cerrar\">×</button></div>\n  <div class=\"fi-toast fi-toast--err\"><span class=\"fi-toast__dot\"></span><span class=\"fi-toast__texto\">No se ha podido guardar la corrección. Inténtalo de nuevo.</span><button class=\"fi-toast__x\" aria-label=\"Cerrar\">×</button></div>\n  <div class=\"fi-toast fi-toast--info\"><span class=\"fi-toast__dot\"></span><span class=\"fi-toast__texto\">Semana sin fichar: revisa el lunes 23.</span><button class=\"fi-toast__x\" aria-label=\"Cerrar\">×</button></div>\n</div>",
+   "css": ".fi-toasts{display:flex;flex-direction:column;gap:.6rem;max-width:min(360px,calc(100vw - 2rem));padding:1rem;background:#f7f6f0;font-family:-apple-system,BlinkMacSystemFont,Inter,'SF Pro Text',ui-sans-serif,system-ui,sans-serif;color:#15161a}\n.fi-toast{display:flex;align-items:flex-start;gap:.6rem;background:#fff;border:1px solid rgba(21,22,26,.07);border-radius:16px;padding:.85rem 1rem;box-shadow:0 24px 60px -16px rgba(21,22,26,.18),0 4px 12px rgba(21,22,26,.05);font-size:.86rem;animation:fi-toast-in .3s cubic-bezier(.16,1,.3,1)}\n.fi-toast.leaving{animation:fi-toast-out .25s cubic-bezier(.16,1,.3,1) forwards}\n.fi-toast__dot{width:8px;height:8px;border-radius:50%;margin-top:.35rem;flex-shrink:0}\n.fi-toast--ok .fi-toast__dot{background:#2f6b2f}.fi-toast--err .fi-toast__dot{background:#a3352b}.fi-toast--info .fi-toast__dot{background:#aebb0c}\n.fi-toast__texto{flex:1;min-width:0}\n.fi-toast__acc{border:0;background:none;padding:0;font:inherit;font-weight:700;text-decoration:underline;cursor:pointer;color:#15161a}\n.fi-toast__x{flex-shrink:0;background:transparent;border:none;cursor:pointer;color:#3a3a33;font-size:1.15rem;line-height:1;padding:.15rem .35rem;margin:-.15rem -.25rem 0 0;border-radius:8px;font-family:inherit}\n.fi-toast__x:hover{background:rgba(21,22,26,.07);color:#15161a}\n@keyframes fi-toast-in{from{opacity:0;transform:translateY(8px) scale(.97)}to{opacity:1;transform:none}}\n@keyframes fi-toast-out{to{opacity:0;transform:translateY(8px) scale(.97)}}",
+   "js": "document.querySelectorAll('.fi-toast__x').forEach(function(b){b.addEventListener('click',function(){var t=b.closest('.fi-toast');t.classList.add('leaving');setTimeout(function(){t.remove()},250);});});"
+  },
+  {
+   "id": "fi-jornada-desplegable",
+   "nombre": "Jornada como fila desplegable alineada en columnas",
+   "categoria": "listados",
+   "proyecto": "Fichaje",
+   "stack": "html+js",
+   "archivos": [
+    "/Users/lolyfernandezrodriguez/Desktop/Fichaje/public/css/styles.css:1659",
+    "/Users/lolyfernandezrodriguez/Desktop/Fichaje/public/css/styles.css:1643"
+   ],
+   "descripcion": "<details> por persona y día: en la fila, nombre, Entrada, Salida, Pausas, horas en negrita, estado en píldora (En jornada lima, Sin cerrar rojo) y chevron; al abrir, la lista de fichajes con hora y ubicación. Agrupadas bajo cabeceras de día en mayúsculas.",
+   "cuando_usar": "Registros con resumen por fila y detalle que solo se necesita a veces (fichajes, movimientos, logs).",
+   "reglas": [
+    "Columnas con minmax(0,…) y estado de ancho fijo «para que todas las jornadas queden alineadas» aunque cambie el contenido.",
+    "La jornada sin cerrar (salida olvidada) se marca con borde y estado rojos.",
+    "En ≤760px la fila pasa a dos líneas con grid-template-areas: nombre+estado arriba y los cuatro datos debajo.",
+    "Resumen del periodo encima en baldosas (resumen-tile, la de aviso en rojo)."
+   ],
+   "html": "<div class=\"fi-jor\">\n  <p class=\"fi-jor__dia\">Lunes 23 de noviembre <span>3 personas</span></p>\n  <details class=\"fi-jornada\" open><summary><span class=\"fi-jornada__nombre\">Rosa Martín</span><span class=\"fi-jornada__dato\"><span class=\"etq\">Entrada</span>08:01</span><span class=\"fi-jornada__dato\"><span class=\"etq\">Salida</span>16:05</span><span class=\"fi-jornada__dato\"><span class=\"etq\">Pausas</span>30 min</span><span class=\"fi-jornada__dato fi-jornada__horas\"><span class=\"etq\">Horas</span>7 h 34 min</span><span class=\"fi-jornada__estado\">Cerrada</span><span class=\"fi-jornada__chev\">▾</span></summary>\n    <ul class=\"fi-jornada__ev\"><li><b>08:01</b> Entrada <span class=\"ubi\">En la sede</span></li><li><b>11:00</b> Pausa</li><li><b>11:30</b> Vuelta</li><li><b>16:05</b> Salida <span class=\"ubi\">En la sede</span></li></ul></details>\n  <details class=\"fi-jornada fi-jornada--sin-cerrar\"><summary><span class=\"fi-jornada__nombre\">Pedro Lara</span><span class=\"fi-jornada__dato\"><span class=\"etq\">Entrada</span>09:12</span><span class=\"fi-jornada__dato\"><span class=\"etq\">Salida</span>—</span><span class=\"fi-jornada__dato\"><span class=\"etq\">Pausas</span>—</span><span class=\"fi-jornada__dato fi-jornada__horas\"><span class=\"etq\">Horas</span>—</span><span class=\"fi-jornada__estado\">Sin cerrar</span><span class=\"fi-jornada__chev\">▾</span></summary></details>\n</div>",
+   "css": ".fi-jor{max-width:860px;padding:1rem;background:#f7f6f0;font-family:-apple-system,BlinkMacSystemFont,Inter,'SF Pro Text',ui-sans-serif,system-ui,sans-serif;color:#15161a}\n.fi-jor__dia{display:flex;align-items:baseline;justify-content:space-between;margin:0 0 .5rem;padding:0 .2rem;font-size:.78rem;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:#3a3a33}\n.fi-jor__dia span{font-weight:500;text-transform:none;letter-spacing:0}\n.fi-jornada{border:1px solid rgba(21,22,26,.07);border-radius:14px;background:#fff;margin-bottom:.45rem;transition:border-color .2s,box-shadow .2s}\n.fi-jornada:hover,.fi-jornada[open]{border-color:rgba(21,22,26,.14)}\n.fi-jornada summary{list-style:none;cursor:pointer;display:grid;grid-template-columns:minmax(0,1.6fr) repeat(3,minmax(0,.8fr)) minmax(0,1fr) 104px 18px;align-items:center;gap:.75rem;padding:.75rem 1rem;border-radius:14px}\n.fi-jornada summary::-webkit-details-marker{display:none}\n.fi-jornada__nombre{font-weight:600;font-size:.92rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}\n.fi-jornada__dato{display:flex;flex-direction:column;font-size:.88rem;font-variant-numeric:tabular-nums}\n.fi-jornada__dato .etq{font-size:.68rem;color:#3a3a33;text-transform:uppercase;letter-spacing:.04em}\n.fi-jornada__horas{font-weight:700}\n.fi-jornada__estado{justify-self:end;padding:.2rem .65rem;border-radius:9999px;font-size:.72rem;font-weight:600;white-space:nowrap;background:rgba(21,22,26,.06);color:#3a3a33}\n.fi-jornada--sin-cerrar{border-color:rgba(163,53,43,.25)}\n.fi-jornada--sin-cerrar .fi-jornada__estado{background:rgba(163,53,43,.1);color:#a3352b}\n.fi-jornada__chev{opacity:.5;transition:transform .25s}\n.fi-jornada[open] .fi-jornada__chev{transform:rotate(180deg)}\n.fi-jornada__ev{list-style:none;margin:0;padding:.25rem 1rem .9rem;border-top:1px solid rgba(21,22,26,.06)}\n.fi-jornada__ev li{display:flex;align-items:center;gap:.75rem;padding:.45rem 0;font-size:.85rem}\n.fi-jornada__ev li+li{border-top:1px dashed rgba(21,22,26,.07)}\n.fi-jornada__ev .ubi{margin-left:auto;font-size:.78rem}\n@media (max-width:760px){.fi-jornada summary{grid-template-columns:repeat(3,minmax(0,1fr)) minmax(0,1.25fr) 18px;grid-template-areas:\"n n n e c\" \"a b p h h\";row-gap:.55rem}\n.fi-jornada__nombre{grid-area:n}.fi-jornada__estado{grid-area:e}.fi-jornada__chev{grid-area:c}.fi-jornada__horas{grid-area:h}}",
+   "js": ""
+  },
+  {
+   "id": "fi-selector-mes",
+   "nombre": "Selector de mes ← Noviembre 2026 → con panel de 12 meses",
+   "categoria": "formularios",
+   "proyecto": "Fichaje",
+   "stack": "html+js",
+   "archivos": [
+    "/Users/lolyfernandezrodriguez/Desktop/Fichaje/public/css/styles.css:1446",
+    "/Users/lolyfernandezrodriguez/Desktop/Fichaje/public/css/styles.css:1536"
+   ],
+   "descripcion": "Campo con el aspecto de un input: flecha anterior, botón central con el mes e icono de calendario, flecha siguiente; el botón abre un panel con el año (‹ 2026 ›), rejilla 3×4 de meses (actual con filo, elegido en lima) y «Ir al mes actual».",
+   "cuando_usar": "Filtros de periodo mensual (informes, registros, facturación) donde se salta mes a mes o a uno concreto.",
+   "reglas": [
+    "Mismo aspecto que un campo de texto para que conviva en una fila de filtros.",
+    "Los meses futuros sin datos se desactivan (opacidad .3).",
+    "Junto a él, atajos de periodo en control segmentado (Hoy, Semana, Mes), que en móvil se vuelven una fila deslizable sin barra."
+   ],
+   "html": "<div class=\"fi-mes\">\n  <div class=\"fi-mes__sel\"><button class=\"fi-mes__paso\" aria-label=\"Mes anterior\">‹</button><button class=\"fi-mes__boton\">Noviembre 2026 <span class=\"ic\">📅</span></button><button class=\"fi-mes__paso\" aria-label=\"Mes siguiente\" disabled>›</button></div>\n  <div class=\"fi-mes__panel\"><div class=\"fi-mes__cab\"><button class=\"fi-mes__anio-paso\">‹</button><span>2026</span><button class=\"fi-mes__anio-paso\" disabled>›</button></div>\n    <div class=\"fi-mes__rej\"><button>ene</button><button>feb</button><button>mar</button><button>abr</button><button>may</button><button>jun</button><button>jul</button><button>ago</button><button>sep</button><button class=\"elegido\">oct</button><button class=\"actual\">nov</button><button disabled>dic</button></div>\n    <button class=\"fi-mes__actual\">Ir al mes actual</button></div>\n</div>",
+   "css": ".fi-mes{width:300px;padding:1rem;background:#f7f6f0;font-family:-apple-system,BlinkMacSystemFont,Inter,'SF Pro Text',ui-sans-serif,system-ui,sans-serif;color:#15161a}\n.fi-mes__sel{display:flex;align-items:stretch;height:46px;border:1px solid rgba(21,22,26,.1);border-radius:12px;background:rgba(21,22,26,.025)}\n.fi-mes__sel:focus-within{border-color:#aebb0c;background:#fff;box-shadow:0 0 0 4px rgba(214,224,34,.25)}\n.fi-mes button{font:inherit;color:#15161a;cursor:pointer}\n.fi-mes__paso{flex:0 0 40px;display:grid;place-items:center;border:none;background:transparent;border-radius:11px;font-size:1.2rem!important}\n.fi-mes__paso:hover:not(:disabled){background:rgba(21,22,26,.06)}\n.fi-mes button:disabled{opacity:.3;cursor:default}\n.fi-mes__boton{flex:1;display:flex;align-items:center;justify-content:center;gap:.5rem;border:none;border-left:1px solid rgba(21,22,26,.07);border-right:1px solid rgba(21,22,26,.07);background:transparent;font-size:.95rem;font-weight:600}\n.fi-mes__boton .ic{font-size:.8rem;opacity:.55}\n.fi-mes__panel{margin-top:8px;width:280px;padding:.75rem;background:#fff;border:1px solid rgba(21,22,26,.08);border-radius:16px;box-shadow:0 24px 60px -16px rgba(21,22,26,.18),0 4px 12px rgba(21,22,26,.05);box-sizing:border-box}\n.fi-mes__cab{display:flex;align-items:center;justify-content:space-between;margin-bottom:.5rem;font-weight:700}\n.fi-mes__anio-paso{width:34px;height:34px;border:none;border-radius:10px;background:transparent}\n.fi-mes__rej{display:grid;grid-template-columns:repeat(3,1fr);gap:.3rem}\n.fi-mes__rej button{height:40px;border:none;border-radius:10px;background:transparent;font-size:.88rem;font-weight:500;text-transform:capitalize}\n.fi-mes__rej button:hover:not(:disabled){background:rgba(21,22,26,.06)}\n.fi-mes__rej .actual{box-shadow:inset 0 0 0 1.5px rgba(21,22,26,.18)}\n.fi-mes__rej .elegido{background:#d6e022;font-weight:700}\n.fi-mes__actual{width:100%;margin-top:.6rem;padding:.55rem;border:none;border-top:1px solid rgba(21,22,26,.07);background:transparent;font-size:.85rem;font-weight:600;color:#3a3a33!important}",
+   "js": ""
+  },
+  {
+   "id": "fi-teclado-pin",
+   "nombre": "Acceso con PIN: puntos y teclado numérico en pantalla",
+   "categoria": "acceso",
+   "proyecto": "Fichaje",
+   "stack": "html+js",
+   "archivos": [
+    "/Users/lolyfernandezrodriguez/Desktop/Fichaje/public/css/kiosko.css:113",
+    "/Users/lolyfernandezrodriguez/Desktop/Fichaje/public/kiosko.html:36",
+    "/Users/lolyfernandezrodriguez/Desktop/Fichaje/public/css/styles.css:2561"
+   ],
+   "descripcion": "Cuatro círculos que se rellenan al teclear (y tiemblan si el PIN es incorrecto) y un teclado 3×4 de teclas redondas grandes con «Borrar»/acciones en texto; el estado se anuncia a lectores de pantalla.",
+   "cuando_usar": "Accesos rápidos en quiosco/tablet compartida o en el móvil tras un primer acceso con contraseña.",
+   "reglas": [
+    "8f8b411 «Teclado numérico en pantalla para entrar con PIN en el móvil»; eb1ebe9 tras un primer acceso con contraseña.",
+    "97fdf88/16a8aec: modo quiosco por dispositivo autorizado, que recuerda «Fichar con PIN».",
+    "Teclas con :active scale(.94) porque en táctil no hay hover.",
+    "El teclado debe caber entero en una tablet apaisada (max-width: min(420px,46vh))."
+   ],
+   "html": "<div class=\"fi-pin\">\n  <p class=\"fi-pin__tit\">Introduce tu PIN</p>\n  <div class=\"fi-pin__dots\"><span class=\"filled\"></span><span class=\"filled\"></span><span></span><span></span></div>\n  <div class=\"fi-pin__teclado\"><button>1</button><button>2</button><button>3</button><button>4</button><button>5</button><button>6</button><button>7</button><button>8</button><button>9</button><button class=\"acc\">Salir</button><button>0</button><button class=\"acc\">Borrar</button></div>\n</div>",
+   "css": ".fi-pin{max-width:340px;padding:2rem 1rem;text-align:center;background:#f7f6f0;font-family:-apple-system,BlinkMacSystemFont,Inter,'SF Pro Text',ui-sans-serif,system-ui,sans-serif;color:#15161a}\n.fi-pin__tit{margin:0;font-weight:700;font-size:1.2rem}\n.fi-pin__dots{display:flex;justify-content:center;gap:1rem;margin:1.75rem 0}\n.fi-pin__dots span{width:1rem;height:1rem;border-radius:50%;border:2px solid rgba(21,22,26,.2);transition:background .15s,border-color .15s,transform .15s}\n.fi-pin__dots span.filled{background:#15161a;border-color:#15161a;transform:scale(1.1)}\n.fi-pin__dots.shake{animation:fi-shake .4s}\n@keyframes fi-shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-10px)}40%{transform:translateX(10px)}60%{transform:translateX(-8px)}80%{transform:translateX(8px)}}\n.fi-pin__teclado{display:grid;grid-template-columns:repeat(3,1fr);gap:.85rem;max-width:300px;margin:0 auto}\n.fi-pin__teclado button{aspect-ratio:1;border-radius:50%;border:1px solid rgba(21,22,26,.08);background:#fff;font:600 1.4rem inherit;font-family:inherit;color:#15161a;cursor:pointer;display:grid;place-items:center;transition:transform .1s,background .15s}\n.fi-pin__teclado button:active{transform:scale(.94);background:rgba(21,22,26,.06)}\n.fi-pin__teclado .acc{background:transparent;border:none;color:#3a3a33;font-size:.9rem}",
+   "js": "document.querySelectorAll('.fi-pin').forEach(function(p){var d=p.querySelectorAll('.fi-pin__dots span'),n=2;p.querySelector('.fi-pin__teclado').addEventListener('click',function(e){var b=e.target.closest('button');if(!b)return;if(b.textContent==='Borrar'){n=Math.max(0,n-1);}else if(/\\d/.test(b.textContent)){n=Math.min(4,n+1);}d.forEach(function(s,i){s.classList.toggle('filled',i<n)});if(n===4){var c=p.querySelector('.fi-pin__dots');c.classList.add('shake');setTimeout(function(){c.classList.remove('shake');n=0;d.forEach(function(s){s.classList.remove('filled')});},400);}});});"
+  },
+  {
+   "id": "fi-solicitud-correccion",
+   "nombre": "Solicitud pendiente con «antes → después» y aprobar/rechazar",
+   "categoria": "detalle",
+   "proyecto": "Fichaje",
+   "stack": "html+js",
+   "archivos": [
+    "/Users/lolyfernandezrodriguez/Desktop/Fichaje/public/css/styles.css:1997",
+    "/Users/lolyfernandezrodriguez/Desktop/Fichaje/public/css/styles.css:2016",
+    "/Users/lolyfernandezrodriguez/Desktop/Fichaje/public/css/styles.css:2029"
+   ],
+   "descripcion": "Tarjeta con raya lima a la izquierda: persona y día, «pedido hace 2 h», el cambio como hora tachada → hora nueva con flecha lima, motivo en gris y botones Rechazar / Aprobar; las ya resueltas quedan debajo como filas compactas con su estado.",
+   "cuando_usar": "Flujos de aprobación (correcciones, permisos, devoluciones) donde el revisor debe ver exactamente qué cambia.",
+   "reglas": [
+    "7035282/e543e9d: solicitudes de «día que no fiché» y «anular un día» con aprobación del admin.",
+    "97fdf88: motivo opcional en correcciones.",
+    "Pendientes arriba con acciones; resueltas abajo sin acciones, separadas por un título.",
+    "Contador rojo en la pestaña Correcciones (periodo__num/tab-badge).",
+    "En ≤640px las acciones ocupan todo el ancho."
+   ],
+   "html": "<div class=\"fi-sol-lista\">\n  <div class=\"fi-sol\"><div class=\"fi-sol__info\"><div class=\"fi-sol__cab\"><span class=\"fi-sol__dia\">Rosa Martín · lunes 23 nov</span><span class=\"fi-sol__cuando\">pedido hace 2 h</span></div>\n    <span class=\"fi-cambio\">Salida <s>15:00</s><span class=\"fi-cambio__fl\">→</span><b>16:05</b></span>\n    <p class=\"fi-sol__motivo\">Olvidé fichar al salir, me quedé a cerrar.</p></div>\n    <div class=\"fi-sol__acc\"><button class=\"fi-btn fi-btn--danger\">Rechazar</button><button class=\"fi-btn fi-btn--primary\">Aprobar</button></div></div>\n  <p class=\"fi-sol__sep\">Resueltas</p>\n  <div class=\"fi-res\"><span class=\"n\">Pedro Lara</span><span class=\"d\">vie 20 nov</span><span class=\"fi-cambio\">Entrada <s>09:30</s><span class=\"fi-cambio__fl\">→</span><b>09:00</b></span><span class=\"fi-badge ok\">Aprobada</span></div>\n</div>",
+   "css": ".fi-sol-lista{max-width:720px;padding:1rem;background:#f7f6f0;font-family:-apple-system,BlinkMacSystemFont,Inter,'SF Pro Text',ui-sans-serif,system-ui,sans-serif;color:#15161a}\n.fi-sol{display:flex;align-items:center;gap:1rem;padding:.9rem 1rem;margin-bottom:.45rem;border:1px solid rgba(21,22,26,.09);border-left:3px solid #d6e022;border-radius:14px;background:#fff}\n.fi-sol__info{flex:1;min-width:0;display:flex;flex-direction:column;gap:.35rem}\n.fi-sol__cab{display:flex;flex-wrap:wrap;align-items:baseline;gap:.2rem .6rem}\n.fi-sol__dia{font-weight:600;font-size:.9rem}.fi-sol__cuando{font-size:.76rem;color:#3a3a33}\n.fi-sol__motivo{margin:0;font-size:.85rem;color:#3a3a33}\n.fi-sol__acc{display:flex;gap:.5rem;flex-shrink:0}\n.fi-cambio{display:inline-flex;flex-wrap:wrap;align-items:center;gap:.4rem;font-size:.88rem;font-variant-numeric:tabular-nums}\n.fi-cambio s{color:#3a3a33;text-decoration-thickness:1.5px}.fi-cambio__fl{color:#aebb0c;font-weight:700}\n.fi-btn{display:inline-flex;align-items:center;border-radius:9999px;padding:.48rem 1.05rem;font:600 .82rem inherit;font-family:inherit;border:1px solid transparent;cursor:pointer;transition:transform .25s,background .2s,color .2s}\n.fi-btn--primary{background:#d6e022;color:#15161a}.fi-btn--primary:hover{transform:translateY(-1px);background:#15161a;color:#d6e022}\n.fi-btn--danger{background:rgba(163,53,43,.08);color:#a3352b}.fi-btn--danger:hover{background:rgba(163,53,43,.14)}\n.fi-sol__sep{margin:1.6rem 0 .5rem;padding-top:1rem;border-top:1px solid rgba(21,22,26,.08);font-size:.95rem;font-weight:700}\n.fi-res{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr) minmax(0,1.4fr) auto;align-items:center;gap:.25rem 1rem;padding:.7rem 1rem;font-size:.86rem;border:1px solid rgba(21,22,26,.07);border-radius:14px;background:#fff}\n.fi-res .n{font-weight:600}.fi-res .d{color:#3a3a33}\n.fi-badge{padding:.22rem .7rem;border-radius:9999px;font-size:.74rem;font-weight:600}\n.fi-badge.ok{background:rgba(90,140,90,.16);color:#2f6b2f}\n@media (max-width:640px){.fi-sol{flex-direction:column;align-items:stretch}.fi-sol__acc .fi-btn{flex:1;justify-content:center}.fi-res{grid-template-columns:1fr auto}}",
+   "js": ""
+  }
+ ]
+}

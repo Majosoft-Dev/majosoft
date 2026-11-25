@@ -1,13 +1,13 @@
 #!/usr/bin/env python3
 """Junta los inventarios de piezas de UI (inv-*.json) en public/biblioteca.json.
 
-Uso: python3 lib/biblioteca-juntar.py carpeta-con-los-inv
+Uso: python3 lib/biblioteca-juntar.py   (lee lib/biblioteca-inv/inv-*.json; las piezas de movimiento salen de lib/biblioteca-inv/movimiento.py)
 Cada inventario puede traer { proyecto, paleta, tipografia, piezas } o { proyectos: [...], piezas }.
 Las rutas de archivo se guardan relativas al Escritorio (p. ej. «Cetemet/src/...:12»).
 """
 import json, os, sys, glob, re
 
-src = sys.argv[1]
+src = sys.argv[1] if len(sys.argv) > 1 else os.path.join(os.path.dirname(__file__), "biblioteca-inv")
 out = os.path.join(os.path.dirname(__file__), "..", "public", "biblioteca.json")
 DESK = os.path.expanduser("~/Desktop/")
 CATS = {"navegacion", "listados", "calendarios", "detalle", "formularios", "estados", "estadisticas", "movil", "avisos", "acceso", "otros"}
@@ -41,11 +41,11 @@ for f in sorted(glob.glob(os.path.join(src, "inv-*.json"))):
 GRUPOS = json.load(open(os.path.join(os.path.dirname(__file__), "biblioteca-grupos.json")))
 for p in piezas:
     p["grupos"] = [k for k, g in GRUPOS.items() if p["id"] in g["piezas"]]
-    if "animaciones" in GRUPOS and "animaciones" not in p["grupos"] and re.search(r"@keyframes|animation\s*:", p["css"]):
+    if "animaciones" in GRUPOS and not p["grupos"] and re.search(r"@keyframes|animation\s*:", p["css"]):
         p["grupos"].append("animaciones")
     if not p["grupos"]:
         print("Sin grupo:", p["id"])
-grupos = [{"id": k, **{c: g.get(c, "") for c in ("titulo", "familia", "descripcion", "portada")}} for k, g in GRUPOS.items()]
+grupos = [{"id": k, **{c: g.get(c, "") for c in ("titulo", "familia", "descripcion", "portada")}, "directo": bool(g.get("directo")), "conjuntos": g.get("conjuntos", [])} for k, g in GRUPOS.items()]
 
 json.dump({"proyectos": list(proyectos.values()), "grupos": grupos, "piezas": piezas}, open(out, "w"), ensure_ascii=False)
 print(f"{len(piezas)} piezas de {len(proyectos)} proyectos → {os.path.normpath(out)}")

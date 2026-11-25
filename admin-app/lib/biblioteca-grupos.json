@@ -49,105 +49,286 @@
  "selectores": {
   "titulo": "Selectores",
   "piezas": [
+   "fi-segmentado-pastilla",
    "selector-segmentado",
-   "pestanas-partes",
-   "re-pestanas-segmentadas",
    "selector-segmentado-2",
+   "re-pestanas-segmentadas",
    "bb-pestanas-subrayado",
    "ar-pestanas-progreso",
-   "ar-semana-selector",
-   "fi-segmentado-pastilla",
-   "fi-selector-mes",
+   "pestanas-partes",
    "desplegable-propio",
-   "campo-sugerencias",
    "ro-desplegable-acordeon",
-   "re-selector-color",
+   "ar-semana-selector",
+   "fi-selector-mes",
+   "campo-sugerencias",
    "um-selector-modulos",
-   "barra-filtros",
-   "ce-listado-pestanas-buscador",
-   "um-listado-tarjeta",
-   "ro-galeria-documentos",
-   "arbol-casillas"
+   "arbol-casillas",
+   "re-selector-color"
   ],
   "familia": "Controles",
   "descripcion": "Pestañas, segmentados, desplegables: elegir entre opciones.",
-  "portada": "fi-segmentado-pastilla"
+  "portada": "fi-segmentado-pastilla",
+  "directo": true,
+  "conjuntos": [
+   {
+    "titulo": "Control segmentado y pestañas",
+    "piezas": [
+     "fi-segmentado-pastilla",
+     "selector-segmentado",
+     "selector-segmentado-2",
+     "re-pestanas-segmentadas",
+     "bb-pestanas-subrayado",
+     "ar-pestanas-progreso",
+     "pestanas-partes"
+    ]
+   },
+   {
+    "titulo": "Desplegable",
+    "piezas": [
+     "desplegable-propio",
+     "ro-desplegable-acordeon"
+    ]
+   },
+   {
+    "titulo": "Título que es un selector",
+    "piezas": [
+     "ar-semana-selector"
+    ]
+   },
+   {
+    "titulo": "Selector de mes",
+    "piezas": [
+     "fi-selector-mes"
+    ]
+   },
+   {
+    "titulo": "Campo con sugerencias",
+    "piezas": [
+     "campo-sugerencias"
+    ]
+   },
+   {
+    "titulo": "Elegir con tarjetas o casillas",
+    "piezas": [
+     "um-selector-modulos",
+     "arbol-casillas"
+    ]
+   },
+   {
+    "titulo": "Selector de color",
+    "piezas": [
+     "re-selector-color"
+    ]
+   }
+  ]
  },
  "botones": {
   "titulo": "Botones",
   "piezas": [
-   "botones",
    "botones-2",
-   "um-botones-jerarquia",
+   "botones",
    "wp-botones-pildora",
+   "um-botones-jerarquia",
    "ce-boton-estados",
    "enlace-compartir"
   ],
   "familia": "Controles",
   "descripcion": "Jerarquía de botones, píldoras y botones con estado.",
-  "portada": "wp-botones-pildora"
+  "portada": "wp-botones-pildora",
+  "directo": true,
+  "conjuntos": [
+   {
+    "titulo": "Juego de botones",
+    "piezas": [
+     "botones-2",
+     "botones",
+     "wp-botones-pildora",
+     "um-botones-jerarquia"
+    ]
+   },
+   {
+    "titulo": "Botón con estados (procesando, hecho, error)",
+    "piezas": [
+     "ce-boton-estados"
+    ]
+   },
+   {
+    "titulo": "Copiar un enlace",
+    "piezas": [
+     "enlace-compartir"
+    ]
+   }
+  ]
  },
  "campos": {
   "titulo": "Campos y formularios",
   "piezas": [
    "campos-formulario",
    "um-bloque-formulario",
-   "formulario-modal",
    "re-fila-ajuste",
    "wp-fila-ajuste",
    "re-campo-direccion",
-   "re-selector-color",
-   "bb-editor-variantes",
    "editor-subtareas",
-   "sm-panel-lateral-precio",
-   "campo-sugerencias",
-   "fi-selector-mes"
+   "bb-editor-variantes",
+   "formulario-modal",
+   "sm-panel-lateral-precio"
   ],
   "familia": "Controles",
   "descripcion": "Campos sueltos, filas de ajuste y formularios completos.",
-  "portada": "re-fila-ajuste"
+  "portada": "re-fila-ajuste",
+  "directo": true,
+  "conjuntos": [
+   {
+    "titulo": "Campos con validación",
+    "piezas": [
+     "campos-formulario",
+     "um-bloque-formulario"
+    ]
+   },
+   {
+    "titulo": "Fila de ajuste",
+    "piezas": [
+     "re-fila-ajuste",
+     "wp-fila-ajuste"
+    ]
+   },
+   {
+    "titulo": "Campo con prefijo fijo",
+    "piezas": [
+     "re-campo-direccion"
+    ]
+   },
+   {
+    "titulo": "Listas que se repiten",
+    "piezas": [
+     "editor-subtareas",
+     "bb-editor-variantes"
+    ]
+   },
+   {
+    "titulo": "Formulario en ventana",
+    "piezas": [
+     "formulario-modal"
+    ],
+    "ancho": true
+   },
+   {
+    "titulo": "Panel de edición lateral",
+    "piezas": [
+     "sm-panel-lateral-precio"
+    ],
+    "ancho": true
+   }
+  ]
  },
  "interruptores": {
-  "titulo": "Interruptores y casillas",
+  "titulo": "Interruptores",
   "piezas": [
-   "um-interruptor",
    "interruptor",
-   "arbol-casillas",
-   "um-selector-modulos"
+   "um-interruptor"
   ],
   "familia": "Controles",
-  "descripcion": "Switches, casillas y árboles con casillas.",
-  "portada": "interruptor"
+  "descripcion": "Encender y apagar una opción.",
+  "portada": "interruptor",
+  "directo": true,
+  "conjuntos": [
+   {
+    "titulo": "Interruptor",
+    "piezas": [
+     "interruptor",
+     "um-interruptor"
+    ]
+   }
+  ]
  },
  "subidas": {
   "titulo": "Subida de archivos",
   "piezas": [
-   "selector-portada",
    "ce-zona-foto",
+   "selector-portada",
    "bb-subida-miniaturas",
    "um-tema-arrastrable",
    "importar-archivo-seleccion"
   ],
   "familia": "Controles",
   "descripcion": "Soltar fotos, portadas y archivos con vista previa.",
-  "portada": "ce-zona-foto"
+  "portada": "ce-zona-foto",
+  "directo": true,
+  "conjuntos": [
+   {
+    "titulo": "Zona para soltar archivos",
+    "piezas": [
+     "ce-zona-foto",
+     "selector-portada",
+     "bb-subida-miniaturas"
+    ]
+   },
+   {
+    "titulo": "Subida con barra de progreso",
+    "piezas": [
+     "um-tema-arrastrable"
+    ],
+    "ancho": true
+   },
+   {
+    "titulo": "Importar con selección previa",
+    "piezas": [
+     "importar-archivo-seleccion"
+    ],
+    "ancho": true
+   }
+  ]
  },
  "editores": {
   "titulo": "Editores",
   "piezas": [
-   "editor-texto",
    "ce-editor-texto",
-   "ce-editor-documento",
+   "editor-texto",
    "editor-documento-a4",
+   "ce-editor-documento",
    "ro-editor-lateral",
-   "consola-sql",
-   "ce-vista-google",
    "wp-vista-previa-email",
-   "sm-tarjeta-promocion"
+   "ce-vista-google",
+   "consola-sql"
   ],
   "familia": "Controles",
   "descripcion": "Texto enriquecido, documentos y vistas previas.",
-  "portada": "editor-documento-a4"
+  "portada": "editor-documento-a4",
+  "directo": true,
+  "conjuntos": [
+   {
+    "titulo": "Texto enriquecido",
+    "piezas": [
+     "ce-editor-texto",
+     "editor-texto"
+    ],
+    "ancho": true
+   },
+   {
+    "titulo": "Editor de documento",
+    "piezas": [
+     "editor-documento-a4",
+     "ce-editor-documento",
+     "ro-editor-lateral"
+    ],
+    "ancho": true
+   },
+   {
+    "titulo": "Vista previa",
+    "piezas": [
+     "wp-vista-previa-email",
+     "ce-vista-google"
+    ],
+    "ancho": true
+   },
+   {
+    "titulo": "Consola",
+    "piezas": [
+     "consola-sql"
+    ],
+    "ancho": true
+   }
+  ]
  },
  "tablas": {
   "titulo": "Tablas y listados",
@@ -350,18 +531,6 @@
   "descripcion": "Fichas, cajones laterales y desplegables.",
   "portada": "fi-solicitud-correccion"
  },
- "arrastrar": {
-  "titulo": "Arrastrar y ordenar",
-  "piezas": [
-   "fila-accion",
-   "um-tema-arrastrable",
-   "sm-tarjeta-producto",
-   "ar-asignar-arrastrando"
-  ],
-  "familia": "Transversal",
-  "descripcion": "Reordenar y asignar arrastrando.",
-  "portada": "ar-asignar-arrastrando"
- },
  "progreso": {
   "titulo": "Progreso",
   "piezas": [
@@ -378,25 +547,92 @@
   "descripcion": "Barras y anillos de avance.",
   "portada": "ro-envio-destinatarios"
  },
- "movil": {
-  "titulo": "Pensado para móvil",
-  "piezas": [
-   "menu-movil",
-   "pestanas-partes",
-   "tabla-tarjetas-movil",
-   "re-tabla-tarjetas-movil",
-   "ro-tabla-a-fichas",
-   "ro-menu-movil-desplegable",
-   "vista-publica-cliente",
-   "calendario-mes-tarjetas",
-   "fi-teclado-pin"
+ "entradas": {
+  "titulo": "Animaciones de entrada",
+  "familia": "Movimiento",
+  "descripcion": "Cómo aparece lo que llega: escalonado, titulares que suben, menús que se abren.",
+  "portada": "mo-titular-sube",
+  "directo": true,
+  "conjuntos": [
+   {
+    "titulo": "Entrada escalonada",
+    "piezas": [
+     "mo-entrada-escalonada",
+     "mo-menu-escalonado",
+     "mo-menu-movil-fichaje"
+    ],
+    "ancho": true
+   },
+   {
+    "titulo": "Titular que sube",
+    "piezas": [
+     "mo-titular-sube"
+    ],
+    "ancho": true
+   },
+   {
+    "titulo": "Tarjeta que sube",
+    "piezas": [
+     "mo-bloque-sube"
+    ]
+   },
+   {
+    "titulo": "Resaltar lo que cambia",
+    "piezas": [
+     "mo-resalte-cambio"
+    ]
+   }
   ],
-  "familia": "Transversal",
-  "descripcion": "Piezas que cambian o nacen para el móvil.",
-  "portada": "ro-tabla-a-fichas"
+  "piezas": [
+   "mo-entrada-escalonada",
+   "mo-menu-escalonado",
+   "mo-menu-movil-fichaje",
+   "mo-titular-sube",
+   "mo-bloque-sube",
+   "mo-resalte-cambio"
+  ]
+ },
+ "transiciones": {
+  "titulo": "Transiciones de página",
+  "familia": "Movimiento",
+  "descripcion": "Pasar de una página o pestaña a otra sin saltos (pulsa su menú).",
+  "portada": "mo-pagina-menu-quieto",
+  "directo": true,
+  "conjuntos": [
+   {
+    "titulo": "Cambio de página",
+    "piezas": [
+     "mo-pagina-menu-quieto",
+     "mo-pagina-fundido",
+     "mo-pagina-sin-fundido"
+    ],
+    "ancho": true
+   },
+   {
+    "titulo": "Pastilla que viaja entre páginas",
+    "piezas": [
+     "mo-pastilla-viaja"
+    ]
+   },
+   {
+    "titulo": "Según hacia dónde vas",
+    "piezas": [
+     "mo-desliza-direccion",
+     "mo-cambio-pestana"
+    ]
+   }
+  ],
+  "piezas": [
+   "mo-pagina-menu-quieto",
+   "mo-pagina-fundido",
+   "mo-pagina-sin-fundido",
+   "mo-pastilla-viaja",
+   "mo-desliza-direccion",
+   "mo-cambio-pestana"
+  ]
  },
  "animaciones": {
-  "titulo": "Animaciones",
+  "titulo": "Microanimaciones",
   "piezas": [
    "selector-segmentado",
    "fi-segmentado-pastilla",
@@ -426,8 +662,38 @@
    "fi-teclado-pin",
    "um-botones-jerarquia"
   ],
+  "familia": "Movimiento",
+  "descripcion": "Pequeños movimientos de controles: pastillas que se deslizan, toasts, esqueletos de carga.",
+  "portada": "ce-boton-estados",
+  "directo": true
+ },
+ "arrastrar": {
+  "titulo": "Arrastrar y ordenar",
+  "piezas": [
+   "fila-accion",
+   "um-tema-arrastrable",
+   "sm-tarjeta-producto",
+   "ar-asignar-arrastrando"
+  ],
   "familia": "Transversal",
-  "descripcion": "Movimiento: pastillas que se deslizan, entradas, esqueletos.",
-  "portada": "ce-boton-estados"
+  "descripcion": "Reordenar y asignar arrastrando.",
+  "portada": "ar-asignar-arrastrando"
+ },
+ "movil": {
+  "titulo": "Pensado para móvil",
+  "piezas": [
+   "menu-movil",
+   "pestanas-partes",
+   "tabla-tarjetas-movil",
+   "re-tabla-tarjetas-movil",
+   "ro-tabla-a-fichas",
+   "ro-menu-movil-desplegable",
+   "vista-publica-cliente",
+   "calendario-mes-tarjetas",
+   "fi-teclado-pin"
+  ],
+  "familia": "Transversal",
+  "descripcion": "Piezas que cambian o nacen para el móvil.",
+  "portada": "ro-tabla-a-fichas"
  }
 }
