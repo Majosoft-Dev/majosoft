@@ -11,6 +11,7 @@ const ICONS = {
   check: '<rect x="3" y="4" width="18" height="17" rx="2"/><path d="M8 2v4M16 2v4M8 13l2.5 2.5L16 10"/>',
   cal: '<rect x="3" y="4" width="18" height="17" rx="2"/><path d="M8 2v4M16 2v4M3 10h18M8 14h.01M12 14h.01M16 14h.01M8 18h.01M12 18h.01"/>',
   chart: '<path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/>',
+  grid: '<rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/>',
   web: '<circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c3 3 3 15 0 18M12 3c-3 3-3 15 0 18"/>',
 };
 const icon = n => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">${ICONS[n]}</svg>`;
@@ -83,6 +84,8 @@ async function pintarShell(active) {
       <nav>${link("/admin/estadisticas", "estadisticas", "Estadísticas web", "chart")}${link("/admin/mensajes", "mensajes", "Mensajes web", "chat")}${link("/admin/correo", "correo", "Correo", "mail")}</nav>
       <div class="side-sec">Redes</div>
       <nav>${link("/admin/publicaciones", "publicaciones", "Publicaciones", "cal")}</nav>
+      <div class="side-sec">Diseño</div>
+      <nav>${link("/admin/biblioteca", "biblioteca", "Biblioteca de UI", "grid")}</nav>
       <div class="side-sec">Sistemas</div>
       <nav>${link("/admin/servidores", "servidores", "Servidores", "server")}${link("/admin/consultas", "consultas", "Consultas SQL", "doc")}</nav>
       <div class="side-sec">Cuenta</div>

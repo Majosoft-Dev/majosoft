@@ -451,7 +451,8 @@ app.post("/admin/api/consultas", async (req, res) => {
   catch (e) { res.status(e.status || 500).json({ error: e.message }); }
 });
 
-const PAGES = { "": "index.html", presupuestos: "presupuestos.html", facturas: "facturas.html", correo: "correo.html", mensajes: "mensajes.html", seguridad: "seguridad.html", servidores: "servidores.html", consultas: "consultas.html", estadisticas: "estadisticas.html", bonos: "bonos.html", tareas: "tareas.html", publicaciones: "publicaciones.html" };
+const PAGES = { "": "index.html", presupuestos: "presupuestos.html", facturas: "facturas.html", correo: "correo.html", mensajes: "mensajes.html", seguridad: "seguridad.html", servidores: "servidores.html", consultas: "consultas.html", estadisticas: "estadisticas.html", bonos: "bonos.html", tareas: "tareas.html", publicaciones: "publicaciones.html", biblioteca: "biblioteca.html" };
+app.get("/admin/biblioteca.json", (req, res) => res.sendFile(path.join(PUBLIC, "biblioteca.json")));
 app.get("/admin/menu.js", (req, res) => res.sendFile(path.join(PUBLIC, "menu.js")));
 app.get("/admin/panel.js", (req, res) => res.sendFile(path.join(PUBLIC, "panel.js")));
 app.get(["/admin", "/admin/:page"], (req, res, next) => {
