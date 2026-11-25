@@ -1,0 +1,361 @@
+{
+ "login": {
+  "titulo": "Login y acceso",
+  "piezas": [
+   "login",
+   "bb-acceso-contrasena",
+   "re-acceso-partido",
+   "login-dos-pasos",
+   "wp-login-foto",
+   "ro-acceso-caja",
+   "fi-teclado-pin"
+  ]
+ },
+ "menus": {
+  "titulo": "Menús y navegación",
+  "piezas": [
+   "barra-lateral",
+   "menu-movil",
+   "ce-menu-lateral",
+   "menu-lateral",
+   "wp-menu-lateral-grupos",
+   "sm-tema-menu-negro",
+   "ro-menu-lateral-iconos",
+   "ro-menu-movil-desplegable",
+   "ar-barra-superior-lima",
+   "paginacion"
+  ]
+ },
+ "cabeceras": {
+  "titulo": "Cabeceras de página",
+  "piezas": [
+   "cabecera-seccion",
+   "ce-lamina-destacada",
+   "re-cabecera-pagina",
+   "cabecera-pagina",
+   "wp-cabecera-pagina",
+   "re-ficha-cabecera"
+  ]
+ },
+ "selectores": {
+  "titulo": "Selectores",
+  "piezas": [
+   "selector-segmentado",
+   "pestanas-partes",
+   "re-pestanas-segmentadas",
+   "selector-segmentado-2",
+   "bb-pestanas-subrayado",
+   "ar-pestanas-progreso",
+   "ar-semana-selector",
+   "fi-segmentado-pastilla",
+   "fi-selector-mes",
+   "desplegable-propio",
+   "campo-sugerencias",
+   "ro-desplegable-acordeon",
+   "re-selector-color",
+   "um-selector-modulos",
+   "barra-filtros",
+   "ce-listado-pestanas-buscador",
+   "um-listado-tarjeta",
+   "ro-galeria-documentos",
+   "arbol-casillas"
+  ]
+ },
+ "botones": {
+  "titulo": "Botones",
+  "piezas": [
+   "botones",
+   "botones-2",
+   "um-botones-jerarquia",
+   "wp-botones-pildora",
+   "ce-boton-estados",
+   "enlace-compartir"
+  ]
+ },
+ "campos": {
+  "titulo": "Campos y formularios",
+  "piezas": [
+   "campos-formulario",
+   "um-bloque-formulario",
+   "formulario-modal",
+   "re-fila-ajuste",
+   "wp-fila-ajuste",
+   "re-campo-direccion",
+   "re-selector-color",
+   "bb-editor-variantes",
+   "editor-subtareas",
+   "sm-panel-lateral-precio",
+   "campo-sugerencias",
+   "fi-selector-mes"
+  ]
+ },
+ "interruptores": {
+  "titulo": "Interruptores y casillas",
+  "piezas": [
+   "um-interruptor",
+   "interruptor",
+   "arbol-casillas",
+   "um-selector-modulos"
+  ]
+ },
+ "subidas": {
+  "titulo": "Subida de archivos",
+  "piezas": [
+   "selector-portada",
+   "ce-zona-foto",
+   "bb-subida-miniaturas",
+   "um-tema-arrastrable",
+   "importar-archivo-seleccion"
+  ]
+ },
+ "editores": {
+  "titulo": "Editores",
+  "piezas": [
+   "editor-texto",
+   "ce-editor-texto",
+   "ce-editor-documento",
+   "editor-documento-a4",
+   "ro-editor-lateral",
+   "consola-sql",
+   "ce-vista-google",
+   "wp-vista-previa-email",
+   "sm-tarjeta-promocion"
+  ]
+ },
+ "tablas": {
+  "titulo": "Tablas y listados",
+  "piezas": [
+   "tabla-listado",
+   "tabla-tarjetas-movil",
+   "barra-filtros",
+   "paginacion",
+   "fila-accion",
+   "ce-listado-pestanas-buscador",
+   "ce-lista-reciente",
+   "um-listado-tarjeta",
+   "um-acciones-bloque",
+   "re-tabla-tarjetas-movil",
+   "re-lista-estancias",
+   "tabla-listado-2",
+   "lista-tareas-agrupada",
+   "bb-tabla-estado-editable",
+   "wp-listado-reservas",
+   "sm-fila-pedido",
+   "ro-tabla-a-fichas",
+   "fi-jornada-desplegable",
+   "accion-en-bloque-flotante"
+  ]
+ },
+ "tarjetas": {
+  "titulo": "Tarjetas",
+  "piezas": [
+   "tarjeta-curso",
+   "tarjeta-bloque",
+   "tarjeta-resumen-competicion",
+   "bb-tarjeta-producto-estado",
+   "sm-tarjeta-producto",
+   "sm-tarjeta-promocion",
+   "ro-galeria-documentos",
+   "um-tema-arrastrable",
+   "ar-semana-selector"
+  ]
+ },
+ "calendarios": {
+  "titulo": "Calendarios y agendas",
+  "piezas": [
+   "calendario-mensual",
+   "re-calendario-ocupacion",
+   "re-proximos-dias",
+   "calendario-mes-tarjetas",
+   "calendario-tareas",
+   "wp-calendario-ocupacion",
+   "ro-calendario-publicaciones",
+   "ro-agenda-dias",
+   "fi-selector-mes"
+  ]
+ },
+ "cifras": {
+  "titulo": "Cifras y KPIs",
+  "piezas": [
+   "cifras-kpi",
+   "bloque-hoy",
+   "tarjeta-resumen-competicion",
+   "ce-franja-cifras",
+   "ce-en-vivo",
+   "kpis",
+   "metricas-con-barra",
+   "wp-kpi-cifras",
+   "sm-kpi-tienda",
+   "ro-kpi-en-vivo",
+   "vista-publica-cliente",
+   "ce-grafico-evolucion"
+  ]
+ },
+ "graficas": {
+  "titulo": "Gráficas",
+  "piezas": [
+   "ce-grafico-evolucion",
+   "ce-lista-barras",
+   "ce-mapa-calor",
+   "um-barras-dia",
+   "um-nivel-y-porcentaje",
+   "grafica-barras-mensual",
+   "grafica-svg-diaria",
+   "filas-proporcion",
+   "barras-hora-dia",
+   "metricas-con-barra",
+   "ro-grafica-barras",
+   "bloque-hoy"
+  ]
+ },
+ "etiquetas": {
+  "titulo": "Etiquetas y estados",
+  "piezas": [
+   "etiquetas-estado",
+   "re-estado-reserva",
+   "pastillas-estado",
+   "wp-etiqueta-estado",
+   "um-nivel-y-porcentaje",
+   "ce-lista-reciente",
+   "re-lista-estancias",
+   "bb-tabla-estado-editable",
+   "bb-tarjeta-producto-estado"
+  ]
+ },
+ "modales": {
+  "titulo": "Modales y diálogos",
+  "piezas": [
+   "modal-confirmacion",
+   "modal-edicion-ancho",
+   "um-modal-confirmar",
+   "dialogo-confirmacion",
+   "formulario-modal",
+   "wp-confirmacion-propia",
+   "ar-modal-icono",
+   "importar-archivo-seleccion"
+  ]
+ },
+ "avisos": {
+  "titulo": "Avisos y toasts",
+  "piezas": [
+   "toast",
+   "alerta",
+   "um-toast",
+   "aviso-toast-guardado",
+   "alertas-estado",
+   "wp-aviso-tonos",
+   "fi-avisos-toast",
+   "re-requiere-atencion",
+   "wp-atencion-hoy",
+   "ro-tareas-para-hoy",
+   "re-franja-viendo-como",
+   "accion-en-bloque-flotante"
+  ]
+ },
+ "vacios": {
+  "titulo": "Estados vacíos y de carga",
+  "piezas": [
+   "estado-vacio-carga",
+   "um-skeleton",
+   "um-estado-vacio",
+   "estados-vacios",
+   "wp-estado-vacio"
+  ]
+ },
+ "mensajes": {
+  "titulo": "Chat y mensajes",
+  "piezas": [
+   "re-chat",
+   "wp-chat-reserva",
+   "ce-mensaje-carta",
+   "bandeja-maestro-detalle",
+   "um-tickets-acordeon",
+   "ro-envio-destinatarios",
+   "wp-vista-previa-email"
+  ]
+ },
+ "detalle": {
+  "titulo": "Fichas y paneles de detalle",
+  "piezas": [
+   "ficha-detalle",
+   "re-ficha-cabecera",
+   "panel-detalle-lateral",
+   "bandeja-maestro-detalle",
+   "sm-panel-lateral-precio",
+   "fi-solicitud-correccion",
+   "seccion-plegable",
+   "fi-jornada-desplegable",
+   "um-tickets-acordeon",
+   "ro-desplegable-acordeon",
+   "modal-edicion-ancho"
+  ]
+ },
+ "arrastrar": {
+  "titulo": "Arrastrar y ordenar",
+  "piezas": [
+   "fila-accion",
+   "um-tema-arrastrable",
+   "sm-tarjeta-producto",
+   "ar-asignar-arrastrando"
+  ]
+ },
+ "progreso": {
+  "titulo": "Progreso",
+  "piezas": [
+   "ro-envio-destinatarios",
+   "um-tema-arrastrable",
+   "ar-pestanas-progreso",
+   "ar-semana-selector",
+   "tarjeta-resumen-competicion",
+   "um-nivel-y-porcentaje",
+   "metricas-con-barra",
+   "ce-boton-estados"
+  ]
+ },
+ "movil": {
+  "titulo": "Pensado para móvil",
+  "piezas": [
+   "menu-movil",
+   "pestanas-partes",
+   "tabla-tarjetas-movil",
+   "re-tabla-tarjetas-movil",
+   "ro-tabla-a-fichas",
+   "ro-menu-movil-desplegable",
+   "vista-publica-cliente",
+   "calendario-mes-tarjetas",
+   "fi-teclado-pin"
+  ]
+ },
+ "animaciones": {
+  "titulo": "Animaciones",
+  "piezas": [
+   "selector-segmentado",
+   "fi-segmentado-pastilla",
+   "ar-barra-superior-lima",
+   "ar-pestanas-progreso",
+   "re-pestanas-segmentadas",
+   "bb-pestanas-subrayado",
+   "seccion-plegable",
+   "panel-detalle-lateral",
+   "menu-movil",
+   "toast",
+   "aviso-toast-guardado",
+   "ce-boton-estados",
+   "um-skeleton",
+   "estado-vacio-carga",
+   "um-toast",
+   "fi-avisos-toast",
+   "cabecera-pagina",
+   "kpis",
+   "ce-en-vivo",
+   "ro-kpi-en-vivo",
+   "dialogo-confirmacion",
+   "wp-confirmacion-propia",
+   "um-modal-confirmar",
+   "desplegable-propio",
+   "campos-formulario",
+   "fi-teclado-pin",
+   "um-botones-jerarquia"
+  ]
+ }
+}

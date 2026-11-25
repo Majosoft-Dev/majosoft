@@ -46,6 +46,8 @@
     .pro { display: inline-flex; align-items: center; gap: 5px; font-size: 11.5px; font-weight: 700; padding: 3px 8px; border-radius: 99px; background: color-mix(in srgb, var(--c) 14%, #fff); color: color-mix(in srgb, var(--c) 75%, #000); }
     .pro i { width: 6px; height: 6px; border-radius: 50%; background: var(--c); }
     .stack { font-size: 11.5px; font-weight: 600; color: var(--muted); padding: 3px 8px; border-radius: 99px; background: var(--cream); }
+    button.stack { border: 0; font: inherit; font-size: 11.5px; font-weight: 600; cursor: pointer; }
+    button.stack:hover { background: var(--ink); color: var(--cream); }
     .vacio { text-align: center; color: var(--muted); padding: 60px 20px; background: #fff; border: 1px dashed var(--line); border-radius: 16px; }
     .vacio b { display: block; color: var(--ink); font-size: 15px; margin-bottom: 4px; }
 
@@ -134,10 +136,11 @@ const $ = id => document.getElementById(id);
 const esc = s => String(s ?? "").replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
 const norm = s => String(s ?? "").toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "");
 
-const CATS = { navegacion: "Navegación", listados: "Listados y tablas", calendarios: "Calendarios", detalle: "Detalle y edición", formularios: "Formularios", estados: "Estados y etiquetas", estadisticas: "Estadísticas y gráficas", movil: "Móvil", avisos: "Avisos y diálogos", acceso: "Acceso", otros: "Otros" };
 const COLORES = ["#2f7d4f", "#2563c9", "#a86b00", "#b4236e", "#6b4fc9", "#0f8a8a", "#b42318", "#5c6b0c", "#8a5a2b", "#3a3a33"];
 
-const { proyectos, piezas } = await fetch("/admin/biblioteca.json", { credentials: "same-origin" }).then(r => r.json());
+const { proyectos, piezas, grupos } = await fetch("/admin/biblioteca.json", { credentials: "same-origin" }).then(r => r.json());
+// Grupos por tipo de pieza (selectores, login, animaciones…). Una pieza puede estar en varios; el primero es el suyo.
+const GR = Object.fromEntries(grupos.map(g => [g.id, g.titulo]));
 const nombresPro = [...new Set(piezas.map(p => p.proyecto))];
 const color = pro => COLORES[nombresPro.indexOf(pro) % COLORES.length];
 const fuentes = Object.fromEntries(proyectos.map(p => [p.proyecto, p.tipografia || ""]));
@@ -152,23 +155,23 @@ const doc = p => `<!doctype html><html lang="es"><head><meta charset="utf-8"><me
 <script>const t=()=>parent.postMessage({bibAlto:document.documentElement.scrollHeight,id:${JSON.stringify(p.id)}},"*");addEventListener("load",t);new ResizeObserver(t).observe(document.body);<\/script></body></html>`;
 
 // Filtros
-const estado = { q: "", pro: "", cat: "" };
+const estado = { q: "", pro: "", grupo: "" };
 const cuenta = (k, v) => piezas.filter(p => p[k] === v).length;
+const cuentaGrupo = g => piezas.filter(p => p.grupos.includes(g) && (!estado.pro || p.proyecto === estado.pro)).length;
 function pintarChips() {
   $("fProyecto").innerHTML = `<button class="chip ${estado.pro ? "" : "on"}" data-v="">Todos los proyectos <small>${piezas.length}</small></button>` +
     nombresPro.map(n => `<button class="chip ${estado.pro === n ? "on" : ""}" data-v="${esc(n)}" style="--c:${color(n)}"><i></i>${esc(n)} <small>${cuenta("proyecto", n)}</small></button>`).join("");
-  const cats = Object.keys(CATS).filter(c => piezas.some(p => p.categoria === c));
-  $("fCategoria").innerHTML = `<button class="chip ${estado.cat ? "" : "on"}" data-v="">Todo</button>` +
-    cats.map(c => `<button class="chip ${estado.cat === c ? "on" : ""}" data-v="${c}">${CATS[c]} <small>${cuenta("categoria", c)}</small></button>`).join("");
+  $("fCategoria").innerHTML = `<button class="chip ${estado.grupo ? "" : "on"}" data-v="">Todo</button>` +
+    grupos.filter(g => cuentaGrupo(g.id) || estado.grupo === g.id).map(g => `<button class="chip ${estado.grupo === g.id ? "on" : ""}" data-v="${g.id}">${esc(g.titulo)} <small>${cuentaGrupo(g.id)}</small></button>`).join("");
 }
-$("fProyecto").onclick = e => { const b = e.target.closest(".chip"); if (!b) return; estado.pro = b.dataset.v; pintarChips(); pintar(); };
-$("fCategoria").onclick = e => { const b = e.target.closest(".chip"); if (!b) return; estado.cat = b.dataset.v; pintarChips(); pintar(); };
+$("fProyecto").onclick = e => { const b = e.target.closest(".chip"); if (!b) return; estado.pro = b.dataset.v; if (estado.grupo && !cuentaGrupo(estado.grupo)) estado.grupo = ""; pintarChips(); pintar(); };
+$("fCategoria").onclick = e => { const b = e.target.closest(".chip"); if (!b) return; estado.grupo = b.dataset.v; pintarChips(); pintar(); };
 $("q").oninput = e => { estado.q = norm(e.target.value.trim()); pintar(); };
 
 let visibles = [];
 const filtrar = () => piezas.filter(p =>
-  (!estado.pro || p.proyecto === estado.pro) && (!estado.cat || p.categoria === estado.cat) &&
-  (!estado.q || norm([p.nombre, p.descripcion, p.cuando_usar, p.proyecto, p.stack, CATS[p.categoria], ...p.reglas].join(" ")).includes(estado.q)));
+  (!estado.pro || p.proyecto === estado.pro) && (!estado.grupo || p.grupos.includes(estado.grupo)) &&
+  (!estado.q || norm([p.nombre, p.descripcion, p.cuando_usar, p.proyecto, p.stack, ...p.grupos.map(g => GR[g]), ...p.reglas].join(" ")).includes(estado.q)));
 
 // Las miniaturas se cargan solo cuando aparecen en pantalla
 const vigia = new IntersectionObserver(es => es.forEach(e => {
@@ -180,15 +183,17 @@ const vigia = new IntersectionObserver(es => es.forEach(e => {
 function pintar() {
   visibles = filtrar();
   if (!visibles.length) { $("lista").innerHTML = `<div class="vacio"><b>Nada con ese filtro</b>Prueba con otra palabra o quita algún filtro.</div>`; return; }
-  const grupos = Object.keys(CATS).map(c => [c, visibles.filter(p => p.categoria === c)]).filter(([, l]) => l.length);
-  $("lista").innerHTML = grupos.map(([c, l]) => `<section class="sec"><h2>${CATS[c]} <small>${l.length}</small></h2><div class="rejilla">${l.map(p => `
+  // Con un grupo elegido salen todas las suyas; si no, cada pieza una sola vez, en su grupo principal
+  const secciones = estado.grupo ? [[estado.grupo, visibles]]
+    : grupos.map(g => [g.id, visibles.filter(p => p.grupos[0] === g.id)]).filter(([, l]) => l.length);
+  $("lista").innerHTML = secciones.map(([c, l]) => `<section class="sec"><h2>${esc(GR[c])} <small>${l.length}</small></h2><div class="rejilla">${l.map(p => `
     <button class="pieza" data-id="${esc(p.id)}">
       <div class="mini"><iframe data-id="${esc(p.id)}" tabindex="-1" aria-hidden="true" sandbox="allow-scripts" loading="lazy"></iframe></div>
       <div class="txt"><b>${esc(p.nombre)}</b><p>${esc(p.descripcion)}</p>
         <div class="meta"><span class="pro" style="--c:${color(p.proyecto)}"><i></i>${esc(p.proyecto)}</span>${p.stack ? `<span class="stack">${esc(p.stack)}</span>` : ""}</div></div>
     </button>`).join("")}</div></section>`).join("");
   $("lista").querySelectorAll(".mini iframe").forEach(f => vigia.observe(f));
-  visibles = grupos.flatMap(([, l]) => l);   // mismo orden que en pantalla, para ‹ ›
+  visibles = secciones.flatMap(([, l]) => l);   // mismo orden que en pantalla, para ‹ ›
 }
 $("lista").onclick = e => { const b = e.target.closest(".pieza"); if (b) abrir(b.dataset.id); };
 
@@ -203,7 +208,7 @@ function abrir(id) {
   const arch = p.archivos.map(a => { const [ruta, linea] = a.split(/:(?=\d+$)/);
     return `<a href="vscode://file/Users/lolyfernandezrodriguez/Desktop/${encodeURI(ruta)}${linea ? ":" + linea : ""}" title="Abrir en VS Code">${esc(a)}</a>`; }).join("");
   $("ficha").innerHTML = `
-    <div><div class="meta" style="margin-bottom:10px"><span class="pro" style="--c:${color(p.proyecto)}"><i></i>${esc(p.proyecto)}</span><span class="stack">${esc(CATS[p.categoria])}</span>${p.stack ? `<span class="stack">${esc(p.stack)}</span>` : ""}</div>
+    <div><div class="meta" style="margin-bottom:10px"><span class="pro" style="--c:${color(p.proyecto)}"><i></i>${esc(p.proyecto)}</span>${p.grupos.map(g => `<button class="stack ir" data-g="${g}" title="Ver todas las piezas de este grupo">${esc(GR[g])}</button>`).join("")}${p.stack ? `<span class="stack">${esc(p.stack)}</span>` : ""}</div>
       <h3>${esc(p.nombre)}</h3></div>
     <p>${esc(p.descripcion)}</p>
     ${p.cuando_usar ? `<div class="usar"><h4>Cuándo usarla</h4><p>${esc(p.cuando_usar)}</p></div>` : ""}
@@ -227,6 +232,8 @@ function pintarCodigo() {
   $("ficha").querySelectorAll(".codigo-bar [data-k]").forEach(b => b.classList.toggle("on", b.dataset.k === pestana));
 }
 $("ficha").onclick = async e => {
+  const ir = e.target.closest("[data-g]");
+  if (ir) { estado.grupo = ir.dataset.g; cerrar(); pintarChips(); pintar(); scrollTo({ top: 0 }); return; }
   const k = e.target.closest("[data-k]");
   if (k && !k.disabled) { pestana = k.dataset.k; pintarCodigo(); return; }
   const c = e.target.closest(".copiar"); if (!c) return;

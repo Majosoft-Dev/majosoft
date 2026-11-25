@@ -36,5 +36,16 @@ for f in sorted(glob.glob(os.path.join(src, "inv-*.json"))):
         p["reglas"] = p.get("reglas") or []
         piezas.append(p)
 
-json.dump({"proyectos": list(proyectos.values()), "piezas": piezas}, open(out, "w"), ensure_ascii=False)
+# Grupos (selectores, login, animaciones…): una pieza puede estar en varios; el primero es el principal.
+# Se editan a mano en lib/biblioteca-grupos.json. Lo que tenga @keyframes entra solo en «Animaciones».
+GRUPOS = json.load(open(os.path.join(os.path.dirname(__file__), "biblioteca-grupos.json")))
+for p in piezas:
+    p["grupos"] = [k for k, g in GRUPOS.items() if p["id"] in g["piezas"]]
+    if "animaciones" in GRUPOS and "animaciones" not in p["grupos"] and re.search(r"@keyframes|animation\s*:", p["css"]):
+        p["grupos"].append("animaciones")
+    if not p["grupos"]:
+        print("Sin grupo:", p["id"])
+grupos = [{"id": k, "titulo": g["titulo"]} for k, g in GRUPOS.items()]
+
+json.dump({"proyectos": list(proyectos.values()), "grupos": grupos, "piezas": piezas}, open(out, "w"), ensure_ascii=False)
 print(f"{len(piezas)} piezas de {len(proyectos)} proyectos → {os.path.normpath(out)}")
