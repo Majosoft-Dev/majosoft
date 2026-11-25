@@ -1,0 +1,62 @@
+{
+ "botones-2": {
+  "nota": "Botones reales del panel (.btn y sus variantes de panel.css).",
+  "css": "/* Sin CSS propio: /admin/panel.css, bloque «Componentes comunes».\n   Va dentro de un contenedor .mj-ui (o <body class=\"mj-ui\">). */",
+  "html": "<div class=\"bib-fila\"><button class=\"btn\">Duplicar</button><button class=\"btn btn--ink\">Descargar PDF</button><button class=\"btn btn--lime\">Pagado: convertir en factura</button><button class=\"btn btn--danger\">Eliminar</button><button class=\"btn btn--sm\">Pequeño</button><button class=\"btn\" disabled>Guardando…</button></div>",
+  "js": ""
+ },
+ "desplegable-propio": {
+  "nota": "Es un <select> normal: panel.js lo cambia solo por el desplegable propio. Pruébalo.",
+  "css": "/* Sin CSS propio: usa /admin/panel.css tal cual. */",
+  "html": "<div class=\"bib-campos\"><label class=\"f\">Periodicidad<select><option>Mensual</option><option selected>Trimestral</option><option>Anual</option></select></label><label class=\"f\">Estado<select><option>Borrador</option><option>Enviado</option><option>Pagado</option><option disabled>Anulado</option></select></label></div>",
+  "js": "// Nada que hacer: cualquier <select> de una página con /admin/panel.js se sustituye solo.\n// El <select> original sigue oculto y lanza input y change al elegir."
+ },
+ "campo-sugerencias": {
+  "nota": "Un <input list> con su <datalist>: panel.js le pone la lista propia.",
+  "css": "/* Sin CSS propio: usa /admin/panel.css tal cual. */",
+  "html": "<div class=\"bib-campos\"><label class=\"f\">Cliente (opcional)<input list=\"bib-clientes\" placeholder=\"Elige o escribe un cliente\"></label><datalist id=\"bib-clientes\"><option>Panadería Luna</option><option>Clínica Arce</option><option>Taller Sur</option><option>Estudio Mar</option></datalist></div>",
+  "js": "// Nada que hacer: panel.js mejora solo los <input list=\"…\">."
+ },
+ "dialogo-confirmacion": {
+  "nota": "Llaman de verdad a confirmar() y aviso() de panel.js.",
+  "css": "/* Sin CSS propio: usa /admin/panel.css tal cual. */",
+  "html": "<div class=\"bib-fila\"><button class=\"btn btn--danger\" data-confirmar=\"¿Eliminar la factura R-04? No se puede deshacer.\">Eliminar factura</button><button class=\"btn\" data-confirmar=\"¿Enviar el presupuesto a Clínica Arce?\">Enviar presupuesto</button><button class=\"btn\" data-aviso=\"El PDF se ha generado y está en Descargas.\" data-titulo=\"Listo\">Aviso</button></div>",
+  "js": "import { confirmar, aviso } from \"/admin/panel.js\";\n\nif (await confirmar(\"¿Eliminar la factura R-04? No se puede deshacer.\")) {\n  // «Eliminar» en rojo: lo detecta solo por el texto (eliminar, borrar, desconectar…)\n}\nawait aviso(\"El PDF se ha generado.\", { titulo: \"Listo\" });\n// window.alert() también pasa por aviso()."
+ },
+ "aviso-toast-guardado": {
+  "nota": "toast() y autosaver() de panel.js. Escribe en el campo y mira el estado.",
+  "css": "/* Sin CSS propio: usa /admin/panel.css tal cual. */",
+  "html": "<div class=\"bib-fila\"><button class=\"btn\" data-toast=\"Guardado ✓\">Toast</button><button class=\"btn\" data-toast=\"No se ha podido guardar\" data-err>Toast de error</button></div><div class=\"bib-campos\" style=\"margin-top:14px\"><label class=\"f\">Notas internas<input data-autosave placeholder=\"Escribe y espera un momento…\"></label><span class=\"bib-estado\" data-save-state>Sin cambios</span></div>",
+  "js": "import { toast, autosaver } from \"/admin/panel.js\";\n\ntoast(\"Guardado ✓\");\ntoast(\"No se ha podido guardar\", true);\n\n// Guardado automático: agrupa cambios seguidos y escribe el estado en [data-save-state]\nconst guardar = autosaver(() => api(\"notas\", { method: \"PUT\", body: { texto: campo.value } }));\ncampo.oninput = guardar;   // guardar.flush() guarda ya lo pendiente"
+ },
+ "selector-segmentado-2": {
+  "nota": "Pestañas .tabs de panel.css.",
+  "css": "/* Sin CSS propio: /admin/panel.css, bloque «Componentes comunes».\n   Va dentro de un contenedor .mj-ui (o <body class=\"mj-ui\">). */",
+  "html": "<div class=\"bib-fila\"><div class=\"tabs\"><button>7 días</button><button class=\"on\">30 días</button><button>3 meses</button><button>1 año</button></div></div>",
+  "js": "document.querySelectorAll(\".tabs\").forEach(t => t.onclick = e => {\n  const b = e.target.closest(\"button\"); if (!b) return;\n  t.querySelectorAll(\"button\").forEach(x => x.classList.toggle(\"on\", x === b));\n});"
+ },
+ "kpis": {
+  "nota": "Cifras .kpis / .kpi de panel.css, con su entrada escalonada.",
+  "css": "/* Sin CSS propio: /admin/panel.css, bloque «Componentes comunes».\n   Va dentro de un contenedor .mj-ui (o <body class=\"mj-ui\">). */",
+  "html": "<div class=\"kpis\"><div class=\"kpi dark\"><small>Cobrado este año</small><b>12.480 €</b><em class=\"sube\">▲ 18 % que el año pasado</em></div><div class=\"kpi\"><small>Pendiente</small><b>2.150 €</b><em class=\"baja\">▼ 3 facturas</em></div><div class=\"kpi\"><small>Facturas</small><b>38</b><em>este año</em></div><div class=\"kpi\"><small>Clientes</small><b>14</b><em>activos</em></div></div><button class=\"btn btn--sm\" data-repetir>↻ Repetir la entrada</button>",
+  "js": ""
+ },
+ "cabecera-pagina": {
+  "nota": "La .page-head y .crumbs de panel.css: es la misma cabecera de arriba de esta página.",
+  "css": "/* Sin CSS propio: usa /admin/panel.css tal cual. */",
+  "html": "<div class=\"page-head\"><div><div class=\"crumbs\">Comercial</div><h1>Facturas</h1><p>Lo cobrado y lo pendiente de este año.</p></div><div class=\"bib-fila\"><button class=\"btn\">Exportar</button><button class=\"btn btn--ink\">+ Nueva factura</button></div></div>",
+  "js": ""
+ },
+ "menu-lateral": {
+  "nota": "Es el menú de la izquierda de esta misma página (mountShell() de panel.js). Estréchala para verlo como barra superior con ☰.",
+  "css": "/* Sin CSS propio: usa /admin/panel.css tal cual. */",
+  "html": "<div class=\"bib-nota\"><b>← Míralo a tu izquierda.</b> El menú del panel no se copia: lo pinta <code>mountShell()</code> de <code>/admin/panel.js</code> en todas las páginas, antes del primer pintado. En pantallas estrechas pasa a ser una barra superior con ☰.</div>",
+  "js": "<!-- En el <head> de cada página: pinta el menú antes del primer pintado -->\n<script type=\"module\" src=\"/admin/menu.js\" blocking=\"render\"></script>\n\n// y en el script de la página:\nimport { mountShell } from \"/admin/panel.js\";\nawait mountShell(\"facturas\");   // clave del apartado activo"
+ },
+ "mo-entrada-escalonada": {
+  "nota": "La entrada real de panel.css: .page-head, .kpis, .card y las filas de las tablas suben solas al aparecer.",
+  "css": "/* Sin CSS propio: /admin/panel.css, bloque «Componentes comunes».\n   Va dentro de un contenedor .mj-ui (o <body class=\"mj-ui\">). */",
+  "html": "<div class=\"page-head\"><div><div class=\"crumbs\">Comercial</div><h1>Facturas</h1><p>Lo cobrado y lo pendiente.</p></div></div><div class=\"kpis\"><div class=\"kpi dark\"><small>Cobrado</small><b>12.480 €</b></div><div class=\"kpi\"><small>Pendiente</small><b>2.150 €</b></div><div class=\"kpi\"><small>Facturas</small><b>38</b></div><div class=\"kpi\"><small>Clientes</small><b>14</b></div></div><div class=\"card\" style=\"padding:0;overflow:hidden\"><table class=\"bib-tabla\"><tbody><tr><td>Panadería Luna</td><td>Mantenimiento web</td><td>90,75 €</td></tr><tr><td>Clínica Arce</td><td>Desarrollo de app</td><td>2.420,00 €</td></tr><tr><td>Taller Sur</td><td>Licencia anual</td><td>36,30 €</td></tr><tr><td>Estudio Mar</td><td>Bono de horas</td><td>480,00 €</td></tr></tbody></table></div><button class=\"btn btn--sm\" data-repetir style=\"margin-top:12px\">↻ Repetir la entrada</button>",
+  "js": "/* No hace falta nada: panel.css anima solo estos elementos al aparecer\n   (.page-head, .kpis > *, .grid > .card, .card, .sec, tbody tr, .msg). */"
+ }
+}

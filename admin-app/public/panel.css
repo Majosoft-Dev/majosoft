@@ -40,6 +40,37 @@ body.has-side { padding-left: var(--side); }
 .page-head p { margin: 4px 0 0; color: var(--muted); font-size: 14px; }
 .crumbs { font-size: 12px; color: var(--muted); font-weight: 600; letter-spacing: .02em; margin-bottom: 6px; }
 
+/* ===== Componentes comunes (dentro de .mj-ui) =====
+   Botones, pestañas, tarjetas, cifras y campos. Hoy cada página trae su propia copia en su <style>;
+   aquí está la versión de referencia (la más repetida), que es la que enseña la Biblioteca de UI.
+   Va dentro de .mj-ui para no colarse en las páginas que aún usan su copia: para pasar una página
+   a estos, se pone class="mj-ui" en su <body> y se borra su copia. */
+.mj-ui .btn { display: inline-flex; align-items: center; gap: 6px; padding: 9px 15px; border-radius: 10px; border: 1px solid var(--line); background: #fff; color: var(--ink); font: inherit; font-weight: 700; font-size: 13px; cursor: pointer; text-decoration: none; white-space: nowrap; }
+.mj-ui .btn:hover { border-color: var(--ink); }
+.mj-ui .btn[disabled] { opacity: .5; cursor: wait; }
+.mj-ui .btn--ink { background: var(--ink); color: var(--cream); border-color: var(--ink); }
+.mj-ui .btn--ink:hover { background: #2a2b26; }
+.mj-ui .btn--lime { background: var(--lime); color: var(--ink); border-color: var(--lime); }
+.mj-ui .btn--danger:hover { border-color: var(--bad); color: var(--bad); }
+.mj-ui .btn--sm { padding: 6px 10px; font-size: 12px; }
+.mj-ui .tabs { display: flex; gap: 4px; background: #fff; border: 1px solid var(--line); padding: 4px; border-radius: 12px; width: max-content; max-width: 100%; }
+.mj-ui .tabs button { border: none; background: none; padding: 7px 12px; border-radius: 8px; font: inherit; font-size: 12.5px; font-weight: 700; color: var(--muted); cursor: pointer; }
+.mj-ui .tabs button.on { background: var(--ink); color: var(--cream); }
+.mj-ui .card { background: #fff; border: 1px solid var(--line); border-radius: 16px; padding: 20px; min-width: 0; }
+.mj-ui .kpis { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-bottom: 14px; }
+.mj-ui .kpi { background: #fff; border: 1px solid var(--line); border-radius: 16px; padding: 18px 20px; min-width: 0; }
+.mj-ui .kpi small { color: var(--muted); font-size: 12px; font-weight: 700; }
+.mj-ui .kpi b { display: block; font-size: 26px; letter-spacing: -.03em; margin-top: 6px; }
+.mj-ui .kpi em { font-style: normal; font-size: 12px; font-weight: 700; color: var(--muted); }
+.mj-ui .kpi em.sube { color: var(--ok); } .mj-ui .kpi em.baja { color: var(--bad); }
+.mj-ui .kpi.dark { background: var(--ink); color: var(--cream); border-color: var(--ink); }
+.mj-ui .kpi.dark small, .mj-ui .kpi.dark em { color: #a9a99c; } .mj-ui .kpi.dark b { color: var(--lime); }
+.mj-ui .kpi.dark em.sube { color: var(--lime); } .mj-ui .kpi.dark em.baja { color: #ff8a7a; }
+.mj-ui label.f { display: flex; flex-direction: column; gap: 5px; font-size: 12px; font-weight: 700; color: var(--muted); }
+.mj-ui label.f input, .mj-ui label.f textarea, .mj-ui label.f select { font: inherit; font-size: 14px; color: var(--ink); padding: 9px 11px; border: 1px solid var(--line); border-radius: 10px; background: #fcfcf8; font-weight: 500; }
+.mj-ui label.f input:focus, .mj-ui label.f textarea:focus { outline: none; border-color: var(--ink); box-shadow: 0 0 0 3px rgba(214, 224, 34, .45); background: #fff; }
+@media (max-width: 760px) { .mj-ui .kpis { grid-template-columns: 1fr 1fr; } }
+
 /* Avisos */
 .toast { position: fixed; right: 20px; bottom: 20px; z-index: 90; background: var(--ink); color: var(--cream); padding: 10px 16px; border-radius: 10px; font: 600 13px Inter, system-ui, sans-serif; box-shadow: 0 10px 30px rgba(0,0,0,.2); opacity: 0; transform: translateY(8px); transition: .2s; pointer-events: none; }
 .toast.on { opacity: 1; transform: none; }

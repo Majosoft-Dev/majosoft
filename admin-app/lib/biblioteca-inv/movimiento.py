@@ -176,11 +176,13 @@ PAGINAS_JS = """const PAGINAS = [
 
 pieza(id="mo-pagina-menu-quieto", nombre="Cambio de página con el menú quieto", categoria="otros", proyecto="Panel Majosoft", stack="css (View Transitions)",
   archivos=["/Users/lolyfernandezrodriguez/Desktop/Majosoft/admin-app/public/panel.css:63"],
-  descripcion="Al pasar de una página a otra, el contenido viejo se va subiendo 4 px y desvaneciéndose (0,16 s) y el nuevo entra desde 8 px más abajo (0,32 s); el menú lateral no se mueve.",
+  descripcion="Al pasar de una página a otra, el contenido viejo se va subiendo 6 px y desvaneciéndose (0,16 s) y el nuevo entra desde 10 px más abajo (0,28 s); el menú lateral no se mueve. Pruébalo de verdad con el menú de la izquierda.",
   cuando_usar="Paneles de varias páginas (navegación normal, sin SPA): parece una aplicación sin añadir JavaScript.",
   reglas=["Entre documentos basta con @view-transition { navigation: auto; } en el CSS de las dos páginas; la demo usa document.startViewTransition() porque aquí todo es una sola página.",
           "El menú lleva view-transition-name: side y sus animaciones a none: se queda fijo mientras cambia el resto.",
-          "La salida es más corta que la entrada (0,16 s frente a 0,32 s) y con curva de aceleración; la entrada, con curva de salida.",
+          "La salida es más corta que la entrada (0,16 s frente a 0,28 s) y con ease-in; la entrada, con curva de salida cubic-bezier(.16,1,.3,1).",
+          "Al pulsar un enlace del menú, <main> se marca con .mj-saliendo (baja a 0,55 de opacidad) mientras llega la página nueva.",
+          "Ojo: panel.css tiene dos bloques de transición (líneas ~63 y «Cambio de página desde el menú»); manda el segundo, el primero sobra.",
           "El menú se pinta antes del primer pintado (script con blocking=\"render\") para que no parpadee (commit 0a7c6fe); la transición llegó en d06af53.",
           "Con prefers-reduced-motion las animaciones de la transición se quitan."],
   html="""<div class="mo-pq"><aside class="mo-pq-side"><b>Majosoft</b><a data-p="0" class="on">Resumen</a><a data-p="1">Facturas</a><a data-p="2">Calendario</a></aside><main class="mo-pq-main"></main></div>""",
@@ -193,11 +195,11 @@ pieza(id="mo-pagina-menu-quieto", nombre="Cambio de página con el menú quieto"
 .mo-pq-main{padding:24px 26px}
 .mo-pq-main small{font-size:12px;color:#6b6b62;font-weight:600}.mo-pq-main h3{margin:4px 0 2px;font-size:24px;letter-spacing:-.03em}.mo-pq-main p{margin:0 0 16px;color:#6b6b62}
 .mo-pq-k{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}.mo-pq-k div{background:#fff;border:1px solid #dcdbd0;border-radius:14px;padding:12px 14px}.mo-pq-k span{font-size:12px;color:#6b6b62;font-weight:700}.mo-pq-k b{display:block;font-size:20px;margin-top:4px}
-::view-transition-old(root){animation:mo-pq-out .16s cubic-bezier(.4,0,1,1) both}
-::view-transition-new(root){animation:mo-pq-in .32s cubic-bezier(.16,1,.3,1) both}
+::view-transition-old(root){animation:mo-pq-out .16s ease-in both}
+::view-transition-new(root){animation:mo-pq-in .28s cubic-bezier(.16,1,.3,1) both}
 ::view-transition-group(mo-side),::view-transition-old(mo-side),::view-transition-new(mo-side){animation:none}
-@keyframes mo-pq-out{to{opacity:0;transform:translateY(-4px)}}
-@keyframes mo-pq-in{from{opacity:0;transform:translateY(8px)}}
+@keyframes mo-pq-out{to{opacity:0;transform:translateY(-6px)}}
+@keyframes mo-pq-in{from{opacity:0;transform:translateY(10px)}}
 @media (prefers-reduced-motion:reduce){::view-transition-old(root),::view-transition-new(root){animation:none}}""",
   js=VT + PAGINAS_JS + """
 const main = document.querySelector('.mo-pq-main');

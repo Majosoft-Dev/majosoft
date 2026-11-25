@@ -36,6 +36,16 @@ for f in sorted(glob.glob(os.path.join(src, "inv-*.json"))):
         p["reglas"] = p.get("reglas") or []
         piezas.append(p)
 
+# Piezas nativas del panel: se pintan con el CSS y el JS reales (/admin/panel.css y panel.js), no con una copia
+NATIVOS = json.load(open(os.path.join(os.path.dirname(__file__), "biblioteca-inv", "nativos.json")))
+for p in piezas:
+    n = NATIVOS.get(p["id"])
+    if n and p["proyecto"] == "Panel Majosoft":
+        p.update(html=n["html"], css=n["css"], js=n["js"], nota=n["nota"], nativo=True)
+        p["archivos"] = ["Majosoft/admin-app/public/panel.css", "Majosoft/admin-app/public/panel.js"] + [a for a in p["archivos"] if "panel.css" not in a and "panel.js" not in a]
+faltan = set(NATIVOS) - {p["id"] for p in piezas if p.get("nativo")}
+if faltan: print("Nativos sin pieza:", faltan)
+
 # Grupos (selectores, login, animaciones…): una pieza puede estar en varios; el primero es el principal.
 # Se editan a mano en lib/biblioteca-grupos.json. Lo que tenga @keyframes entra solo en «Animaciones».
 GRUPOS = json.load(open(os.path.join(os.path.dirname(__file__), "biblioteca-grupos.json")))
