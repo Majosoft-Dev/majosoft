@@ -60,6 +60,43 @@ const num = (n, d = 0) => Number(n).toLocaleString('es-ES', { minimumFractionDig
   };
   const brilla = (el) => { el.classList.remove('nuevo-brillo'); void el.offsetWidth; el.classList.add('nuevo-brillo'); };
   const tras = (ms) => new Promise((ok) => setTimeout(ok, ms));
+  // Confeti pequeño que sale de un elemento (sin librerías)
+  const confeti = (el, colores = ['#e02b20', '#f5c542', '#12d678', '#5b9dff', '#fff']) => {
+    const p = pos(el);
+    for (let i = 0; i < 28; i++) {
+      const c = document.createElement('i');
+      c.className = 'happ__confeti'; c.style.background = colores[i % colores.length];
+      c.style.left = p.x + 'px'; c.style.top = p.y + 'px'; body.append(c);
+      const ang = Math.random() * Math.PI * 2, v = 60 + Math.random() * 90;
+      gsap.to(c, { x: Math.cos(ang) * v, y: Math.sin(ang) * v - 40, rotation: Math.random() * 540, duration: 0.7, ease: 'power2.out' });
+      gsap.to(c, { y: '+=' + (90 + Math.random() * 60), opacity: 0, duration: 1, delay: 0.6, ease: 'power1.in', onComplete: () => c.remove() });
+    }
+  };
+  // Narración de lo que pasa en el panel (debajo de él)
+  const guia = document.getElementById('happ-guia');
+  const contar_pasos = (txt, k, total) => {
+    if (!guia) return;
+    guia.classList.remove('tuya');
+    guia.querySelector('.happ-guia__n').textContent = `${k}/${total}`;
+    const t = guia.querySelector('.happ-guia__t');
+    gsap.fromTo(t, { y: 8, opacity: 0 }, { y: 0, opacity: 1, duration: 0.35, onStart: () => { t.textContent = txt; } });
+    guia.querySelector('.happ-guia__pasos').innerHTML = Array.from({ length: total }, (_, i) => `<i class="${i < k ? 'on' : ''}"></i>`).join('');
+  };
+  const presenta = () => {
+    if (!guia) return;
+    guia.classList.remove('tuya');
+    guia.querySelector('.happ-guia__n').textContent = '▶';
+    const t = guia.querySelector('.happ-guia__t');
+    gsap.fromTo(t, { y: 8, opacity: 0 }, { y: 0, opacity: 1, duration: 0.35, onStart: () => { t.textContent = `${S.negocio} · un panel hecho a medida para ${S.para}`; } });
+    guia.querySelector('.happ-guia__pasos').innerHTML = '';
+  };
+  const tuTurno = () => {
+    if (!guia) return;
+    guia.classList.add('tuya');
+    guia.querySelector('.happ-guia__n').textContent = '✋';
+    guia.querySelector('.happ-guia__t').textContent = 'Tu turno: toca lo que quieras. En unos segundos sigue solo.';
+    guia.querySelector('.happ-guia__pasos').innerHTML = '';
+  };
 
   const I = {
     casa: '<path d="M3 11l9-7 9 7v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/>',
@@ -88,10 +125,10 @@ const num = (n, d = 0) => Number(n).toLocaleString('es-ES', { minimumFractionDig
     ['jazmin', 'Jazmín', 'doble', [[6, 4, 'Luis T.', 'b']]],
   ];
   const alojamiento = {
-    tema: 'aloj', url: 'panel.casaolivo.es', negocio: 'Casa Olivo', sub: 'Casa rural', logo: '✿', ini: 'LM', usuario: 'Lucía M.',
+    tema: 'aloj', para: 'una casa rural', url: 'panel.casaolivo.es', negocio: 'Casa Olivo', sub: 'Casa rural', logo: '✿', ini: 'LM', usuario: 'Lucía M.',
     nav: [['inicio', 'Inicio', 'casa'], ['calendario', 'Calendario', 'cal'], ['huespedes', 'Huéspedes', 'gente'], ['mensajes', 'Mensajes', 'chat', 1]],
     vistas: {
-      inicio: `<header class="hp-head"><div><small>Martes, 25 de noviembre</small><h4>Buenos días, Lucía</h4><p>Hoy llegan 2 huéspedes y se va 1.</p></div><button type="button" class="hp-btn" data-a="reserva">+ Nueva reserva</button></header>
+      inicio: `<header class="hp-head"><div><small>Martes, 25 de noviembre</small><h4>Buenos días, Lucía</h4><p>Hoy llegan 2 huéspedes y se va 1.</p></div><div class="al-acc"><span class="al-tiempo"><svg viewBox="0 0 24 24"><g class="rayos"><path d="M12 1v3M12 20v3M1 12h3M20 12h3M4.2 4.2l2.1 2.1M17.7 17.7l2.1 2.1M4.2 19.8l2.1-2.1M17.7 6.3l2.1-2.1"/></g><circle cx="12" cy="12" r="4.5"/></svg>18° · Jaén</span><button type="button" class="hp-btn" data-a="reserva">+ Nueva reserva</button></div></header>
         <div class="al-top">
           <div class="al-ocup"><small>Ocupación de noviembre</small><b><span data-n="78" id="al-oc">78</span> %</b><div class="al-ocup__barra"><i id="al-oc-b" style="width:78%"></i></div><em>4 habitaciones · 120 noches</em></div>
           <div class="al-ing"><small>Ingresos del mes</small><b data-n="12480" data-suf=" €">12.480 €</b>
@@ -101,18 +138,29 @@ const num = (n, d = 0) => Number(n).toLocaleString('es-ES', { minimumFractionDig
         <div class="al-llegadas">
           <div class="al-lleg"><span class="al-foto" style="--h:24"></span><div><b>Ana Ruiz</b><span>Olivo · 3 noches</span></div><em>16:00</em></div>
           <div class="al-lleg"><span class="al-foto" style="--h:150"></span><div><b>Familia Sanz</b><span>Encina · 6 noches</span></div><em>18:30</em></div>
-        </div>`,
+        </div>
+        <div class="al-hoy"><small class="hp-sub">Hoy en la casa</small>
+          <ul><li class="hecha"><i>✓</i><span>Limpieza de Olivo</span><em>Carmen · 11:00</em></li><li class="curso"><i></i><span>Preparar Encina para 4</span><em>en curso</em></li><li><i></i><span>Leña para la chimenea</span><em>antes de las 18:00</em></li><li><i></i><span>Desayuno de mañana · 6 personas</span><em>pedido a la panadería</em></li></ul></div>`,
       calendario: `<header class="hp-head"><div><small>24 nov – 7 dic</small><h4>Calendario</h4></div><div class="hp-seg"><span class="on">2 semanas</span><span>Mes</span></div></header>
         <div class="al-gantt">
           <div class="al-g-cab"><span></span><div class="al-g-dias">${DIAS.map((d, i) => `<span class="${i === 1 ? 'hoy' : ''}">${d}</span>`).join('')}</div></div>
           ${HAB.map(([id, nom, tipo, est]) => `<div class="al-g-fila" data-h="${id}"><b>${nom}<small>${tipo}</small></b><div class="al-g-pista">${est.map(([ini, l, n, t]) => `<i class="al-est${t ? ' al-est--' + t : ''}" style="--a:${ini};--l:${l}">${n}</i>`).join('')}${id === 'jazmin' ? '<i class="al-hueco" style="--a:1;--l:3"></i>' : ''}</div></div>`).join('')}
+          <div class="al-g-ley"><span style="--c:#6f8a4e">Confirmada</span><span style="--c:#e8c7a0">Pagada al llegar</span><span class="raya">Bloqueo</span><span style="--c:var(--ac)">Nueva</span><em>Quincena al 71 % · 3 llegadas · 2 salidas</em></div>
         </div>`,
       huespedes: `<header class="hp-head"><div><small>142 huéspedes · 4,9 ★ de media</small><h4>Huéspedes</h4></div></header>
-        <div class="al-huesp">${[['Ana Ruiz', '3 estancias · Valencia', 24, 'Repite'], ['Jordi Pons', '1 estancia · Barcelona', 200, '★ 5'], ['Marta Gil', '5 estancias · Jaén', 320, 'Repite'], ['Familia Sanz', '2 estancias · Madrid', 150, 'Con niños'], ['Luis Torres', '1 estancia · Sevilla', 80, '★ 5'], ['Pedro Molina', '4 estancias · Granada', 260, 'Repite']]
+        <div class="al-huesp">${[['Ana Ruiz', '3 estancias · Valencia', 24, 'Repite'], ['Jordi Pons', '1 estancia · Barcelona', 200, '★ 5'], ['Marta Gil', '5 estancias · Jaén', 320, 'Repite'], ['Familia Sanz', '2 estancias · Madrid', 150, 'Con niños'], ['Luis Torres', '1 estancia · Sevilla', 80, '★ 5'], ['Pedro Molina', '4 estancias · Granada', 260, 'Repite'], ['Inés Navarro', '2 estancias · Bilbao', 330, 'Con perro'], ['Sara Vela', '1 estancia · Málaga', 110, '★ 4,8']]
           .map(([n, d, h, e]) => `<div class="al-h"><span class="al-foto" style="--h:${h}"></span><div><b>${n}</b><span>${d}</span></div><em>${e}</em></div>`).join('')}</div>`,
-      mensajes: `<header class="hp-head"><div><small>Con Familia Sanz · llegan hoy</small><h4>Mensajes</h4></div></header>
-        <div class="hp-chat" id="al-chat"><p class="hm">¡Hola! Llegamos sobre las 18:30.</p><p class="hm hm--yo">¡Perfecto! Os esperamos con la chimenea encendida 🔥</p></div>
-        <div class="hp-rapidas"><button type="button" data-r="¡Claro! Que venga Lola 🐾">¡Claro, que venga!</button><button type="button" data-r="mapa">Enviar ubicación</button><button type="button" data-r="La llave está en el cajetín, código 2580.">Cómo entrar</button></div>`,
+      mensajes: `<header class="hp-head"><div><small>1 sin leer · respondes en 6 min de media</small><h4>Mensajes</h4></div></header>
+        <div class="al-msj">
+          <div class="al-conv">${[['FS', 'Familia Sanz', 'Llegamos sobre las 18:30', '12:04', 150, 1], ['AR', 'Ana Ruiz', '¡Muchas gracias por todo!', '10:31', 24], ['JP', 'Jordi Pons', '¿Hay aparcamiento cerca?', 'ayer', 200], ['MG', 'Marta Gil', 'Os dejo 5 estrellas ⭐', 'lun', 320], ['LT', 'Luis Torres', 'Perfecto, nos vemos el 30', 'dom', 80]]
+            .map(([i, n, m, h, c, on]) => `<button type="button" class="${on ? 'on' : ''}"><span class="al-foto" style="--h:${c}"></span><div><b>${n}</b><span>${m}</span></div><em>${h}</em></button>`).join('')}</div>
+          <div class="al-hilo">
+            <div class="al-hilo__cab"><span class="al-foto" style="--h:150"></span><div><b>Familia Sanz</b><span>Encina · 6 noches · llegan hoy a las 18:30</span></div><span class="st st--ok">Pagada</span></div>
+            <div class="hp-chat" id="al-chat"><p class="hm">¡Hola! Llegamos sobre las 18:30.</p><p class="hm hm--yo">¡Perfecto! Os esperamos con la chimenea encendida 🔥</p></div>
+            <div class="hp-rapidas"><button type="button" data-r="¡Claro! Que venga Lola 🐾">¡Claro, que venga!</button><button type="button" data-r="mapa">Enviar ubicación</button><button type="button" data-r="La llave está en el cajetín, código 2580.">Cómo entrar</button></div>
+            <div class="al-escribe"><span>Escribe un mensaje…</span><i>➤</i></div>
+          </div>
+        </div>`,
     },
     entra: {
       inicio: (s) => {
@@ -133,6 +181,21 @@ const num = (n, d = 0) => Number(n).toLocaleString('es-ES', { minimumFractionDig
         avisa('Reserva de Lucas V. · 3 noches');
         const oc = q('#al-oc'); a(oc, 81); q('#al-oc-b').style.width = '81%';
       },
+      entrante() {
+        if (q('.al-entrante')) return;
+        const c = document.createElement('div'); c.className = 'al-entrante';
+        c.innerHTML = `<small><i></i>Nueva reserva · desde tu web</small><b>Lucas Vidal</b><span>3 noches · 2 adultos · Jazmín</span>
+          <div class="al-entrante__pie"><strong>285 €</strong><em>sin comisiones</em></div>
+          <div class="al-entrante__acc"><button type="button" data-a="aceptar">Aceptar</button><button type="button" data-a="ver">Ver</button></div>`;
+        q('.happ__view[data-v="inicio"]').append(c);
+        gsap.fromTo(c, { x: 60, opacity: 0, scale: 0.96 }, { x: 0, opacity: 1, scale: 1, duration: 0.6, ease: 'back.out(1.6)' });
+        c.querySelector('[data-a="aceptar"]').addEventListener('click', () => alojamiento.acciones.aceptar());
+        c.querySelector('[data-a="ver"]').addEventListener('click', () => alojamiento.acciones.aceptar());
+      },
+      aceptar() {
+        const c = q('.al-entrante'); if (c) gsap.to(c, { x: 40, opacity: 0, duration: 0.3, onComplete: () => c.remove() });
+        abrir('calendario'); setTimeout(() => alojamiento.acciones.reservar(), 650);
+      },
       llega(txt) {
         const chat = q('#al-chat'), p = document.createElement('p');
         p.className = 'hm hm--escribe'; p.innerHTML = '<i></i><i></i><i></i>'; chat.append(p);
@@ -143,7 +206,7 @@ const num = (n, d = 0) => Number(n).toLocaleString('es-ES', { minimumFractionDig
         if (b.dataset.r === 'mapa') { p.className = 'hm hm--yo hm--mapa'; p.innerHTML = '<span></span><b>Casa Olivo · Camino del Molino, 4</b>'; }
         else { p.className = 'hm hm--yo'; p.textContent = b.dataset.r; }
         chat.append(p); gsap.from(p, { y: 10, opacity: 0, duration: 0.35 });
-        while (chat.children.length > 5) chat.firstElementChild.remove();
+        while (chat.children.length > 6) chat.firstElementChild.remove();
         avisa('Mensaje enviado');
       },
     },
@@ -155,13 +218,14 @@ const num = (n, d = 0) => Number(n).toLocaleString('es-ES', { minimumFractionDig
     },
     guion(g) {
       const A = this.acciones;
-      g.clic('[data-a="reserva"]', () => abrir('calendario')).esperar(0.9)
-        .clic(() => q('.al-hueco') || q('.al-est--nueva'), () => A.reservar()).esperar(1.6)
-        .ir('inicio').esperar(1.4)
-        .ir('mensajes').ocultar().pausa(() => A.llega('¿Se admiten perros? Venimos con Lola 🐶')).mostrar()
+      g.paso('Entra una reserva desde tu propia web, sin comisiones').hacer(() => A.entrante()).esperar(1.6)
+        .clic('.al-entrante [data-a="aceptar"]', () => A.aceptar()).esperar(0.6)
+        .paso('Se coloca sola en el calendario de habitaciones').esperar(1.8)
+        .paso('Y la ocupación del mes se actualiza al momento').ir('inicio').esperar(1.6)
+        .paso('Un huésped escribe… y se le contesta con un toque').ir('mensajes').ocultar().pausa(() => A.llega('¿Se admiten perros? Venimos con Lola 🐶')).mostrar()
         .clic(() => q('.hp-rapidas button'), (b) => A.responder(b)).esperar(1.1)
         .clic(() => q('.hp-rapidas button:nth-child(2)'), (b) => A.responder(b)).esperar(1.6)
-        .ir('huespedes').esperar(1.6);
+        .paso('Cada huésped, con su historial: quién repite y cómo os valora').ir('huespedes').esperar(1.8);
     },
   };
 
@@ -186,9 +250,12 @@ const num = (n, d = 0) => Number(n).toLocaleString('es-ES', { minimumFractionDig
     <div class="cl-datos"><div>Próxima cita<b>${prox.split(' · ')[1] || prox}</b></div><div>Tratamiento<b>${prox.split(' · ')[0]}</b></div><div>Visitas<b>${(edad % 9) + 3}</b></div></div>
     <small class="hp-sub" style="margin-bottom:6px">Odontograma</small>
     <div class="cl-dientes">${Array.from({ length: 32 }, (_, i) => `<i class="${(d.emp || []).includes(i) ? 'emp' : ''}${(d.imp || []).includes(i) ? 'imp' : ''}${(d.falta || []).includes(i) ? 'falta' : ''}${marca === i ? ' marca' : ''}"></i>`).join('')}</div>
-    <div class="cl-leyenda"><span style="--c:#cfe8e8">Empaste</span><span style="--c:#ffd9b8">Implante</span><span style="--c:transparent">Falta</span></div>`;
+    <div class="cl-leyenda"><span style="--c:#cfe8e8">Empaste</span><span style="--c:#ffd9b8">Implante</span><span style="--c:transparent">Falta</span></div>
+    <small class="hp-sub" style="margin:12px 0 6px">Últimas visitas</small>
+    <ul class="cl-hist">${[['12 oct', 'Limpieza', '45 €', 'Pagado'], ['3 jul', 'Revisión', '0 €', 'Incluida'], ['18 mar', prox.split(' · ')[0], '120 €', 'Pagado'], ['9 ene', 'Radiografía', '30 €', 'Pagado']]
+      .map(([f, t, p, e]) => `<li><em>${f}</em><b>${t}</b><span>${p}</span><span class="st st--ok">${e}</span></li>`).join('')}</ul>`;
   const clinica = {
-    tema: 'clin', url: 'gestion.clinicaarce.es', negocio: 'Clínica Arce', sub: 'Dental', logo: '+', ini: 'ER', usuario: 'Dra. Elena R.',
+    tema: 'clin', para: 'una clínica dental', url: 'gestion.clinicaarce.es', negocio: 'Clínica Arce', sub: 'Dental', logo: '+', ini: 'ER', usuario: 'Dra. Elena R.',
     nav: [['hoy', 'Agenda', 'cal'], ['pacientes', 'Pacientes', 'gente'], ['recordatorios', 'Recordatorios', 'campana']],
     vistas: {
       hoy: `<header class="hp-head"><div><small>Martes, 25 de noviembre · 3 gabinetes</small><h4>Agenda de hoy</h4></div><button type="button" class="hp-btn" data-a="cita">+ Nueva cita</button></header>
@@ -199,6 +266,7 @@ const num = (n, d = 0) => Number(n).toLocaleString('es-ES', { minimumFractionDig
               <i class="cl-ahora" style="--ahora:.3125"></i></div></div>
           <div class="cl-lado">
             <div class="hp-card"><div class="cl-anillo" id="cl-anillo" style="--p:0"><svg viewBox="0 0 64 64"><circle class="fondo" cx="32" cy="32" r="26"/><circle class="valor" cx="32" cy="32" r="26"/></svg><div><b data-n="86" data-suf=" %">86 %</b><small>ocupación del día</small></div></div></div>
+            <div class="cl-tv"><small>Pantalla de sala</small><div class="cl-tv__giro" id="cl-tv"><b>A-11</b><span>Gabinete 1 · Laura C.</span></div></div>
             <div class="hp-card"><small>Sala de espera</small><ul class="cl-espera">
               <li data-p="laura"><span class="av">LC</span><b>Laura Cano</b><span class="st st--ac">En consulta</span></li>
               <li data-p="andres"><span class="av">AT</span><b>Andrés Toro</b><span class="st">En sala · 8 min</span></li>
@@ -212,7 +280,8 @@ const num = (n, d = 0) => Number(n).toLocaleString('es-ES', { minimumFractionDig
       recordatorios: `<header class="hp-head"><div><small>Citas de mañana, miércoles 26</small><h4>Recordatorios</h4></div><button type="button" class="hp-btn" data-a="enviar">Enviar por WhatsApp</button></header>
         <div class="cl-progreso"><i id="cl-prog"></i></div>
         <ul class="cl-rec">${[['IR', 'Inés Rey', 'Primera visita', '9:00'], ['PS', 'Pedro Sanz', 'Revisión', '9:30'], ['MF', 'Marina Flores', 'Implante', '10:00'], ['JM', 'Javier Moya', 'Limpieza', '11:30'], ['AT', 'Andrés Toro', 'Empaste', '12:00'], ['MA', 'Mar Alcalá', 'Ortodoncia', '12:30']]
-          .map(([i, n, t, h]) => `<li><span class="av">${i}</span><div><b>${n}</b> <small style="color:var(--suave)">· ${t}</small></div><em>${h}</em><span class="st st--gris">Sin enviar</span></li>`).join('')}</ul>`,
+          .map(([i, n, t, h]) => `<li><span class="av">${i}</span><div><b>${n}</b> <small style="color:var(--suave)">· ${t}</small></div><em>${h}</em><span class="st st--gris">Sin enviar</span></li>`).join('')}</ul>
+        <div class="cl-stats"><div><b data-n="94" data-suf=" %">94 %</b><span>de pacientes confirma</span></div><div><b data-n="31">31</b><span>ausencias evitadas este mes</span></div><div><b data-n="0">0</b><span>llamadas para recordar citas</span></div></div>`,
     },
     entra: {
       hoy: (s) => {
@@ -220,15 +289,17 @@ const num = (n, d = 0) => Number(n).toLocaleString('es-ES', { minimumFractionDig
         gsap.from(s.querySelectorAll('.cl-cita'), { opacity: 0, scale: 0.9, stagger: 0.05, duration: 0.4 });
       },
       pacientes: (s) => gsap.from(s.querySelectorAll('.cl-lista button'), { x: -10, stagger: 0.04, duration: 0.35, clearProps: 'transform' }),
-      recordatorios: (s) => gsap.from(s.querySelectorAll('.cl-rec li'), { opacity: 0, y: 8, stagger: 0.05, duration: 0.35 }),
+      recordatorios: (s) => { contar(s); gsap.from(s.querySelectorAll('.cl-rec li'), { opacity: 0, y: 8, stagger: 0.05, duration: 0.35 }); },
     },
     acciones: {
       mover() {
         const c = q('[data-c="rosa"]'); if (!c || c.dataset.movida) return;
         c.dataset.movida = 1; c.classList.add('cl-cita--mueve');
-        flip(c, () => { c.style.gridColumn = 4; c.style.gridRow = '6 / span 1'; }, 0.8);
+        // En el móvil solo se ven dos gabinetes: la cita se mueve al 2
+        const estrecho = main.clientWidth < 440;
+        flip(c, () => { c.style.gridColumn = estrecho ? 3 : 4; c.style.gridRow = (estrecho ? '7' : '6') + ' / span 1'; }, 0.8);
         setTimeout(() => c.classList.remove('cl-cita--mueve'), 900);
-        const st = q('[data-p="rosa"] .st'); st.textContent = 'Llega 11:30';
+        const st = q('[data-p="rosa"] .st'); st.textContent = estrecho ? 'Llega 12:00' : 'Llega 11:30';
         avisa('Cita movida a las 11:30 · se avisa a Rosa');
       },
       nueva() {
@@ -243,6 +314,11 @@ const num = (n, d = 0) => Number(n).toLocaleString('es-ES', { minimumFractionDig
       sala() {
         const pon = (p, t, k) => { const li = q(`[data-p="${p}"]`); const s = li.querySelector('.st'); s.className = 'st ' + k; s.textContent = t; brilla(li); };
         pon('laura', 'Terminada ✓', 'st--ok'); setTimeout(() => pon('andres', 'En consulta', 'st--ac'), 500);
+        const tv = q('#cl-tv');
+        gsap.to(tv, { rotateX: 90, duration: 0.25, ease: 'power2.in', onComplete: () => {
+          tv.innerHTML = '<b>A-12</b><span>Gabinete 1 · Andrés T.</span>'; tv.classList.add('llama');
+          gsap.fromTo(tv, { rotateX: -90 }, { rotateX: 0, duration: 0.4, ease: 'back.out(2)' });
+        } });
       },
       filtrar(v) {
         v = v.trim().toLowerCase();
@@ -274,12 +350,12 @@ const num = (n, d = 0) => Number(n).toLocaleString('es-ES', { minimumFractionDig
     },
     guion(g) {
       const A = this.acciones;
-      g.clic('[data-c="rosa"]', () => A.mover()).esperar(1.5)
-        .hacer(() => A.sala()).esperar(1.2)
-        .clic('[data-a="cita"]', () => A.nueva()).esperar(1.5)
-        .ir('pacientes').clic('#cl-busca').escribir('#cl-busca', 'mar', A.filtrar).esperar(0.6)
+      g.paso('Arrastra una cita a otro gabinete: el paciente recibe el aviso').clic('[data-c="rosa"]', () => A.mover()).esperar(1.5)
+        .paso('Termina una consulta y la pantalla de sala llama al siguiente').hacer(() => A.sala()).esperar(1.6)
+        .paso('Una cita nueva en el hueco libre: la ocupación sube').clic('[data-a="cita"]', () => A.nueva()).esperar(1.5)
+        .paso('Busca un paciente y abre su ficha con el odontograma').ir('pacientes').clic('#cl-busca').escribir('#cl-busca', 'mar', A.filtrar).esperar(0.6)
         .clic(() => q('#cl-lista button:not(.fuera)'), (b) => A.ficha(b.dataset.id)).esperar(2)
-        .ir('recordatorios').clic('[data-a="enviar"]', () => A.enviar()).esperar(3.6)
+        .paso('Recordatorios de mañana por WhatsApp, de una vez').ir('recordatorios').clic('[data-a="enviar"]', () => A.enviar()).esperar(3.6)
         .ir('hoy').esperar(0.8);
     },
   };
@@ -287,9 +363,9 @@ const num = (n, d = 0) => Number(n).toLocaleString('es-ES', { minimumFractionDig
   /* =================================================================
      3 · ACADEMIA — Academia Norte (oposiciones): oscuro y rojo
   ================================================================= */
-  const LIGA = [['carlos', 'CG', 'Carlos Gil', 412], ['nuria', 'NP', 'Nuria Pérez', 398], ['david', 'DM', 'David Mora', 377], ['lara', 'LS', 'Lara Soto', 365], ['mario', 'MV', 'Mario Vílchez', 351], ['alba', 'AL', 'Alba López', 340]];
+  const LIGA = [['carlos', 'CG', 'Carlos Gil', 412, 'Bombero', 48, 12], ['nuria', 'NP', 'Nuria Pérez', 398, 'Guardia Civil', 45, 9], ['david', 'DM', 'David Mora', 377, 'Bombero', 41, 4], ['lara', 'LS', 'Lara Soto', 365, 'Guardia Civil', 39, 6], ['mario', 'MV', 'Mario Vílchez', 351, 'Policía', 37, 3], ['alba', 'AL', 'Alba López', 340, 'Bombero', 35, 7]];
   const academia = {
-    tema: 'acad', url: 'campus.academianorte.es', negocio: 'Academia Norte', sub: 'Oposiciones', logo: 'N', ini: 'JB', usuario: 'José B.',
+    tema: 'acad', para: 'una academia de oposiciones', url: 'campus.academianorte.es', negocio: 'Academia Norte', sub: 'Oposiciones', logo: 'N', ini: 'JB', usuario: 'José B.',
     nav: [['panel', 'Panel', 'panel'], ['alumnos', 'Alumnos', 'gente'], ['tests', 'Tests', 'test'], ['liga', 'Liga', 'trofeo']],
     vistas: {
       panel: `<header class="hp-head"><div><small>Convocatoria Bombero 2027</small><h4>Hola, José</h4></div><button type="button" class="hp-btn" data-a="test">+ Nuevo test</button></header>
@@ -302,7 +378,8 @@ const num = (n, d = 0) => Number(n).toLocaleString('es-ES', { minimumFractionDig
           <div class="ac-simu"><small>Próximo simulacro</small><b>Simulacro general · sábado 9:00</b>
             <div class="ac-cuenta" id="ac-cuenta"><span><strong>2</strong><em>días</em></span><span><strong>14</strong><em>horas</em></span><span><strong>32</strong><em>min</em></span><span><strong>10</strong><em>seg</em></span></div></div>
           <div class="hp-card"><small>Tests por día</small><div class="ac-barras">${[38, 52, 44, 61, 58, 72, 49, 66, 80, 96].map((h) => `<i style="--h:${h}%"></i>`).join('')}</div></div>
-        </div>`,
+        </div>
+        <div class="ac-vivo"><span class="ac-vivo__punto"></span><b>En directo</b><span class="ac-vivo__caras">${['CG', 'NP', 'MV', 'LS', 'AL'].map((i) => `<i>${i}</i>`).join('')}</span><em><strong id="ac-conect">23</strong> conectados</em><span class="ac-vivo__feed" id="ac-feed">Nuria acaba de sacar 28/30 en el Tema 9</span></div>`,
       alumnos: `<header class="hp-head"><div><small>184 activos · 6 con nota baja</small><h4>Alumnos</h4></div></header>
         <div class="ac-alumnos">${[['CG', 'Carlos Gil', 'Bombero', 60, 'Tema 12 de 20', 8.6], ['NP', 'Nuria Pérez', 'Guardia Civil', 45, 'Tema 9 de 20', 7.9], ['DM', 'David Mora', 'Bombero', 20, 'Tema 4 de 20', 5.8], ['MV', 'Mario Vílchez', 'Policía', 75, 'Tema 15 de 20', 9.1], ['LS', 'Lara Soto', 'Guardia Civil', 35, 'Tema 7 de 20', 7.2], ['AL', 'Alba López', 'Bombero', 55, 'Tema 11 de 20', 6.9]]
           .map(([i, n, o, p, t, nota]) => `<div class="ac-al"><span class="av">${i}</span><div><b>${n}</b><small>${o}</small></div><div><div class="ac-prog"><i style="--p:${p}%"></i></div><small>${t}</small></div><span class="ac-nota${nota >= 8 ? ' alta' : ''}">${num(nota, 1)}</span></div>`).join('')}</div>`,
@@ -312,15 +389,19 @@ const num = (n, d = 0) => Number(n).toLocaleString('es-ES', { minimumFractionDig
             <label class="ac-campo">Tema<span>Tema 13 · Hidráulica</span></label>
             <label class="ac-campo">Preguntas: <b id="ac-npreg" style="color:var(--tinta)">20</b><div class="ac-rango" id="ac-rango" style="--v:40%"><i></i><b></b></div></label>
             <label class="ac-campo">Tiempo<span>30 minutos · penaliza 1/3</span></label>
+            <div class="ac-campo">Dificultad<div class="ac-dif"><span>Fácil</span><span class="on">Media</span><span>Difícil</span></div></div>
+            <div class="ac-opc"><span>Mezclar preguntas y respuestas</span><i class="on"></i></div>
+            <div class="ac-opc"><span>Mostrar la corrección al terminar</span><i class="on"></i></div>
             <button type="button" class="hp-btn" data-a="publicar">Publicar a todos</button></div>
           <div class="ac-lista-t" id="ac-lista-t">
-            <div class="ac-t"><div><b>Tema 12 · Incendios</b><small>30 preguntas · ayer</small></div><em><strong>142</strong>lo han hecho</em></div>
-            <div class="ac-t"><div><b>Tema 11 · Rescate</b><small>25 preguntas · lunes</small></div><em><strong>168</strong>lo han hecho</em></div>
-            <div class="ac-t"><div><b>Psicotécnico 4</b><small>40 preguntas · domingo</small></div><em><strong>171</strong>lo han hecho</em></div>
+            <div class="ac-t"><div><b>Tema 12 · Incendios</b><small>30 preguntas · ayer</small><span class="ac-ap"><i style="--p:78%"></i></span><small class="ac-ap__t">78 % aprobados</small></div><em><strong>142</strong>lo han hecho</em></div>
+            <div class="ac-t"><div><b>Tema 11 · Rescate</b><small>25 preguntas · lunes</small><span class="ac-ap"><i style="--p:84%"></i></span><small class="ac-ap__t">84 % aprobados</small></div><em><strong>168</strong>lo han hecho</em></div>
+            <div class="ac-t"><div><b>Psicotécnico 4</b><small>40 preguntas · domingo</small><span class="ac-ap"><i style="--p:69%"></i></span><small class="ac-ap__t">69 % aprobados</small></div><em><strong>171</strong>lo han hecho</em></div>
+            <div class="ac-t"><div><b>Simulacro general 3</b><small>100 preguntas · hace 1 semana</small><span class="ac-ap"><i style="--p:72%"></i></span><small class="ac-ap__t">72 % aprobados</small></div><em><strong>176</strong>lo han hecho</em></div>
           </div>
         </div>`,
       liga: `<header class="hp-head"><div><small>Liga del opositor · jornada 11</small><h4>Liga</h4></div><div class="hp-seg"><span class="on">Semana</span><span>Total</span></div></header>
-        <div class="ac-liga" id="ac-liga">${LIGA.map(([id, i, n, p], k) => `<div class="ac-pos" data-id="${id}"><span>${k + 1}</span><span class="av">${i}</span><b>${n}</b><strong data-n="${p}">${p}</strong><span class="sube">▲ 2</span></div>`).join('')}</div>`,
+        <div class="ac-liga" id="ac-liga">${LIGA.map(([id, i, n, p, o, t, r], k) => `<div class="ac-pos" data-id="${id}"><span>${k + 1}</span><span class="av">${i}</span><div class="ac-pos__n"><b>${n}</b><small>${o} · ${t} tests</small></div><div class="ac-pos__barra"><i style="--p:${Math.round(p / 4.6)}%"></i></div><span class="ac-racha">🔥 ${r} días</span><strong data-n="${p}">${p}</strong><span class="sube">▲ 2</span></div>`).join('')}</div>`,
     },
     entra: {
       panel: (s) => { contar(s); gsap.fromTo(s.querySelectorAll('.ac-barras i'), { scaleY: 0 }, { scaleY: 1, stagger: 0.05, duration: 0.5, ease: 'power3.out' }); },
@@ -337,7 +418,7 @@ const num = (n, d = 0) => Number(n).toLocaleString('es-ES', { minimumFractionDig
         const b = q('[data-a="publicar"]'); if (b.disabled) return; b.disabled = true;
         const t = document.createElement('div'); t.className = 'ac-t';
         t.innerHTML = `<div><b>Tema 13 · Hidráulica</b><small>${q('#ac-npreg').textContent} preguntas · ahora</small></div><em><strong data-n="0">0</strong>lo han hecho</em>`;
-        q('#ac-lista-t').prepend(t); gsap.from(t, { opacity: 0, y: -12, duration: 0.45 }); brilla(t);
+        q('#ac-lista-t').prepend(t); q('#ac-lista-t').lastElementChild.remove(); gsap.from(t, { opacity: 0, y: -12, duration: 0.45 }); brilla(t);
         a(t.querySelector('strong'), 37, 0, '', 4);
         avisa('Test publicado a 184 alumnos');
       },
@@ -350,6 +431,7 @@ const num = (n, d = 0) => Number(n).toLocaleString('es-ES', { minimumFractionDig
             filas.sort((x, y) => +y.querySelector('strong').dataset.n - +x.querySelector('strong').dataset.n).forEach((f, k) => { liga.append(f); f.firstElementChild.textContent = k + 1; });
           }, 0.8);
           fila.classList.add('subio'); avisa('Lara sube al 2.º puesto · +45 puntos');
+          setTimeout(() => confeti(fila), 450);
         }, 500);
       },
     },
@@ -362,11 +444,12 @@ const num = (n, d = 0) => Number(n).toLocaleString('es-ES', { minimumFractionDig
     },
     guion(g) {
       const A = this.acciones;
-      g.clic('[data-a="test"]', () => abrir('tests')).esperar(0.7)
+      g.paso('El campus en directo: quién está conectado y qué está sacando').esperar(2.2)
+        .paso('Prepara un test nuevo en segundos').clic('[data-a="test"]', () => abrir('tests')).esperar(0.7)
         .clic('#ac-rango b', () => A.rango(30)).esperar(1)
-        .clic('[data-a="publicar"]', () => A.publicar()).esperar(2.4)
-        .ir('liga').esperar(0.5).hacer(() => A.subir()).esperar(2.4)
-        .ir('alumnos').esperar(2.2)
+        .paso('Publícalo y mira cómo lo van haciendo los alumnos').clic('[data-a="publicar"]', () => A.publicar()).esperar(2.4)
+        .paso('La liga engancha: los puntos suben y el ranking se mueve').ir('liga').esperar(0.5).hacer(() => A.subir()).esperar(2.6)
+        .paso('El progreso de cada alumno, tema a tema').ir('alumnos').esperar(2.2)
         .ir('panel').esperar(0.8);
     },
   };
@@ -378,9 +461,26 @@ const num = (n, d = 0) => Number(n).toLocaleString('es-ES', { minimumFractionDig
   const curva = (v) => { const max = 140, w = 300, h = 120; return v.map((y, i) => [i * (w / (v.length - 1)), h - (y / max) * h]); };
   const camino = (pts) => pts.map(([x, y], i) => (i ? 'L' : 'M') + x.toFixed(1) + ' ' + y.toFixed(1)).join('');
   const PED = { nuevos: [['1044', 'Eva M.', '5 l · Picual', '42,50 €'], ['1045', 'Juan L.', '3 botellas', '29,70 €'], ['1046', 'Sonia P.', 'Lote regalo', '39,90 €']], prep: [['1042', 'Ana R.', '2 botellas', '19,80 €'], ['1043', 'Toni B.', 'Lote regalo', '39,90 €']], env: [['1040', 'Rafa C.', 'Arbequina 1 l', '16,50 €', 'MRW · en camino'], ['1041', 'Pilar G.', '6 botellas', '59,40 €', 'SEUR · entregado']] };
+  // Mapa de puntos de España (contorno aproximado de la península, sin Portugal)
+  const CONTORNO = [[8, 10], [18, 6], [30, 8], [45, 9], [55, 10], [62, 12], [70, 16], [80, 18], [90, 20], [93, 26], [86, 34], [80, 42], [76, 50], [78, 56], [72, 64], [66, 70], [58, 74], [46, 78], [36, 80], [30, 74], [24, 68], [22, 62], [26, 54], [22, 44], [24, 36], [18, 30], [14, 26], [10, 22], [6, 16]];
+  const dentro = (x, y) => { let si = false; for (let i = 0, k = CONTORNO.length - 1; i < CONTORNO.length; k = i++) { const [xi, yi] = CONTORNO[i], [xk, yk] = CONTORNO[k]; if ((yi > y) !== (yk > y) && x < ((xk - xi) * (y - yi)) / (yk - yi) + xi) si = !si; } return si; };
+  let MAPA = '';
+  for (let y = 4; y < 84; y += 3.4) for (let x = 3; x < 98; x += 3.4) if (dentro(x, y)) MAPA += `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="1.05"/>`;
+  const CIUDADES = { Madrid: [48, 42], Barcelona: [86, 30], Valencia: [74, 50], Sevilla: [32, 68], Bilbao: [55, 13], 'Jaén': [48, 64], 'A Coruña': [11, 11], 'Málaga': [44, 75], Zaragoza: [66, 28], Murcia: [68, 62] };
+  const ping = (ciudad) => {
+    const m = q('#sh-mapa'); if (!m) return;
+    const [x, y] = CIUDADES[ciudad], ns = 'http://www.w3.org/2000/svg';
+    const g = document.createElementNS(ns, 'g'); g.setAttribute('class', 'sh-ping');
+    g.innerHTML = `<circle class="onda" cx="${x}" cy="${y}" r="2"/><circle class="centro" cx="${x}" cy="${y}" r="1.9"/>`;
+    m.append(g);
+    gsap.fromTo(g.querySelector('.onda'), { attr: { r: 2 }, opacity: 0.9 }, { attr: { r: 11 }, opacity: 0, duration: 1.4, ease: 'power2.out', repeat: 1 });
+    gsap.from(g.querySelector('.centro'), { attr: { r: 0 }, duration: 0.4, ease: 'back.out(3)' });
+    gsap.to(g, { opacity: 0, duration: 1, delay: 4, onComplete: () => g.remove() });
+    const u = q('#sh-ult'); if (u) u.textContent = `Último: ${ciudad} · ahora mismo`;
+  };
   const ped = ([n, c, d, p, e]) => `<div class="sh-ped" data-ped="${n}"><b><span>#${n}</span><span>${p}</span></b><span>${c} · ${d}</span>${e ? `<i>${e}</i>` : ''}</div>`;
   const tienda = {
-    tema: 'shop', url: 'admin.aceitessur.es', negocio: 'Aceites Sur', sub: 'Tienda online', logo: 'A', ini: 'MC', usuario: 'Marta C.',
+    tema: 'shop', para: 'una tienda de aceite', url: 'admin.aceitessur.es', negocio: 'Aceites Sur', sub: 'Tienda online', logo: 'A', ini: 'MC', usuario: 'Marta C.',
     nav: [['ventas', 'Ventas', 'grafica'], ['pedidos', 'Pedidos', 'caja', 3], ['productos', 'Productos', 'etiqueta']],
     vistas: {
       ventas: `<header class="hp-head"><div><small>Hoy, martes 25</small><h4>Ventas</h4></div><div class="hp-seg"><span class="on">Hoy</span><span>Semana</span><span>Mes</span></div></header>
@@ -394,16 +494,13 @@ const num = (n, d = 0) => Number(n).toLocaleString('es-ES', { minimumFractionDig
             <svg viewBox="0 0 300 120" preserveAspectRatio="none"><defs><linearGradient id="sh-deg" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#c9a227" stop-opacity=".35"/><stop offset="1" stop-color="#c9a227" stop-opacity="0"/></linearGradient></defs>
               <g class="rejilla"><line x1="0" x2="300" y1="30" y2="30"/><line x1="0" x2="300" y1="60" y2="60"/><line x1="0" x2="300" y1="90" y2="90"/></g>
               <path class="area" id="sh-area"/><path class="linea" id="sh-linea"/><circle class="punto" id="sh-punto" r="4"/></svg></div>
-          <div class="hp-card"><small>Más vendidos</small><ul class="sh-top">
-            <li><span class="sh-bot" style="--c:#b58a1e"></span><b>Picual 500 ml</b><em>38 uds</em></li>
-            <li><span class="sh-bot" style="--c:#7d8f3a"></span><b>Arbequina 1 l</b><em>21 uds</em></li>
-            <li><span class="sh-bot" style="--c:#8a3b2a"></span><b>Lote regalo</b><em>12 uds</em></li></ul></div>
+          <div class="hp-card sh-mapa"><small>Pedidos en directo</small><svg viewBox="0 0 100 84" id="sh-mapa">${MAPA}</svg><span class="sh-mapa__ult" id="sh-ult">Último: Madrid · hace 2 min</span></div>
         </div>`,
       pedidos: `<header class="hp-head"><div><small>Pulsa un pedido para avanzarlo</small><h4>Pedidos</h4></div></header>
         <div class="sh-kanban">${[['nuevos', 'Nuevos'], ['prep', 'Preparando'], ['env', 'Enviados']].map(([k, t]) => `<div class="sh-col" data-col="${k}"><header>${t}<span>${PED[k].length}</span></header>${PED[k].map(ped).join('')}</div>`).join('')}</div>`,
       productos: `<header class="hp-head"><div><small>4 productos · 1 con poco stock</small><h4>Productos</h4></div><button type="button" class="hp-btn">+ Producto</button></header>
         <div class="sh-prods">${[['picual', 'Picual 500 ml', '9,90 €', 48, 64, '#b58a1e', 'bot'], ['arbequina', 'Arbequina 1 l', '16,50 €', 30, 40, '#7d8f3a', 'bot'], ['lote', 'Lote regalo', '39,90 €', 9, 22, '#8a3b2a', 'lata'], ['aceitunas', 'Aceitunas aliñadas', '4,50 €', 120, 80, '#6f8a2e', 'lata']]
-          .map(([id, n, p, u, pc, c, f]) => `<div class="sh-prod" data-prod="${id}"><div class="sh-prod__foto">${f === 'bot' ? `<span class="sh-bot" style="--c:${c}"></span>` : `<span class="sh-lata" style="--c:${c}"></span>`}</div><b>${n}</b><span class="sh-precio">${p}</span><div class="sh-stock${pc < 25 ? ' poco' : ''}"><i style="--p:${pc}%"></i></div><small>Quedan <span data-n="${u}">${u}</span></small></div>`).join('')}</div>`,
+          .map(([id, n, p, u, pc, c, f], k) => `<div class="sh-prod" data-prod="${id}"><div class="sh-prod__foto">${f === 'bot' ? `<span class="sh-bot" style="--c:${c}"><em>Aceites<br>Sur</em></span>` : `<span class="sh-lata" style="--c:${c}"><em>${id === 'lote' ? 'Regalo' : 'Aliñadas'}</em></span>`}</div><b>${n}</b><span class="sh-precio">${p} <small class="sh-val">★ ${['4,9', '4,8', '5,0', '4,7'][k]} · ${[38, 21, 12, 17][k]} hoy</small></span><div class="sh-stock${pc < 25 ? ' poco' : ''}"><i style="--p:${pc}%"></i></div><small>Quedan <span data-n="${u}">${u}</span></small></div>`).join('')}</div>`,
     },
     entra: {
       ventas: (s) => {
@@ -428,7 +525,8 @@ const num = (n, d = 0) => Number(n).toLocaleString('es-ES', { minimumFractionDig
         gsap.to(q('#sh-punto'), { attr: { cy: pts.at(-1)[1] }, duration: 0.6, ease: 'back.out(2)' });
         gsap.fromTo('#sh-mas', { opacity: 0, y: 8 }, { opacity: 1, y: 0, duration: 0.4, yoyo: true, repeat: 1, repeatDelay: 1.2 });
         a(q('#sh-v'), 1315.9, 2, ' €'); a(q('#sh-p'), 43);
-        avisa('Nueva venta · 31,90 €');
+        ping('Bilbao');
+        avisa('Nueva venta desde Bilbao · 31,90 €');
       },
       cuenta() { qa('.sh-col').forEach((c) => { c.querySelector('header span').textContent = c.querySelectorAll('.sh-ped').length; }); },
       nuevo() {
@@ -468,14 +566,15 @@ const num = (n, d = 0) => Number(n).toLocaleString('es-ES', { minimumFractionDig
       qa('.sh-ped').forEach((p) => p.addEventListener('click', () => A.avanzar(p)));
       qa('.sh-prod').forEach((p) => p.addEventListener('click', () => { if (p.dataset.prod === 'picual') A.stock(); else avisa('Abriría la ficha del producto'); }));
       q('.sh-graf').addEventListener('click', () => A.venta());
+      q('.sh-mapa').addEventListener('click', () => { const c = Object.keys(CIUDADES); ping(c[Math.floor(Math.random() * c.length)]); });
     },
     guion(g) {
       const A = this.acciones;
-      g.esperar(0.4).hacer(() => A.venta()).esperar(1.8)
-        .ir('pedidos').hacer(() => A.nuevo()).esperar(1.2)
+      g.paso('Ventas en directo: cada pedido aparece en el mapa').esperar(0.6).hacer(() => ping('Sevilla')).esperar(1).hacer(() => A.venta()).esperar(1.6).hacer(() => ping('Barcelona')).esperar(1)
+        .paso('El pedido entra en el tablero y se prepara con un toque').ir('pedidos').hacer(() => A.nuevo()).esperar(1.2)
         .clic(() => q('[data-ped="1044"]'), (p) => A.avanzar(p, 'prep')).esperar(1.1)
-        .clic(() => q('[data-ped="1042"]'), (p) => A.avanzar(p, 'env')).esperar(1.6)
-        .ir('productos').esperar(0.4).hacer(() => A.stock()).esperar(2.4)
+        .paso('Al enviarlo se crea la etiqueta del transportista').clic(() => q('[data-ped="1042"]'), (p) => A.avanzar(p, 'env')).esperar(1.6)
+        .paso('El stock baja solo y avisa antes de quedarte sin nada').ir('productos').esperar(0.4).hacer(() => A.stock()).esperar(2.4)
         .ir('ventas').esperar(0.8);
     },
   };
@@ -495,14 +594,20 @@ const num = (n, d = 0) => Number(n).toLocaleString('es-ES', { minimumFractionDig
     main.innerHTML = S.nav.map(([v], i) => `<section class="happ__view${i ? '' : ' on'}" data-v="${v}">${S.vistas[v]}</section>`).join('');
     side.querySelectorAll('.happ__nav').forEach((b) => b.addEventListener('click', () => { abrir(b.dataset.v); const e = b.querySelector('.happ__badge'); if (e) gsap.to(e, { scale: 0, duration: 0.3 }); }));
     S.activar();
-    app.classList.remove('cambia'); void app.offsetWidth; app.classList.add('cambia');
+    if (!quieto && pintar.ya) {
+      gsap.fromTo(body, { clipPath: 'circle(0% at 50% 55%)' }, { clipPath: 'circle(140% at 50% 55%)', duration: 0.9, ease: 'power3.inOut', clearProps: 'clipPath' });
+      gsap.fromTo(main.children, { scale: 0.96 }, { scale: 1, duration: 0.9, ease: 'power3.out', clearProps: 'transform' });
+    }
+    pintar.ya = true;
     toast.classList.remove('on');
   };
 
   /* ---------- Guion: lo que hace el cursor de mentira ---------- */
   const res = (el) => (typeof el === 'function' ? el() : typeof el === 'string' ? q(el) : el);
   const G = (t) => {
+    let n = 0;
     const g = {
+      paso(txt) { const k = ++n; t.call(() => contar_pasos(txt, k, n)); return g; },
       mostrar() { t.to(cursor, { opacity: 1, duration: 0.3 }); return g; },
       ocultar() { t.to(cursor, { opacity: 0, duration: 0.3 }); return g; },
       a(el, dur = 0.8) { t.to(cursor, { x: () => pos(res(el)).x, y: () => pos(res(el)).y, duration: dur, ease: 'power2.inOut' }); return g; },
@@ -519,7 +624,7 @@ const num = (n, d = 0) => Number(n).toLocaleString('es-ES', { minimumFractionDig
     pintar(clave);
     const t = gsap.timeline({ onComplete: () => { if (auto && visible) tl = construir(ORDEN[(ORDEN.indexOf(actual) + 1) % ORDEN.length]); } });
     const g = G(t);
-    g.hacer(() => abrir(S.nav[0][0])).esperar(1.3);
+    g.hacer(() => { abrir(S.nav[0][0]); presenta(); }).esperar(1.3);
     t.set(cursor, { x: () => pos(main).x, y: () => pos(main).y + 40 });
     g.mostrar();
     S.guion(g);
@@ -532,7 +637,7 @@ const num = (n, d = 0) => Number(n).toLocaleString('es-ES', { minimumFractionDig
   const parar = () => { tl?.kill(); tl = null; gsap.to(cursor, { opacity: 0, duration: 0.2 }); };
   const tocado = () => {
     if (quieto) return;
-    auto = false; parar();
+    auto = false; parar(); tuTurno();
     clearTimeout(espera);
     espera = setTimeout(() => { auto = true; arrancar(); }, 9000);
   };
@@ -546,6 +651,18 @@ const num = (n, d = 0) => Number(n).toLocaleString('es-ES', { minimumFractionDig
     document.querySelector('#happ-modo span').textContent = m ? 'Ver en escritorio' : 'Ver en móvil';
     setTimeout(() => window.ScrollTrigger && ScrollTrigger.refresh(), 750);
   });
+  // En directo: academia (conectados y resultados) y tienda (pedidos que caen en el mapa)
+  const FEED = ['Carlos acaba de sacar 27/30 en el Tema 12', 'Lara ha terminado el psicotécnico 4', 'Mario repasa el Tema 15 · 92 %', 'Alba ha subido un puesto en la liga', 'David ha hecho su primer simulacro'];
+  let nFeed = 0;
+  setInterval(() => {
+    if (!visible) return;
+    const f = document.getElementById('ac-feed');
+    if (f) {
+      gsap.to(f, { y: -8, opacity: 0, duration: 0.25, onComplete: () => { f.textContent = FEED[nFeed++ % FEED.length]; gsap.fromTo(f, { y: 8, opacity: 0 }, { y: 0, opacity: 1, duration: 0.3 }); } });
+      const c = document.getElementById('ac-conect'); if (c) c.textContent = 21 + Math.floor(Math.random() * 6);
+    }
+    if (actual === 'tienda' && q('.happ__view[data-v="ventas"].on')) { const c = Object.keys(CIUDADES); ping(c[Math.floor(Math.random() * c.length)]); }
+  }, 2600);
   // Cuenta atrás del simulacro (academia)
   let fin = Date.now() + ((2 * 24 + 14) * 3600 + 32 * 60 + 10) * 1000;
   setInterval(() => {
