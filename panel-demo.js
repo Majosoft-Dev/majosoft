@@ -1,6 +1,6 @@
 /* =====================================================================
    Panel de la portada: cuatro productos de ejemplo, cada uno con su diseño
-   (alojamiento, clínica, academia y tienda online). Un cursor de mentira los
+   (alojamiento, clínica, academia y restaurante). Un cursor de mentira los
    usa solos; en cada vuelta se pasa al siguiente negocio. Si alguien lo toca,
    se para y le deja usarlo; a los 9 s sin tocar, sigue solo.
    Todos los datos son inventados.
@@ -455,131 +455,128 @@ const num = (n, d = 0) => Number(n).toLocaleString('es-ES', { minimumFractionDig
   };
 
   /* =================================================================
-     4 · TIENDA ONLINE — Aceites Sur: carril de iconos, verde y oro
+     4 · RESTAURANTE — La Alacena: barra superior de TPV, tomate y tinta
   ================================================================= */
-  const VENTAS = [20, 35, 28, 60, 72, 55, 80, 96, 88, 110, 104, 120];
-  const curva = (v) => { const max = 140, w = 300, h = 120; return v.map((y, i) => [i * (w / (v.length - 1)), h - (y / max) * h]); };
-  const camino = (pts) => pts.map(([x, y], i) => (i ? 'L' : 'M') + x.toFixed(1) + ' ' + y.toFixed(1)).join('');
-  const PED = { nuevos: [['1044', 'Eva M.', '5 l · Picual', '42,50 €'], ['1045', 'Juan L.', '3 botellas', '29,70 €'], ['1046', 'Sonia P.', 'Lote regalo', '39,90 €']], prep: [['1042', 'Ana R.', '2 botellas', '19,80 €'], ['1043', 'Toni B.', 'Lote regalo', '39,90 €']], env: [['1040', 'Rafa C.', 'Arbequina 1 l', '16,50 €', 'MRW · en camino'], ['1041', 'Pilar G.', '6 botellas', '59,40 €', 'SEUR · entregado']] };
-  // Mapa de puntos de España (contorno aproximado de la península, sin Portugal)
-  const CONTORNO = [[8, 10], [18, 6], [30, 8], [45, 9], [55, 10], [62, 12], [70, 16], [80, 18], [90, 20], [93, 26], [86, 34], [80, 42], [76, 50], [78, 56], [72, 64], [66, 70], [58, 74], [46, 78], [36, 80], [30, 74], [24, 68], [22, 62], [26, 54], [22, 44], [24, 36], [18, 30], [14, 26], [10, 22], [6, 16]];
-  const dentro = (x, y) => { let si = false; for (let i = 0, k = CONTORNO.length - 1; i < CONTORNO.length; k = i++) { const [xi, yi] = CONTORNO[i], [xk, yk] = CONTORNO[k]; if ((yi > y) !== (yk > y) && x < ((xk - xi) * (y - yi)) / (yk - yi) + xi) si = !si; } return si; };
-  let MAPA = '';
-  for (let y = 4; y < 84; y += 3.4) for (let x = 3; x < 98; x += 3.4) if (dentro(x, y)) MAPA += `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="1.05"/>`;
-  const CIUDADES = { Madrid: [48, 42], Barcelona: [86, 30], Valencia: [74, 50], Sevilla: [32, 68], Bilbao: [55, 13], 'Jaén': [48, 64], 'A Coruña': [11, 11], 'Málaga': [44, 75], Zaragoza: [66, 28], Murcia: [68, 62] };
-  const ping = (ciudad) => {
-    const m = q('#sh-mapa'); if (!m) return;
-    const [x, y] = CIUDADES[ciudad], ns = 'http://www.w3.org/2000/svg';
-    const g = document.createElementNS(ns, 'g'); g.setAttribute('class', 'sh-ping');
-    g.innerHTML = `<circle class="onda" cx="${x}" cy="${y}" r="2"/><circle class="centro" cx="${x}" cy="${y}" r="1.9"/>`;
-    m.append(g);
-    gsap.fromTo(g.querySelector('.onda'), { attr: { r: 2 }, opacity: 0.9 }, { attr: { r: 11 }, opacity: 0, duration: 1.4, ease: 'power2.out', repeat: 1 });
-    gsap.from(g.querySelector('.centro'), { attr: { r: 0 }, duration: 0.4, ease: 'back.out(3)' });
-    gsap.to(g, { opacity: 0, duration: 1, delay: 4, onComplete: () => g.remove() });
-    const u = q('#sh-ult'); if (u) u.textContent = `Último: ${ciudad} · ahora mismo`;
-  };
-  const ped = ([n, c, d, p, e]) => `<div class="sh-ped" data-ped="${n}"><b><span>#${n}</span><span>${p}</span></b><span>${c} · ${d}</span>${e ? `<i>${e}</i>` : ''}</div>`;
-  const tienda = {
-    tema: 'shop', para: 'una tienda de aceite', url: 'admin.aceitessur.es', negocio: 'Aceites Sur', sub: 'Tienda online', logo: 'A', ini: 'MC', usuario: 'Marta C.',
-    nav: [['ventas', 'Ventas', 'grafica'], ['pedidos', 'Pedidos', 'caja', 3], ['productos', 'Productos', 'etiqueta']],
+  // Mesas: [id, número, x %, y %, forma, plazas, estado, dato]
+  const MESAS = [
+    ['m1', 1, 9, 30, 'red', 2, 'libre'], ['m2', 2, 25, 30, 'red', 2, 'cuenta', '64,80 €'], ['m3', 3, 42, 30, 'cua', 4, 'ocup', 38], ['m4', 4, 59, 30, 'cua', 4, 'ocup', 12],
+    ['m5', 5, 12, 72, 'lar', 6, 'resv', '21:30'], ['m6', 6, 36, 72, 'cua', 4, 'libre'], ['m7', 7, 53, 72, 'cua', 4, 'libre'], ['m8', 8, 70, 72, 'red', 2, 'ocup', 55],
+    ['t1', 'T1', 88, 30, 'red', 2, 'libre'], ['t2', 'T2', 88, 72, 'red', 2, 'ocup', 21],
+  ];
+  const mesa = ([id, n, x, y, f, p, e, d]) => `<button type="button" class="re-mesa re-mesa--${f} re-${e}" data-m="${id}" style="--x:${x}%;--y:${y}%"><b>${n}</b><small>${e === 'ocup' ? `<span data-min="${d}">${d}</span> min` : e === 'resv' ? d : e === 'cuenta' ? 'Cuenta' : p + ' pl.'}</small>${'<i></i>'.repeat(p)}</button>`;
+  const COMANDA = { m3: [['2', 'Croquetas de jamón', '14,00'], ['1', 'Salmorejo', '7,50'], ['2', 'Rabo de toro', '36,00'], ['1', 'Rioja crianza', '18,00']], m2: [['1', 'Ensalada de perdiz', '12,50'], ['2', 'Presa ibérica', '39,00'], ['1', 'Tarta de queso', '6,50'], ['2', 'Cañas', '6,80']] };
+  const ticket = (m, min, items, nuevo) => `<div class="re-tk${nuevo ? ' re-tk--nuevo' : ''}" data-tk="${m}"><header><b>Mesa ${m}</b><span class="re-tk__t" data-min="${min}">${min} min</span></header><ul>${items.map(([c, n, h]) => `<li class="${h ? 'hecho' : ''}"><i></i><span>${c}× ${n}</span></li>`).join('')}</ul><div class="re-tk__barra"><i style="--p:${Math.min(100, min * 4)}%"></i></div></div>`;
+  const restaurante = {
+    tema: 'rest', para: 'un restaurante', url: 'tpv.laalacena.es', negocio: 'La Alacena', sub: 'Restaurante', logo: 'A', ini: 'PG', usuario: 'Paco G.',
+    nav: [['sala', 'Sala', 'panel'], ['cocina', 'Cocina', 'campana', 2], ['reservas', 'Reservas', 'cal'], ['carta', 'Carta', 'etiqueta']],
     vistas: {
-      ventas: `<header class="hp-head"><div><small>Hoy, martes 25</small><h4>Ventas</h4></div><div class="hp-seg"><span class="on">Hoy</span><span>Semana</span><span>Mes</span></div></header>
-        <div class="sh-kpis">
-          <div class="sh-kpi"><small>Ventas de hoy</small><b data-n="1284" data-suf=" €" id="sh-v">1.284 €</b><em>▲ 24 % que el martes pasado</em></div>
-          <div class="sh-kpi"><small>Pedidos</small><b data-n="42" id="sh-p">42</b><em>5 por enviar</em></div>
-          <div class="sh-kpi"><small>Ticket medio</small><b data-n="30.57" data-d="2" data-suf=" €">30,57 €</b><em>▲ 2,10 €</em></div>
-        </div>
-        <div class="sh-ventas">
-          <div class="hp-card sh-graf"><small>Ventas por hora</small><span class="sh-mas" id="sh-mas">+31,90 €</span>
-            <svg viewBox="0 0 300 120" preserveAspectRatio="none"><defs><linearGradient id="sh-deg" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#c9a227" stop-opacity=".35"/><stop offset="1" stop-color="#c9a227" stop-opacity="0"/></linearGradient></defs>
-              <g class="rejilla"><line x1="0" x2="300" y1="30" y2="30"/><line x1="0" x2="300" y1="60" y2="60"/><line x1="0" x2="300" y1="90" y2="90"/></g>
-              <path class="area" id="sh-area"/><path class="linea" id="sh-linea"/><circle class="punto" id="sh-punto" r="4"/></svg></div>
-          <div class="hp-card sh-mapa"><small>Pedidos en directo</small><svg viewBox="0 0 100 84" id="sh-mapa">${MAPA}</svg><span class="sh-mapa__ult" id="sh-ult">Último: Madrid · hace 2 min</span></div>
+      sala: `<header class="hp-head"><div><small>Martes 25 · turno de cena</small><h4>Sala</h4></div><div class="re-pills"><span><i class="ve"></i><b id="re-ocup">5</b>/10 mesas</span><span>Caja <b id="re-caja" data-n="1240" data-suf=" €">1.240 €</b></span></div></header>
+        <div class="re-sala-grid">
+          <div class="re-plano"><span class="re-barra">Barra</span><span class="re-cocina">Cocina</span><span class="re-terraza">Terraza</span>${MESAS.map(mesa).join('')}
+            <div class="re-ley"><span class="l">Libre</span><span class="o">Ocupada</span><span class="r">Reservada</span><span class="c">Pide la cuenta</span></div></div>
+          <div class="re-det" id="re-det"></div>
         </div>`,
-      pedidos: `<header class="hp-head"><div><small>Pulsa un pedido para avanzarlo</small><h4>Pedidos</h4></div></header>
-        <div class="sh-kanban">${[['nuevos', 'Nuevos'], ['prep', 'Preparando'], ['env', 'Enviados']].map(([k, t]) => `<div class="sh-col" data-col="${k}"><header>${t}<span>${PED[k].length}</span></header>${PED[k].map(ped).join('')}</div>`).join('')}</div>`,
-      productos: `<header class="hp-head"><div><small>4 productos · 1 con poco stock</small><h4>Productos</h4></div><button type="button" class="hp-btn">+ Producto</button></header>
-        <div class="sh-prods">${[['picual', 'Picual 500 ml', '9,90 €', 48, 64, '#b58a1e', 'bot'], ['arbequina', 'Arbequina 1 l', '16,50 €', 30, 40, '#7d8f3a', 'bot'], ['lote', 'Lote regalo', '39,90 €', 9, 22, '#8a3b2a', 'lata'], ['aceitunas', 'Aceitunas aliñadas', '4,50 €', 120, 80, '#6f8a2e', 'lata']]
-          .map(([id, n, p, u, pc, c, f], k) => `<div class="sh-prod" data-prod="${id}"><div class="sh-prod__foto">${f === 'bot' ? `<span class="sh-bot" style="--c:${c}"><em>Aceites<br>Sur</em></span>` : `<span class="sh-lata" style="--c:${c}"><em>${id === 'lote' ? 'Regalo' : 'Aliñadas'}</em></span>`}</div><b>${n}</b><span class="sh-precio">${p} <small class="sh-val">★ ${['4,9', '4,8', '5,0', '4,7'][k]} · ${[38, 21, 12, 17][k]} hoy</small></span><div class="sh-stock${pc < 25 ? ' poco' : ''}"><i style="--p:${pc}%"></i></div><small>Quedan <span data-n="${u}">${u}</span></small></div>`).join('')}</div>`,
+      cocina: `<header class="hp-head"><div><small>3 comandas en marcha · tiempo medio 14 min</small><h4>Cocina</h4></div><div class="hp-seg"><span class="on">En marcha</span><span>Servidas</span></div></header>
+        <div class="re-kds" id="re-kds">
+          ${ticket(3, 9, [['2', 'Rabo de toro'], ['1', 'Presa ibérica'], ['1', 'Salmorejo', 1]])}
+          ${ticket(8, 16, [['1', 'Huevos rotos', 1], ['1', 'Lagarto ibérico'], ['2', 'Patatas a lo pobre', 1]])}
+          ${ticket('T2', 4, [['2', 'Ensalada de perdiz'], ['1', 'Croquetas de jamón']])}
+        </div>`,
+      reservas: `<header class="hp-head"><div><small>Esta noche · 38 comensales de 60</small><h4>Reservas</h4></div><button type="button" class="hp-btn" data-a="reserva">+ Reserva</button></header>
+        <div class="re-res" id="re-res">${[['20:30', 10, [['Familia Ruiz', 4, 'Teléfono'], ['Ana y Luis', 2, 'Web']]], ['21:00', 18, [['Empresa Olivar', 8, 'Correo'], ['Marta G.', 2, 'Google'], ['Jorge P.', 4, 'Web']]], ['21:30', 8, [['Cumpleaños Sara', 6, 'Web'], ['Pablo R.', 2, 'Teléfono']]], ['22:00', 2, [['Inés y Leo', 2, 'Google']]], ['22:30', 0, []]]
+          .map(([h, pax, rs]) => `<div class="re-hora" data-h="${h}"><b>${h}</b><div class="re-cap"><i style="--p:${Math.round(pax / 20 * 100)}%"></i><span><strong data-n="${pax}">${pax}</strong>/20</span></div><div class="re-chips">${rs.map(([n, p, o]) => `<span class="re-chip"><b>${n}</b>${p} pers.<em>${o}</em></span>`).join('') || '<span class="re-vacia">Libre · ideal para grupos</span>'}</div></div>`).join('')}</div>`,
+      carta: `<header class="hp-head"><div><small>Carta online y QR de las mesas</small><h4>Carta</h4></div><div class="hp-seg"><span class="on">Platos</span><span>Vinos</span><span>Postres</span></div></header>
+        <div class="re-carta">${[['rabo', '🍲', 'Rabo de toro', '18,00 €', 14, '#e4572e'], ['croq', '🥘', 'Croquetas de jamón', '7,00 €', 31, '#f2b544'], ['salm', '🍅', 'Salmorejo', '7,50 €', 22, '#e86a4a'], ['presa', '🥩', 'Presa ibérica', '19,50 €', 17, '#b5483b'], ['perdiz', '🥗', 'Ensalada de perdiz', '12,50 €', 9, '#6f9a4e'], ['tarta', '🍰', 'Tarta de queso', '6,50 €', 26, '#e8b86a']]
+          .map(([id, e, n, p, v, c]) => `<div class="re-plato" data-pl="${id}"><span class="re-plato__foto" style="--c:${c}">${e}</span><div><b>${n}</b><span>${p} · ${v} hoy</span></div><button type="button" class="ha-sw on" aria-label="Disponible"></button><em class="re-agotado">Agotado</em></div>`).join('')}</div>`,
     },
     entra: {
-      ventas: (s) => {
-        VENTAS[VENTAS.length - 1] = 120;
-        contar(s);
-        const pts = curva(VENTAS), d = camino(pts);
-        const L = s.querySelector('#sh-linea'), A = s.querySelector('#sh-area'), P = s.querySelector('#sh-punto');
-        L.setAttribute('d', d); A.setAttribute('d', d + 'L300 120L0 120Z');
-        P.setAttribute('cx', pts.at(-1)[0]); P.setAttribute('cy', pts.at(-1)[1]);
-        gsap.fromTo(L, { strokeDasharray: 600, strokeDashoffset: 600 }, { strokeDashoffset: 0, duration: 1.4, ease: 'power2.out' });
-        gsap.fromTo(A, { opacity: 0 }, { opacity: 1, duration: 1, delay: 0.5 });
-        gsap.fromTo(P, { scale: 0, transformOrigin: 'center' }, { scale: 1, duration: 0.4, delay: 1.3, ease: 'back.out(3)' });
-      },
-      pedidos: (s) => gsap.from(s.querySelectorAll('.sh-ped'), { opacity: 0, y: 10, stagger: 0.04, duration: 0.35 }),
-      productos: (s) => gsap.from(s.querySelectorAll('.sh-prod'), { opacity: 0, y: 12, stagger: 0.07, duration: 0.4 }),
+      sala: (s) => { contar(s); gsap.from(s.querySelectorAll('.re-mesa'), { scale: 0.6, opacity: 0, stagger: 0.04, duration: 0.4, ease: 'back.out(2)', clearProps: 'transform,opacity' }); restaurante.acciones.detalle('m3'); },
+      cocina: (s) => gsap.from(s.querySelectorAll('.re-tk'), { y: 16, opacity: 0, stagger: 0.08, duration: 0.4 }),
+      reservas: (s) => { gsap.fromTo(s.querySelectorAll('.re-cap i'), { scaleX: 0 }, { scaleX: 1, stagger: 0.06, duration: 0.7, ease: 'power3.out' }); gsap.from(s.querySelectorAll('.re-chip'), { opacity: 0, x: -8, stagger: 0.04, duration: 0.3 }); },
+      carta: (s) => gsap.from(s.querySelectorAll('.re-plato'), { opacity: 0, y: 10, stagger: 0.05, duration: 0.35 }),
     },
     acciones: {
-      venta() {
-        VENTAS[VENTAS.length - 1] = 134;
-        const pts = curva(VENTAS), d = camino(pts);
-        q('#sh-linea').setAttribute('d', d); q('#sh-area').setAttribute('d', d + 'L300 120L0 120Z');
-        gsap.to(q('#sh-punto'), { attr: { cy: pts.at(-1)[1] }, duration: 0.6, ease: 'back.out(2)' });
-        gsap.fromTo('#sh-mas', { opacity: 0, y: 8 }, { opacity: 1, y: 0, duration: 0.4, yoyo: true, repeat: 1, repeatDelay: 1.2 });
-        a(q('#sh-v'), 1315.9, 2, ' €'); a(q('#sh-p'), 43);
-        ping('Bilbao');
-        avisa('Nueva venta desde Bilbao · 31,90 €');
+      detalle(id) {
+        const m = MESAS.find((x) => x[0] === id), el = q(`[data-m="${id}"]`), d = q('#re-det');
+        qa('.re-mesa').forEach((x) => x.classList.toggle('sel', x === el));
+        const est = el.classList.contains('re-ocup') ? 'ocup' : el.classList.contains('re-cuenta') ? 'cuenta' : el.classList.contains('re-resv') ? 'resv' : 'libre';
+        const items = COMANDA[id] || (est === 'ocup' ? [['2', 'Cañas', '6,80'], ['1', 'Tabla de quesos', '14,00']] : []);
+        const total = items.reduce((s, [c, , p]) => s + parseFloat(p.replace(',', '.')), 0);
+        d.innerHTML = `<header><b>Mesa ${m[1]}</b><span class="re-st re-st--${est}">${{ libre: 'Libre', ocup: 'Ocupada', cuenta: 'Pide la cuenta', resv: 'Reservada' }[est]}</span></header>
+          <small>${m[5]} plazas${est === 'ocup' ? ' · ' + (el.querySelector('[data-min]')?.textContent || 0) + ' min' : ''}${est === 'resv' ? ' · ' + m[7] + ' · Cumpleaños Sara' : ''}</small>
+          ${items.length ? `<ul class="re-com">${items.map(([c, n, p]) => `<li><span>${c}×</span><b>${n}</b><em>${p} €</em></li>`).join('')}</ul><div class="re-total"><span>Total</span><b>${num(total, 2)} €</b></div>` : `<div class="re-vacio">${est === 'resv' ? 'Se libera a las 21:15 si no llegan' : 'Mesa libre. Pulsa para sentar a un grupo.'}</div>`}
+          <div class="re-acc">${est === 'libre' ? '<button type="button" class="hp-btn" data-a="sentar">Sentar 4 personas</button>' : est === 'cuenta' ? '<button type="button" class="hp-btn" data-a="cobrar">Cobrar ' + num(total, 2) + ' €</button>' : est === 'ocup' ? '<button type="button" class="hp-btn re-sec" data-a="comanda">+ Comanda</button><button type="button" class="hp-btn" data-a="cuenta">Cuenta</button>' : '<button type="button" class="hp-btn re-sec">Avisar por WhatsApp</button>'}</div>`;
+        gsap.from(d.children, { opacity: 0, y: 6, stagger: 0.04, duration: 0.3 });
+        d.querySelector('[data-a="sentar"]')?.addEventListener('click', () => restaurante.acciones.sentar(id));
+        d.querySelector('[data-a="cobrar"]')?.addEventListener('click', () => restaurante.acciones.cobrar(id));
+        d.querySelector('[data-a="cuenta"]')?.addEventListener('click', () => { el.className = el.className.replace('re-ocup', 're-cuenta'); el.querySelector('small').textContent = 'Cuenta'; restaurante.acciones.detalle(id); });
       },
-      cuenta() { qa('.sh-col').forEach((c) => { c.querySelector('header span').textContent = c.querySelectorAll('.sh-ped').length; }); },
-      nuevo() {
-        if (q('[data-ped="1047"]')) return;
-        const col = q('[data-col="nuevos"]'), tmp = document.createElement('div');
-        tmp.innerHTML = ped(['1047', 'Lucía V.', '2 botellas', '31,90 €']); const p = tmp.firstChild;
-        col.querySelector('header').after(p); gsap.from(p, { opacity: 0, y: -18, duration: 0.5, ease: 'back.out(2)' }); brilla(p);
-        p.addEventListener('click', () => tienda.acciones.avanzar(p));
-        this.cuenta(); avisa('Pedido #1047 · 31,90 €');
+      sentar(id = 'm7') {
+        const el = q(`[data-m="${id}"]`); if (!el.classList.contains('re-libre')) return;
+        el.classList.replace('re-libre', 're-ocup'); el.querySelector('small').innerHTML = '<span data-min="0">0</span> min';
+        gsap.fromTo(el, { scale: 1.25 }, { scale: 1, duration: 0.6, ease: 'elastic.out(1, .5)', clearProps: 'transform' });
+        const o = q('#re-ocup'); o.textContent = +o.textContent + 1;
+        this.detalle(id); avisa(`Mesa ${id.slice(1)} · 4 personas sentadas`);
       },
-      avanzar(p, destino) {
-        const de = p.closest('.sh-col').dataset.col;
-        destino ||= de === 'nuevos' ? 'prep' : de === 'prep' ? 'env' : null;
-        if (!destino) return;
-        p.classList.add('vuela');
-        flip(p, () => {
-          const col = q(`[data-col="${destino}"]`); col.querySelector('header').after(p);
-          if (destino === 'env') { p.querySelector('i')?.remove(); p.insertAdjacentHTML('beforeend', '<i>MRW · etiqueta creada</i>'); }
-        }, 0.7);
-        setTimeout(() => p.classList.remove('vuela'), 750);
-        this.cuenta();
-        avisa(destino === 'env' ? `#${p.dataset.ped} enviado · etiqueta MRW creada` : `#${p.dataset.ped} en preparación`);
-        if (destino === 'prep') this.stock(2);
+      cobrar(id = 'm2') {
+        const el = q(`[data-m="${id}"]`); if (!el.classList.contains('re-cuenta')) return;
+        el.classList.replace('re-cuenta', 're-libre'); el.querySelector('small').textContent = '2 pl.';
+        confeti(el, ['#e4572e', '#2a9d8f', '#f2b544', '#fff']);
+        a(q('#re-caja'), 1309.8, 0, ' €'); const o = q('#re-ocup'); o.textContent = +o.textContent - 1;
+        this.detalle(id); avisa('Mesa 2 cobrada · 64,80 € + 5 € de propina');
       },
-      stock(menos = 42) {
-        const pr = q('[data-prod="picual"]'), n = pr.querySelector('[data-n]'), quedan = Math.max(3, +n.dataset.n - menos);
-        a(n, quedan, 0, '', 1.2); pr.querySelector('.sh-stock i').style.setProperty('--p', (quedan / 75 * 100) + '%');
-        if (quedan < 10) {
-          pr.querySelector('.sh-stock').classList.add('poco');
-          if (!pr.querySelector('.sh-prod__foto .st')) { pr.querySelector('.sh-prod__foto').insertAdjacentHTML('beforeend', '<span class="st">Quedan pocas</span>'); brilla(pr); }
-          setTimeout(() => avisa('Aviso: reponer Picual 500 ml'), 900);
-        }
+      comanda() {
+        if (q('[data-tk="7"]')) return;
+        const k = q('#re-kds'); k.insertAdjacentHTML('beforeend', ticket(7, 0, [['2', 'Croquetas de jamón'], ['2', 'Salmorejo'], ['4', 'Presa ibérica']], true));
+        const t = k.lastElementChild; gsap.from(t, { x: 40, opacity: 0, duration: 0.5, ease: 'back.out(1.6)' }); brilla(t);
+        avisa('Comanda de la mesa 7 en cocina');
+      },
+      marcar() {
+        const tk = q('[data-tk="3"]'); if (!tk) return Promise.resolve();
+        const pend = [...tk.querySelectorAll('li:not(.hecho)')];
+        return pend.reduce((p, li) => p.then(() => tras(550).then(() => { li.classList.add('hecho'); gsap.from(li.querySelector('i'), { scale: 0, duration: 0.3, ease: 'back.out(3)' }); })), Promise.resolve())
+          .then(() => tras(300)).then(() => {
+            tk.classList.add('listo'); tk.querySelector('.re-tk__t').textContent = '¡Listo!';
+            avisa('🔔 Mesa 3: ¡a servir!');
+            return tras(1200).then(() => new Promise((ok) => gsap.to(tk, { y: -20, opacity: 0, duration: 0.4, onComplete: () => { flip([...q('#re-kds').children].filter((x) => x !== tk), () => tk.remove(), 0.5); ok(); } })));
+          });
+      },
+      reserva() {
+        const h = q('.re-hora[data-h="21:30"]'); if (h.querySelector('.nueva')) return;
+        const c = document.createElement('span'); c.className = 're-chip nueva'; c.innerHTML = '<b>Laura M.</b>6 pers.<em>Google</em>';
+        h.querySelector('.re-chips').prepend(c); gsap.from(c, { scale: 0.6, opacity: 0, duration: 0.5, ease: 'back.out(2.5)' }); brilla(c);
+        const st = h.querySelector('[data-n]'); a(st, 14); h.querySelector('.re-cap i').style.setProperty('--p', '70%');
+        avisa('Nueva reserva desde Google · 6 personas, 21:30');
+      },
+      agotar(id = 'rabo') {
+        const p = q(`[data-pl="${id}"]`); if (!p || p.classList.contains('agotado')) return;
+        p.classList.add('agotado'); p.querySelector('.ha-sw').classList.remove('on');
+        gsap.from(p.querySelector('.re-agotado'), { scale: 1.8, opacity: 0, rotation: -12, duration: 0.45, ease: 'back.out(2)' });
+        avisa('Quitado de la carta online y del QR de las mesas');
       },
     },
     activar() {
       const A = this.acciones;
-      qa('.sh-ped').forEach((p) => p.addEventListener('click', () => A.avanzar(p)));
-      qa('.sh-prod').forEach((p) => p.addEventListener('click', () => { if (p.dataset.prod === 'picual') A.stock(); else avisa('Abriría la ficha del producto'); }));
-      q('.sh-graf').addEventListener('click', () => A.venta());
-      q('.sh-mapa').addEventListener('click', () => { const c = Object.keys(CIUDADES); ping(c[Math.floor(Math.random() * c.length)]); });
+      qa('.re-mesa').forEach((m) => m.addEventListener('click', () => A.detalle(m.dataset.m)));
+      q('[data-a="reserva"]').addEventListener('click', () => A.reserva());
+      qa('.re-plato').forEach((p) => p.addEventListener('click', () => (p.classList.contains('agotado') ? (p.classList.remove('agotado'), p.querySelector('.ha-sw').classList.add('on'), avisa('Vuelve a estar disponible')) : A.agotar(p.dataset.pl))));
+      qa('.re-tk').forEach((t) => t.addEventListener('click', () => { const li = t.querySelector('li:not(.hecho)'); if (li) li.classList.add('hecho'); }));
     },
     guion(g) {
       const A = this.acciones;
-      g.paso('Ventas en directo: cada pedido aparece en el mapa').esperar(0.6).hacer(() => ping('Sevilla')).esperar(1).hacer(() => A.venta()).esperar(1.6).hacer(() => ping('Barcelona')).esperar(1)
-        .paso('El pedido entra en el tablero y se prepara con un toque').ir('pedidos').hacer(() => A.nuevo()).esperar(1.2)
-        .clic(() => q('[data-ped="1044"]'), (p) => A.avanzar(p, 'prep')).esperar(1.1)
-        .paso('Al enviarlo se crea la etiqueta del transportista').clic(() => q('[data-ped="1042"]'), (p) => A.avanzar(p, 'env')).esperar(1.6)
-        .paso('El stock baja solo y avisa antes de quedarte sin nada').ir('productos').esperar(0.4).hacer(() => A.stock()).esperar(2.4)
-        .ir('ventas').esperar(0.8);
+      g.paso('Llega un grupo: se sienta en una mesa libre con un toque').clic('[data-m="m7"]', () => A.detalle('m7')).esperar(0.5)
+        .clic('[data-a="sentar"]', () => A.sentar('m7')).esperar(1.3)
+        .paso('La mesa 2 pide la cuenta: se cobra desde el plano').clic('[data-m="m2"]', () => A.detalle('m2')).esperar(0.5)
+        .clic('[data-a="cobrar"]', () => A.cobrar('m2')).esperar(1.6)
+        .paso('La comanda llega sola a la pantalla de cocina').ir('cocina').hacer(() => A.comanda()).esperar(1.2)
+        .paso('Cuando todo está listo, avisa para servir').pausa(() => A.marcar()).esperar(0.8)
+        .paso('Entra una reserva desde Google y se coloca en su hora').ir('reservas').esperar(0.4).hacer(() => A.reserva()).esperar(1.8)
+        .paso('Se acaba un plato: desaparece de la carta del QR al momento').ir('carta').clic('[data-pl="rabo"] .ha-sw', () => A.agotar('rabo')).esperar(1.8)
+        .ir('sala').esperar(0.8);
     },
   };
 
-  const SECTORES = { alojamiento, clinica, academia, tienda };
+  const SECTORES = { alojamiento, clinica, academia, restaurante };
   const ORDEN = Object.keys(SECTORES);
 
   /* ---------- Pintar un negocio entero ---------- */
@@ -651,7 +648,7 @@ const num = (n, d = 0) => Number(n).toLocaleString('es-ES', { minimumFractionDig
     document.querySelector('#happ-modo span').textContent = m ? 'Ver en escritorio' : 'Ver en móvil';
     setTimeout(() => window.ScrollTrigger && ScrollTrigger.refresh(), 750);
   });
-  // En directo: academia (conectados y resultados) y tienda (pedidos que caen en el mapa)
+  // En directo: academia (conectados y resultados) y restaurante (los minutos corren)
   const FEED = ['Carlos acaba de sacar 27/30 en el Tema 12', 'Lara ha terminado el psicotécnico 4', 'Mario repasa el Tema 15 · 92 %', 'Alba ha subido un puesto en la liga', 'David ha hecho su primer simulacro'];
   let nFeed = 0;
   setInterval(() => {
@@ -661,7 +658,11 @@ const num = (n, d = 0) => Number(n).toLocaleString('es-ES', { minimumFractionDig
       gsap.to(f, { y: -8, opacity: 0, duration: 0.25, onComplete: () => { f.textContent = FEED[nFeed++ % FEED.length]; gsap.fromTo(f, { y: 8, opacity: 0 }, { y: 0, opacity: 1, duration: 0.3 }); } });
       const c = document.getElementById('ac-conect'); if (c) c.textContent = 21 + Math.floor(Math.random() * 6);
     }
-    if (actual === 'tienda' && q('.happ__view[data-v="ventas"].on')) { const c = Object.keys(CIUDADES); ping(c[Math.floor(Math.random() * c.length)]); }
+    // Restaurante: los minutos de mesas y comandas van corriendo
+    if (actual === 'restaurante') main.querySelectorAll('[data-min]').forEach((m) => {
+      const v = +m.dataset.min + 1; m.dataset.min = v; m.textContent = m.closest('.re-tk') ? v + ' min' : v;
+      const tk = m.closest('.re-tk'); if (tk && !tk.classList.contains('listo')) { tk.querySelector('.re-tk__barra i').style.setProperty('--p', Math.min(100, v * 4) + '%'); tk.classList.toggle('tarde', v >= 15); }
+    });
   }, 2600);
   // Cuenta atrás del simulacro (academia)
   let fin = Date.now() + ((2 * 24 + 14) * 3600 + 32 * 60 + 10) * 1000;
