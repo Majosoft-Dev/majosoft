@@ -83,9 +83,10 @@
   <!-- Inter -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Just+Another+Hand&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Just+Another+Hand&family=Instrument+Serif:ital@0;1&family=Anton&family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet" />
 
   <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="panel-demo.css" />
 </head>
 
 <body class="bg-cream text-ink font-sans antialiased selection:bg-[#d6e022]/60">
@@ -142,7 +143,7 @@
 
   <main>
     <!-- HERO -->
-    <section id="inicio" class="relative min-h-screen flex items-center pt-32 pb-20 overflow-hidden">
+    <section id="inicio" class="relative flex flex-col items-center pt-32 md:pt-40 pb-16 md:pb-24 overflow-hidden">
       <div class="hero-wrap mx-auto px-5 w-full text-center">
 
         <div class="reveal hero-eyebrow">
@@ -174,7 +175,32 @@
         </div>
       </div>
 
-      <a href="#servicios" class="scroll-cue" aria-label="Desplázate"><span></span></a>
+      <!-- Producto vivo: cuatro paneles de ejemplo, cada uno con su diseño, que se usan solos
+           (y se pueden tocar). Los pinta panel-demo.js; sin JS no se muestran. -->
+      <div class="happ-wrap" id="happ-wrap">
+        <div class="happ-sectores" role="group" aria-label="Pruébalo con tu negocio">
+          <span>Pruébalo con tu negocio:</span>
+          <button type="button" class="on" data-s="alojamiento">Alojamiento</button>
+          <button type="button" data-s="clinica">Clínica</button>
+          <button type="button" data-s="academia">Academia</button>
+          <button type="button" data-s="tienda">Tienda online</button>
+        </div>
+        <div class="happ" id="happ" aria-label="Demostración: panel de gestión hecho a medida">
+          <div class="happ__bar">
+            <span class="wdot"></span><span class="wdot"></span><span class="wdot"></span>
+            <span class="happ__url"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg><span id="happ-url"></span></span>
+            <span class="happ__live"><i></i>Demo en vivo</span>
+            <button type="button" class="happ__modo" id="happ-modo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="7" y="2" width="10" height="20" rx="2"/><path d="M11 18h2"/></svg><span>Ver en móvil</span></button>
+          </div>
+          <div class="happ__body">
+            <aside class="happ__side"></aside>
+            <div class="happ__main"></div>
+            <div class="happ__toast" id="happ-toast"><i>✓</i><span></span></div>
+            <div class="happ__cursor" id="happ-cursor" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M5 3l14 8-6 1.5L10 19z" fill="#15161a" stroke="#fff" stroke-width="1.5" stroke-linejoin="round"/></svg></div>
+          </div>
+        </div>
+        <p class="happ-nota">Esto no es un vídeo: son paneles de verdad, hechos como los que hacemos. Tócalos.</p>
+      </div>
     </section>
 
     <!-- MARQUEE -->
@@ -220,6 +246,12 @@
             <span class="svc__icon">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
             </span>
+                      <div class="svc__demo demo-web" aria-hidden="true">
+              <div class="dw-bar"><i></i><i></i><i></i><span>tuweb.es</span></div>
+              <div class="dw-nav"><span>Inicio</span><span>Reservas</span><b class="dw-pill"></b></div>
+              <div class="dw-pag dw-pag--a"><span class="dw-h"></span><span class="dw-p"></span><span class="dw-btn"></span><div class="dw-cards"><i></i><i></i><i></i></div></div>
+              <div class="dw-pag dw-pag--b"><span class="dw-h dw-h--corta"></span><div class="dw-cal"><i></i><i></i><i class="on"></i><i></i><i></i><i></i><i></i><i></i><i class="on"></i><i></i></div><span class="dw-btn"></span></div>
+            </div>
           </article>
 
           <article class="reveal svc">
@@ -232,6 +264,14 @@
             <span class="svc__icon">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="2" width="14" height="20" rx="2.5"/><line x1="10.5" y1="18" x2="13.5" y2="18"/></svg>
             </span>
+                      <div class="svc__demo demo-app" aria-hidden="true">
+              <div class="da-movil">
+                <div class="da-noti"><b>●</b><span><strong>Reserva confirmada</strong>Mañana a las 10:30</span></div>
+                <span class="da-h"></span>
+                <div class="da-fila"><i></i><span></span></div><div class="da-fila"><i></i><span></span></div><div class="da-fila"><i></i><span></span></div>
+                <div class="da-tabs"><span></span><span></span><span></span><b class="da-pill"></b></div>
+              </div>
+            </div>
           </article>
 
           <article class="reveal svc">
@@ -244,6 +284,11 @@
             <span class="svc__icon">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19l7-7 3 3-7 7-3-3z"/><path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z"/><path d="M2 2l7.586 7.586"/><circle cx="11" cy="11" r="2"/></svg>
             </span>
+                      <div class="svc__demo demo-ux" aria-hidden="true">
+              <div class="du-capa du-capa--wire"><span class="du-h"></span><span class="du-img"></span><span class="du-t"></span><span class="du-t du-t--c"></span><span class="du-b"></span></div>
+              <div class="du-capa du-capa--ui"><span class="du-h"></span><span class="du-img"></span><span class="du-t"></span><span class="du-t du-t--c"></span><span class="du-b">Reservar</span></div>
+              <span class="du-linea"></span>
+            </div>
           </article>
 
           <article class="reveal svc">
@@ -256,62 +301,83 @@
             <span class="svc__icon">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="7" rx="2"/><rect x="3" y="13" width="18" height="7" rx="2"/><line x1="7" y1="7.5" x2="7.01" y2="7.5"/><line x1="7" y1="16.5" x2="7.01" y2="16.5"/></svg>
             </span>
+                      <div class="svc__demo demo-host" aria-hidden="true">
+              <div class="dh-cab"><span><i></i>Todo funcionando</span><b>99,98 %</b></div>
+              <svg class="dh-graf" viewBox="0 0 200 40" preserveAspectRatio="none"><path d="M0 30 L20 28 L40 31 L60 22 L80 25 L100 18 L120 21 L140 12 L160 16 L180 9 L200 11"/></svg>
+              <ul class="dh-log"><li>✓ Copia de seguridad · 03:00</li><li>✓ Certificado SSL renovado</li><li>✓ Actualizaciones aplicadas</li></ul>
+            </div>
           </article>
         </div>
       </div>
     </section>
 
-    <!-- TRABAJOS -->
-    <section id="trabajos" class="relative py-16 md:py-28">
+    <!-- TRABAJOS: fondo oscuro; cada proyecto se queda fijo y el siguiente lo tapa -->
+    <section id="trabajos" class="trabajos relative py-20 md:py-32" data-oscuro>
       <div class="mx-auto max-w-6xl px-5">
-        <header class="reveal-head flex flex-col md:flex-row md:items-end md:justify-between gap-6 mb-14">
+        <header class="reveal-head flex flex-col md:flex-row md:items-end md:justify-between gap-6 mb-14 md:mb-20">
           <div>
             <p class="eyebrow">[ 02 ] Trabajos</p>
             <h2 class="section-title">Nuestras webs y proyectos</h2>
           </div>
-          <p class="md:text-right md:max-w-xs text-ink/55">Una muestra de lo que hemos puesto en marcha.</p>
+          <p class="md:text-right md:max-w-xs trabajos__sub">Una muestra de lo que hemos puesto en marcha. Baja y míralos por dentro.</p>
         </header>
-
-        <div class="grid gap-5 md:grid-cols-2">
-          <!-- Cursos Umme (destacado) -->
-          <a href="cursos-umme" class="reveal project project--feature md:col-span-2">
-            <span class="bento-tag">Plataforma web · Terminado</span>
-            <h3 class="project__title">Cursos Umme</h3>
-            <p class="project__text">Formación online para oposiciones de Pedagogía Terapéutica: vídeo bajo demanda, materiales descargables y pagos online.</p>
-            <span class="project__link">Ver proyecto →</span>
-          </a>
-
-          <!-- OlivaTour (sin captura todavía: no enlaza a su ficha) -->
-          <div class="reveal project spotlight">
-            <span class="bento-tag">App iOS · Turismo gamificado</span>
-            <h3 class="project__title">OlivaTour</h3>
-            <p class="project__text">Descubre la provincia de Jaén jugando, con rutas y retos por sus pueblos.</p>
-            <span class="project__link">Próximamente</span>
-          </div>
-
-          <!-- Una maestra muy especial -->
-          <a href="https://unamaestramuyespecial.es" target="_blank" rel="noopener" class="reveal project spotlight">
-            <span class="bento-tag">Web · Terminado</span>
-            <h3 class="project__title">Una maestra muy especial</h3>
-            <p class="project__text">Web para una maestra de educación especial: recursos, contenidos y contacto.</p>
-            <span class="project__link">Visitar web →</span>
-          </a>
-
-          <!-- Academia Guía del Bombero (destacado) -->
-          <a href="academia-bombero" class="reveal project project--feature md:col-span-2">
-            <span class="bento-tag">Plataforma web · Terminado</span>
-            <h3 class="project__title">Academia Guía del Bombero</h3>
-            <p class="project__text">Academia online para preparar las oposiciones de bombero: cursos, temario y seguimiento del progreso.</p>
-            <span class="project__link">Ver proyecto →</span>
-          </a>
-
-          <!-- Academia Objetivo Baeza (destacado) -->
-          <a href="academia-objetivo-baeza" class="reveal project project--feature md:col-span-2">
-            <span class="bento-tag">Plataforma web · Terminado</span>
-            <h3 class="project__title">Academia Objetivo Baeza</h3>
-            <p class="project__text">Academia online para preparar las oposiciones a la Guardia Civil: cursos, temario, simulacros y seguimiento del progreso.</p>
-            <span class="project__link">Ver proyecto →</span>
-          </a>
+        <div class="stack">
+          <article class="stack-card" style="--i:0">
+            <div class="stack-card__txt">
+              <span class="stack-card__num">01</span>
+              <span class="bento-tag">Plataforma web · Terminado</span>
+              <h3 class="stack-card__title">Cursos Umme</h3>
+              <p class="stack-card__text">Formación online para oposiciones de Pedagogía Terapéutica: vídeo bajo demanda, materiales descargables y pagos online.</p>
+              <ul class='stack-card__tech'><li>Astro</li><li>TypeScript</li><li>PHP 8</li><li>MySQL</li><li>Stripe</li><li>VdoCipher</li></ul>
+              <a href="cursos-umme" class="stack-card__link">Ver proyecto <span>→</span></a>
+            </div>
+            <div class="stack-card__media">
+              <div class="browser"><div class="browser__bar"><i></i><i></i><i></i><span>cursosumme.es</span></div>
+                <div class="browser__view"><img class="scrolly" src="assets/trabajos/umme-larga.webp" alt="Página de inicio de Cursos Umme, completa" loading="lazy" width="900" height="5244" /></div></div>
+            </div>
+          </article>
+          <article class="stack-card" style="--i:1">
+            <div class="stack-card__txt">
+              <span class="stack-card__num">02</span>
+              <span class="bento-tag">Web · Terminado</span>
+              <h3 class="stack-card__title">Una maestra muy especial</h3>
+              <p class="stack-card__text">Web para una maestra de educación especial: recursos, contenidos y contacto.</p>
+              <ul class='stack-card__tech'><li>HTML</li><li>CSS</li><li>JavaScript</li><li>Node.js</li><li>Express</li><li>SQLite</li></ul>
+              <a href="https://unamaestramuyespecial.es" target="_blank" rel="noopener" class="stack-card__link">Visitar web <span>↗</span></a>
+            </div>
+            <div class="stack-card__media">
+              <div class="browser"><div class="browser__bar"><i></i><i></i><i></i><span>unamaestramuyespecial.es</span></div>
+                <div class="browser__view"><img class="scrolly" src="assets/trabajos/maestra-larga.webp" alt="Página de inicio de Una maestra muy especial, completa" loading="lazy" width="900" height="6183" /></div></div>
+            </div>
+          </article>
+          <article class="stack-card" style="--i:2">
+            <div class="stack-card__txt">
+              <span class="stack-card__num">03</span>
+              <span class="bento-tag">Plataforma web · Terminado</span>
+              <h3 class="stack-card__title">Academia Guía del Bombero</h3>
+              <p class="stack-card__text">Academia online para preparar las oposiciones de bombero: cursos, temario y seguimiento del progreso.</p>
+              <ul class='stack-card__tech'><li>Astro SSR</li><li>TypeScript</li><li>Prisma</li><li>PostgreSQL</li><li>Stripe</li><li>Docker</li></ul>
+              <a href="academia-bombero" class="stack-card__link">Ver proyecto <span>→</span></a>
+            </div>
+            <div class="stack-card__media">
+              <div class="browser browser--oscuro"><div class="browser__bar"><i></i><i></i><i></i><span>academia.guiadelbombero.com</span></div>
+                <div class="browser__view duo"><img src="assets/trabajos/bombero.webp" alt="Acceso a la academia" loading="lazy" width="1280" height="800" /><img class="duo__2" src="assets/academia-bombero.webp" alt="Panel de gestión de la academia" loading="lazy" width="1400" height="789" /></div></div>
+            </div>
+          </article>
+          <article class="stack-card" style="--i:3">
+            <div class="stack-card__txt">
+              <span class="stack-card__num">04</span>
+              <span class="bento-tag">Plataforma web · Terminado</span>
+              <h3 class="stack-card__title">Academia Objetivo Baeza</h3>
+              <p class="stack-card__text">Academia online para preparar las oposiciones a la Guardia Civil: cursos, temario, simulacros y seguimiento del progreso.</p>
+              <ul class='stack-card__tech'><li>Astro SSR</li><li>TypeScript</li><li>Prisma</li><li>PostgreSQL</li><li>Docker</li><li>Nginx</li></ul>
+              <a href="academia-objetivo-baeza" class="stack-card__link">Ver proyecto <span>→</span></a>
+            </div>
+            <div class="stack-card__media">
+              <div class="browser browser--oscuro"><div class="browser__bar"><i></i><i></i><i></i><span>academia.objetivobaeza.com</span></div>
+                <div class="browser__view"><img class="zoomy" src="assets/academia-objetivo-baeza.webp" alt="Academia Objetivo Baeza" loading="lazy" width="1400" height="789" /></div></div>
+            </div>
+          </article>
         </div>
       </div>
     </section>
@@ -366,7 +432,7 @@
     </section>
 
     <!-- POR QUÉ MAJOSOFT (banda oscura) -->
-    <section class="band-dark relative py-14 md:py-20">
+    <section class="band-dark relative py-14 md:py-20" data-oscuro>
       <div class="mx-auto max-w-3xl px-5">
         <div class="reveal-head text-center mb-12">
           <p class="band-dark__eyebrow">Preguntas frecuentes</p>
@@ -479,6 +545,8 @@
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/lenis@1.3.4/dist/lenis.min.js"></script>
   <script src="main.js"></script>
+  <script src="panel-demo.js"></script>
 </body>
 </html>

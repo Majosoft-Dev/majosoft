@@ -15,6 +15,16 @@ window.addEventListener('load', () => ScrollTrigger.refresh());
 const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 const canHover = window.matchMedia('(hover: hover)').matches;
 
+/* ---------- Scroll suave (Lenis) sincronizado con ScrollTrigger ----------
+   En el móvil el dedo manda (Lenis no suaviza el táctil); sin movimiento reducido. */
+if (!reduceMotion && typeof Lenis !== 'undefined') {
+  const lenis = new Lenis({ lerp: 0.1 });
+  lenis.on('scroll', ScrollTrigger.update);
+  gsap.ticker.add((t) => lenis.raf(t * 1000));
+  gsap.ticker.lagSmoothing(0);
+  window.__lenis = lenis;
+}
+
 /* ---------- Hero: split en palabras (conservando el span .accent) ---------- */
 function splitHero() {
   document.querySelectorAll('.hero-title .line').forEach((line) => {
@@ -150,8 +160,57 @@ window.addEventListener('DOMContentLoaded', () => {
 
     /* Hero: parallax + fundido al hacer scroll */
     gsap.to('.hero-wrap', {
-      y: 70, opacity: 0.12, ease: 'none',
-      scrollTrigger: { trigger: '#inicio', start: 'top top', end: 'bottom top', scrub: 0.6, invalidateOnRefresh: true },
+      y: 50, opacity: 0.45, ease: 'none',
+      scrollTrigger: { trigger: '#inicio', start: 'top top', end: '+=700', scrub: 0.6, invalidateOnRefresh: true },
+    });
+
+    /* Panel de la portada: entra desde abajo y se endereza al bajar */
+    gsap.from('.happ-wrap', { y: 70, opacity: 0, duration: 1.1, delay: 0.7, ease: 'power3.out' });
+    gsap.fromTo('.happ', { rotateX: 14, scale: 0.94 }, {
+      rotateX: 0, scale: 1, ease: 'none',
+      scrollTrigger: { trigger: '.happ-wrap', start: 'top 92%', end: 'top 22%', scrub: 0.6 },
+    });
+
+    /* Trabajos: cada proyecto se queda fijo y el siguiente lo tapa (escritorio);
+       la captura de la web baja sola dentro del navegador mientras lo miras */
+    const tarjetas = gsap.utils.toArray('.stack-card');
+    const mmT = gsap.matchMedia();
+    mmT.add('(min-width: 861px)', () => {
+      const arriba = (i) => 100 + i * 16;
+      const ultima = tarjetas[tarjetas.length - 1];
+      tarjetas.forEach((card, i) => {
+        if (card === ultima) return;
+        ScrollTrigger.create({
+          trigger: card, start: () => `top ${arriba(i)}px`,
+          endTrigger: ultima, end: () => `top ${arriba(tarjetas.length - 1)}px`,
+          pin: true, pinSpacing: false, invalidateOnRefresh: true,
+        });
+        gsap.to(card, {
+          scale: 0.92, '--sombra': 0.45, ease: 'none',
+          scrollTrigger: { trigger: tarjetas[i + 1], start: 'top bottom', end: () => `top ${arriba(i + 1)}px`, scrub: true, invalidateOnRefresh: true },
+        });
+      });
+    });
+    tarjetas.forEach((card, i) => {
+      const sig = tarjetas[i + 1] || card;
+      const fin = tarjetas[i + 1] ? 'top 35%' : 'bottom top';
+      card.querySelectorAll('.scrolly').forEach((img) => {
+        const vista = img.parentElement;
+        /* Solo baja unas dos pantallas de la web (no la página entera): así va
+           a un ritmo parecido al del scroll y da tiempo a verla */
+        gsap.to(img, {
+          y: () => -Math.min(Math.max(0, img.offsetHeight - vista.clientHeight), vista.clientHeight * 1.8), ease: 'none',
+          scrollTrigger: { trigger: card, start: 'top 75%', endTrigger: sig, end: fin, scrub: 1.2, invalidateOnRefresh: true },
+        });
+      });
+      card.querySelectorAll('.duo__2').forEach((img) => {
+        gsap.to(img, { clipPath: 'inset(0 0 0 0%)', ease: 'none',
+          scrollTrigger: { trigger: card, start: 'top 45%', endTrigger: sig, end: tarjetas[i + 1] ? 'top 70%' : 'bottom 40%', scrub: 0.5 } });
+      });
+      card.querySelectorAll('.zoomy').forEach((img) => {
+        gsap.fromTo(img, { scale: 1.18 }, { scale: 1, ease: 'none',
+          scrollTrigger: { trigger: card, start: 'top bottom', endTrigger: sig, end: fin, scrub: 0.5 } });
+      });
     });
 
     /* Glows con parallax */
@@ -285,6 +344,14 @@ if (!reduceMotion && canHover) {
 const header = document.querySelector('.site-header');
 if (header) {
   ScrollTrigger.create({ start: 'top -40', onUpdate: (self) => header.classList.toggle('scrolled', self.scroll() > 40) });
+  /* Sobre una sección oscura la píldora pasa a tinta */
+  const oscuras = new Set();
+  document.querySelectorAll('[data-oscuro]').forEach((sec) => {
+    ScrollTrigger.create({
+      trigger: sec, start: 'top 44px', end: 'bottom 44px',
+      onToggle: (self) => { self.isActive ? oscuras.add(sec) : oscuras.delete(sec); header.classList.toggle('sobre-oscuro', oscuras.size > 0); },
+    });
+  });
 }
 
 /* ---------- Cursor personalizado ---------- */
@@ -423,6 +490,7 @@ document.querySelectorAll('a[href^="#"]').forEach((enlace) => {
     const destino = document.querySelector(enlace.getAttribute('href'));
     if (!destino) return;
     e.preventDefault();
+    if (window.__lenis) { window.__lenis.scrollTo(destino, { duration: 1.4 }); return; }
     const suave = !window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     window.scrollTo({
       top: destino.getBoundingClientRect().top + window.scrollY,
@@ -466,3 +534,11 @@ document.querySelectorAll('a[href^="#"]').forEach((enlace) => {
   if (navigator.sendBeacon) navigator.sendBeacon('/api/visita', datos);
   else fetch('/api/visita', { method: 'POST', body: datos, keepalive: true }).catch(() => {});
 })();
+
+/* ===== Servicios: cada demo se mueve solo mientras se ve ===== */
+(() => {
+  const io = new IntersectionObserver((es) => es.forEach((e) => e.target.classList.toggle('en-vista', e.isIntersecting)), { threshold: 0.25 });
+  document.querySelectorAll('.svc').forEach((s) => io.observe(s));
+})();
+
+/* (El panel de la portada que se usa solo está en panel-demo.js) */
